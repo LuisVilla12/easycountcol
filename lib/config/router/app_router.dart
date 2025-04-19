@@ -8,6 +8,7 @@ final appRouter = GoRouter(
   routes: [
     GoRoute(
       path: '/',
+      name: HomeScreen.name,
       builder: (context, state) => HomeScreen(),
     ),
     GoRoute(
