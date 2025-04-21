@@ -1,5 +1,4 @@
 import 'package:easycoutcol/config/menu/menu_items.dart';
-import 'package:easycoutcol/config/presentation/screens/tutorial_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 class SideMenu extends StatefulWidget {

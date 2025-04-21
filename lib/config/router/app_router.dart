@@ -1,14 +1,15 @@
+import 'package:easycoutcol/config/presentation/screens/auth/new_user_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/config_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/history_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/home_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/login_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/auth/login_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/tutorial_screen.dart';
 import 'package:go_router/go_router.dart';
 
 // Definir rutas
 final appRouter = GoRouter(
-  initialLocation: '/tutorial',
+  initialLocation: '/new-user',
   routes: [
     GoRoute(
       path: '/home',
@@ -24,6 +25,11 @@ final appRouter = GoRouter(
       path: '/login',
       name: LoginScreen.name,
       builder: (context, state) => LoginScreen(),
+    ),
+    GoRoute(
+      path: '/new-user',
+      name: NewUserScreen.name,
+      builder: (context, state) => NewUserScreen(),
     ),
     GoRoute(
       path: '/history',
