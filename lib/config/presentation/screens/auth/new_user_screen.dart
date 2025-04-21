@@ -155,14 +155,46 @@ class _FormRegisterUserState extends State<FormRegisterUser> {
             ),
           const SizedBox(height: 20,),
           FilledButton.tonalIcon(
-            onPressed: (){
-            // print('Nombre de usuario $username , email $email, contraseña: $password');
+            onPressed: () async {
             // Verificar si esta validado o no
             final isValid=formKey.currentState!.validate();
             // Sino esta vlialoidadno no hacer nada
             if(!isValid) return;
-            registerCubit.onSubmitForm();
-            context.pushNamed(HomeScreen.name);
+            final stateRegister=await registerCubit.onSubmitForm();
+            if (!context.mounted) return;
+            // Verificar que el wiget este montado
+              if(stateRegister){
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                  title: const Text("Éxito"),
+                  content: const Text("Usuario registrado correctamente."),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        context.pushNamed(HomeScreen.name);
+                      },
+                      child: const Text("OK"),
+                    ),
+                  ],
+                ),
+              );
+            }else{
+              showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text("Error"),
+                      content: const Text('Ocurrio un error al registarse'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text("OK"),
+                        ),
+                      ],
+                    ),
+                  );
+            }
             },
             icon: const Icon(Icons.save), 
             label:Text('Registarse' , style:titleStyle,),

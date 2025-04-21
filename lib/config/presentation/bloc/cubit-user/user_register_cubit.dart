@@ -1,5 +1,6 @@
 import 'dart:ffi';
 
+import 'package:easycoutcol/config/api/registerUser.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 
@@ -9,13 +10,16 @@ part 'user_register_state.dart';
 class UserRegisterCubit extends Cubit<UserRegisterState> {
   UserRegisterCubit() : super(const UserRegisterState());
   
-  void onSubmitForm(){
-    if (!state.passwordsMatch) {
-      // podrías emitir un estado de error o manejarlo como necesites
-      return;
-    }
-    emit(state.copyWith(formStatus: FormStatus.posting));
-    print('Submit value: $state');
+  Future<bool> onSubmitForm() async{
+    final state = this.state;
+    final stateRegister = await sentUserRegister(
+      name: state.name,
+      lastname: state.lastname,
+      username: state.username,
+      email: state.email,
+      password: state.password,
+    );
+  return stateRegister;
   }
   void nameChanged(String vale){
     emit(state.copyWith(name: vale));
