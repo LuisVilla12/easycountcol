@@ -200,7 +200,6 @@ class _FormRegisterUserState extends State<FormRegisterUser> {
             label:Text('Registarse' , style:titleStyle,),
             style: FilledButton.styleFrom(    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),)),
             const SizedBox(height: 20,),
-
         ],
       ),
     );
