@@ -6,16 +6,19 @@ class InputCustom extends StatelessWidget {
   final String? errorMessageInput;
   final Icon? iconInput;
   final bool obscureTextInput;
+  final TextInputType? keyboardType;
+  final IconButton? suffixIcon;
   final Function(String)? onChanged;
   final String? Function(String?)? validator;
-  const InputCustom({super.key, required this.labelInput, this.hintInput, this.errorMessageInput, this.onChanged, this.validator, this.obscureTextInput=false, this.iconInput  });
+  const InputCustom({super.key, required this.labelInput, this.hintInput, this.errorMessageInput, this.onChanged, this.validator, this.obscureTextInput=false, this.iconInput,this.keyboardType=TextInputType.text, this.suffixIcon});
 
 
   @override
   Widget build(BuildContext context) {
     final colors=Theme.of(context).colorScheme;
-    final borderCustom= OutlineInputBorder(
-      borderRadius: BorderRadius.circular(15),
+    final borderCustom= UnderlineInputBorder(
+        borderSide: BorderSide(color: colors.primary, width: 2),
+      // borderRadius: BorderRadius.circular(15),
       // borderSide: BorderSide(color: colors.primary)
     );
     return TextFormField(
@@ -23,6 +26,7 @@ class InputCustom extends StatelessWidget {
       // Validar el campo
       validator: validator,
       obscureText: obscureTextInput,
+      keyboardType:keyboardType,
       decoration: InputDecoration(
         // EStilo por default
         enabledBorder: borderCustom,
@@ -40,7 +44,8 @@ class InputCustom extends StatelessWidget {
         focusColor: colors.primary,
         errorText: errorMessageInput,
         // icon: Icon(Icons.account_box, color: colors.primary,)
-        prefixIcon: iconInput
+        prefixIcon: iconInput,
+        suffixIcon: suffixIcon,
       ),
     );
   }

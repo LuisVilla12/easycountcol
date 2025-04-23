@@ -17,12 +17,12 @@ const MenuItem({
 }
 // Definir los iteams
 const appMenuItems=<MenuItem>[
-  MenuItem(
-    title:'Tutorial' ,
-    subtitle: 'Inicio de la aplicación móvil',
-    link: '/tutorial',
-    icon:Icons.school ,
-  ),  
+  // MenuItem(
+  //   title:'Tutorial' ,
+  //   subtitle: 'Inicio de la aplicación móvil',
+  //   link: '/tutorial',
+  //   icon:Icons.school ,
+  // ),  
   MenuItem(
     title:'Inicio' ,
     subtitle: 'Pagina principal de la aplicación movil',
