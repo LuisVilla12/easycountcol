@@ -42,7 +42,7 @@ class _SideMenuState extends State<SideMenu> {
       },
       children: [
         // Adaptar el padding de arriba
-        Padding(padding: EdgeInsets.fromLTRB(28,hasNotch?10:20,10,10), child: Text('EasyCountCol',style: titleStyle),),
+        Padding(padding: EdgeInsets.fromLTRB(28,hasNotch?10:40,10,10), child: Text('EasyCountCol',style: titleStyle),),
         // Itera el arreglo de menuiteams para generar
         ...appMenuItems.asMap().entries.map((entry) {
             final index = entry.key;

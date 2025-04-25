@@ -1,9 +1,8 @@
-import 'package:easycoutcol/config/presentation/screens/auth/desing_login_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/auth/new_user_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/auth/demo_new_user_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/auth/login_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/config_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/history_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/home_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/auth/login_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/tutorial_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -40,17 +39,12 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/login',
       name: LoginScreen.name,
-      builder: (context, state) => DesingLoginScreen(),
+      builder: (context, state) => LoginScreen(),
     ),
     GoRoute(
       path: '/new-user',
       name: NewUserScreen.name,
       builder: (context, state) => NewUserScreen(),
-    ),
-        GoRoute(
-      path: '/example',
-      name: DesingLoginScreen.name,
-      builder: (context, state) => DesingLoginScreen(),
     ),
   ],
 );

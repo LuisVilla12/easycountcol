@@ -17,7 +17,7 @@ class MainApp extends StatelessWidget {
       // Quitar banner
       debugShowCheckedModeBanner: false,
       // colocar tme
-      theme: AppTheme(selectedColor: 4).getTheme(),
+      theme: AppTheme(selectedColor: 0).getTheme(),
     );
   }
 }
