@@ -20,8 +20,6 @@ Future<bool> uploadSampleWithFile({
     ..fields['factor_sample'] = factor_sample
     ..files.add(await http.MultipartFile.fromPath('sample_file', sample_file));
 
-  final response = await request.send();
-
 try {
   final response = await request.send();
   if (response.statusCode == 200) {
