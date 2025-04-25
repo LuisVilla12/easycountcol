@@ -210,13 +210,13 @@ Widget buildImageView() {
               // Sino esta vlialoidadno no hacer nada
               if(!isValid) return;
               if (!context.mounted) return;
-              final stateRegister = await sentSampleRegister(
+              final stateRegister = await uploadSampleWithFile(
               sample_name: nameSample,
               id_user: 3,
               type_sample: typeSample,
               volumen_sample: volumenSample,
               factor_sample: factorSample,
-              sample_route:imagePath,
+              sample_file:imagePath,
             );
             // Verificar que el wiget este montado
               if(stateRegister){

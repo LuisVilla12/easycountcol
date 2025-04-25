@@ -1,35 +1,38 @@
+import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
-Future<bool> sentSampleRegister({
+Future<bool> uploadSampleWithFile({
   required String sample_name,
   required int id_user,
   required String type_sample,
   required String volumen_sample,
   required String factor_sample,
-  required String sample_route,
-  
+  required String sample_file,  // Asegúrate de tener el paquete "dart:io" para trabajar con archivos.
 }) async {
-  final url = Uri.parse('http://10.0.2.2:8000/registrar-muesta'); // Cambia por IP real si usas emulador
+  final uri = Uri.parse('http://10.0.2.2:8000/registrar-muestra-file'); // Asegúrate de que coincida con tu ruta
 
-  final response = await http.post(
-    url,
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({
-      "sample_name": sample_name,
-      "id_user": id_user,
-      "type_sample": type_sample,
-      "volumen_sample": volumen_sample,
-      "factor_sample": factor_sample,
-      "sample_route": sample_route,
-      "creation_date": DateTime.now().toIso8601String().split('T')[0], // "2025-04-23"
-    }),
-  );
+  // Prepara la solicitud con multipart/form-data.
+  final request = http.MultipartRequest('POST', uri)
+    ..fields['sample_name'] = sample_name
+    ..fields['id_user'] = id_user.toString()
+    ..fields['type_sample'] = type_sample
+    ..fields['volumen_sample'] = volumen_sample
+    ..fields['factor_sample'] = factor_sample
+    ..files.add(await http.MultipartFile.fromPath('sample_file', sample_file));
 
+  final response = await request.send();
+
+try {
+  final response = await request.send();
   if (response.statusCode == 200) {
     return true;
   } else {
-    print('Error al registrar: ${response.body}');
+    print('Error al subir: ${response.statusCode}');
     return false;
   }
+} catch (e) {
+  print('Error de red: $e');
+  return false;
+}
+
 }
