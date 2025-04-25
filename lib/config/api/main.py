@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from models.user_model import RegistroUsuario, registrar_usuario
 from models.login_model import LoginUsuario, login_usuario 
+from models.sample_model import RegistarMuestraA, registar_muestra 
 
 app = FastAPI()
 
@@ -20,3 +21,8 @@ def registrar(data: RegistroUsuario):
 @app.post("/login")
 def login(usuario: LoginUsuario):
     return login_usuario(usuario)
+
+    
+@app.post("/registrar-muesta")
+def registarMuestra(muestra: RegistarMuestraA):
+    return registar_muestra(muestra)

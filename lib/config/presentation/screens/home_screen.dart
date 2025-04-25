@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:easycoutcol/config/api/RegisterSample.dart';
 import 'package:easycoutcol/config/menu/side_menu.dart';
 import 'package:easycoutcol/config/presentation/wigets/input_custom.dart';
 import 'package:easycoutcol/config/services/camera_services_implementation.dart';
@@ -137,7 +138,7 @@ Widget buildImageView() {
               labelInput: 'Factor de dilución',hintInput: 'Ingrese el factor de dilución la muestra',
               iconInput: Icon(Icons.science,color: colors.primary),
               onChanged: (value){
-                volumenSample=value;
+                factorSample=value;
                 formKeySample.currentState?.validate();
               },
               validator: (value){
@@ -208,7 +209,52 @@ Widget buildImageView() {
               final isValid=formKeySample.currentState!.validate();
               // Sino esta vlialoidadno no hacer nada
               if(!isValid) return;
-              if (!context.mounted) return;},
+              if (!context.mounted) return;
+              final stateRegister = await sentSampleRegister(
+              sample_name: nameSample,
+              id_user: 3,
+              type_sample: typeSample,
+              volumen_sample: volumenSample,
+              factor_sample: factorSample,
+              sample_route:imagePath,
+            );
+            // Verificar que el wiget este montado
+              if(stateRegister){
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                  title: const Text("Éxito"),
+                  content: const Text("Muestra almacenada correctamente, continua su análisis"),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        // Cerra ventana de dialogo
+                        Navigator.pop(context);
+                        // Cambiar el tab
+                        _tabController.animateTo(0);
+                        },
+                      child: const Text("OK"),
+                    ),
+                  ],
+                ),
+              );
+            }else{
+              showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text("Error"),
+                      content: const Text('Ocurrio un error al registarse'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text("OK"),
+                        ),
+                      ],
+                    ),
+                  );
+            }
+
+              },
               icon: const Icon(Icons.save), 
               label:const Text('Registarse' ),
               style: FilledButton.styleFrom(    
