@@ -1,7 +1,7 @@
-import 'dart:io';
+import 'dart:convert'; // 👈 Para usar jsonDecode
 import 'package:http/http.dart' as http;
 
-Future<bool> uploadSampleWithFile({
+Future<Map<String, dynamic>> uploadSampleWithFile({
   required String sample_name,
   required int id_user,
   required String type_sample,
@@ -19,15 +19,14 @@ Future<bool> uploadSampleWithFile({
     ..fields['volumen_sample'] = volumen_sample
     ..fields['factor_sample'] = factor_sample
     ..files.add(await http.MultipartFile.fromPath('sample_file', sample_file));
-try {
+  
   final response = await request.send();
-  if (response.statusCode == 200) {
-    return true;
-  } else {
-    return false;
-  }
-} catch (e) {
-  return false;
-}
 
+  if (response.statusCode == 200) {
+    final respStr = await response.stream.bytesToString();
+    final jsonData = jsonDecode(respStr);
+    return jsonData; // Regresa  todo el mapa: success, id_sample, message
+  } else {
+    throw Exception('Error al subir muestra: ${response.statusCode}');
+  }
 }

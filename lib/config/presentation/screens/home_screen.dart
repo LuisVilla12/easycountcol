@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:easycoutcol/config/api/RegisterSample.dart';
 import 'package:easycoutcol/config/menu/side_menu.dart';
+import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
 import 'package:easycoutcol/config/presentation/wigets/input_custom.dart';
 import 'package:easycoutcol/config/services/camera_services_implementation.dart';
 import 'package:flutter/material.dart';
@@ -227,34 +228,46 @@ Widget buildImageView() {
                   return; // Detener ejecución
                 }
               if (!context.mounted) return;
-              final stateRegister = await uploadSampleWithFile(
-              sample_name: nameSample,
-              id_user: 3,
-              type_sample: typeSample,
-              volumen_sample: volumenSample,
-              factor_sample: factorSample,
-              sample_file:imagePath,
-            );            // Verificar que el wiget este montado
-            if(stateRegister){
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                  title: const Text("Éxito"),
-                  content: const Text("Muestra almacenada correctamente, continua su análisis"),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        // Cerra ventana de dialogo
-                        Navigator.pop(context);
-                        // Cambiar el tab
-                        },
-                      child: const Text("OK"),
+              try{
+                  final result = await uploadSampleWithFile(
+                    sample_name: nameSample,
+                    id_user: 3,
+                    type_sample: typeSample,
+                    volumen_sample: volumenSample,
+                    factor_sample: factorSample,
+                    sample_file: imagePath, // recuerda que es el path
+                  );
+              if (result['success']) {
+                  final int idSample = result['id_sample'];
+                  // Borrar los datos el formulario
+                  nameSample='';
+                  typeSample='';
+                  volumenSample='';
+                  factorSample='';
+                  imagePath='';
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text("Éxito"),
+                      content: const Text("Muestra almacenada correctamente, continúa su análisis."),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context); // Cierra el diálogo
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ResultsScreen(idMuestra: idSample),
+                              ),
+                            );
+                          },
+                          child: const Text("OK"),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              );
-            }else{
-              showDialog(
+                  );
+                } else {
+                  showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
                       title: const Text("Error"),
@@ -265,10 +278,12 @@ Widget buildImageView() {
                           child: const Text("OK"),
                         ),
                       ],
-                    ),
-                  );
-            }
+                    ));
+                }
+              }
+              catch(e){
 
+              }          // Verificar que el wiget este montado
               },
               icon: const Icon(Icons.save), 
               label:const Text('Registarse' ),

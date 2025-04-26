@@ -2,8 +2,11 @@ from fastapi import FastAPI, HTTPException,Form,File,UploadFile
 from models.user_model import RegistroUsuario, registrar_usuario
 from models.login_model import LoginUsuario, login_usuario 
 from models.sample_model import RegistarMuestraA 
+from fastapi.responses import FileResponse
 import uuid
 import shutil
+import os
+from db import get_db
 
 
 app = FastAPI()
@@ -42,3 +45,59 @@ async def registrar_muestra_file(
         factor_sample=factor_sample,
         sample_file=sample_file
     )
+@app.get("/imagen-procesada/{id_muestra}")
+def get_processed_image(id_muestra: int):
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+
+        sql = "SELECT sample_route FROM samples WHERE id_sample = %s"
+        cursor.execute(sql, (id_muestra,))
+        result = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        if not result:
+            raise HTTPException(status_code=404, detail="Muestra no encontrada")
+
+        filename = result[0]
+        processed_path = f"processed/{filename}"
+
+        if not os.path.exists(processed_path):
+            raise HTTPException(status_code=404, detail="Imagen procesada no encontrada")
+
+        return FileResponse(processed_path, media_type="image/png")
+
+    except Exception as e:
+        print(f"ERROR AL CARGAR IMAGEN procesada: {e}") 
+        raise HTTPException(status_code=400, detail=f"Error al cargar imagen procesada: {e}")
+
+
+@app.get("/imagen-original/{id_muestra}")
+def get_original_image(id_muestra: int):
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+
+        sql = "SELECT sample_route FROM samples WHERE id_sample = %s"
+        cursor.execute(sql, (id_muestra,))
+        result = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        if not result:
+            raise HTTPException(status_code=404, detail="Muestra no encontrada")
+
+        filename = result[0]
+        original_path = f"uploads/{filename}"  # Asegúrate de que el archivo está en esta ruta
+
+        if not os.path.exists(original_path):
+            raise HTTPException(status_code=404, detail="Imagen original no encontrada")
+
+        return FileResponse(original_path, media_type="image/png")
+
+    except Exception as e:
+        print(f"ERROR AL CARGAR IMAGEN ORIGINAL: {e}")  # <-- log
+        raise HTTPException(status_code=400, detail=f"Error al cargar imagen original: {e}")

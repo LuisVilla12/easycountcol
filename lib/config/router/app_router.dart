@@ -27,9 +27,12 @@ final appRouter = GoRouter(
       builder: (context, state) => HistoryScreen(),
     ),
     GoRoute(
-      path: '/results',
+      path: '/results:id',
       name: ResultsScreen.name,
-      builder: (context, state) => ResultsScreen(),
+      builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return ResultsScreen(idMuestra: id); 
+      }
     ),
     GoRoute(
       path: '/config',
@@ -37,7 +40,7 @@ final appRouter = GoRouter(
       builder: (context, state) => ConfigScreen(),
     ),
     GoRoute(
-      path: '/login',
+      path: '/login:id',
       name: LoginScreen.name,
       builder: (context, state) => LoginScreen(),
     ),
