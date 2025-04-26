@@ -19,17 +19,14 @@ Future<bool> uploadSampleWithFile({
     ..fields['volumen_sample'] = volumen_sample
     ..fields['factor_sample'] = factor_sample
     ..files.add(await http.MultipartFile.fromPath('sample_file', sample_file));
-
 try {
   final response = await request.send();
   if (response.statusCode == 200) {
     return true;
   } else {
-    print('Error al subir: ${response.statusCode}');
     return false;
   }
 } catch (e) {
-  print('Error de red: $e');
   return false;
 }
 

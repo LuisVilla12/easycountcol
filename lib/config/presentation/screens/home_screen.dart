@@ -207,8 +207,25 @@ Widget buildImageView() {
               onPressed: () async {
               // Verificar si esta validado o no
               final isValid=formKeySample.currentState!.validate();
-              // Sino esta vlialoidadno no hacer nada
+              // Sino esta validado  no hacer nada
               if(!isValid) return;
+              // Validar que tenga una imagen
+              if (imagePath == '') {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Imagen requerida'),
+                      content: const Text('Por favor selecciona o toma una imagen antes de continuar.'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('Aceptar'),
+                        ),
+                      ],
+                    ),
+                  );
+                  return; // Detener ejecución
+                }
               if (!context.mounted) return;
               final stateRegister = await uploadSampleWithFile(
               sample_name: nameSample,
@@ -217,9 +234,8 @@ Widget buildImageView() {
               volumen_sample: volumenSample,
               factor_sample: factorSample,
               sample_file:imagePath,
-            );
-            // Verificar que el wiget este montado
-              if(stateRegister){
+            );            // Verificar que el wiget este montado
+            if(stateRegister){
                 showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
@@ -231,7 +247,6 @@ Widget buildImageView() {
                         // Cerra ventana de dialogo
                         Navigator.pop(context);
                         // Cambiar el tab
-                        _tabController.animateTo(0);
                         },
                       child: const Text("OK"),
                     ),

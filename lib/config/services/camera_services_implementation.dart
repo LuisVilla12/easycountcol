@@ -13,7 +13,6 @@ class CameraServicesImplementation extends CameraService{
       // Que camara prefiere
       preferredCameraDevice: CameraDevice.rear);
       if(photo==null) return null;
-      print('Tenemos una imagen ${photo.path}');
       return photo.path;
   }
 
@@ -26,7 +25,6 @@ class CameraServicesImplementation extends CameraService{
       // Que camara prefiere
       preferredCameraDevice: CameraDevice.rear);
       if(photo==null) return null;
-      print('Tenemos una imagen ${photo.path}');
       return photo.path;
   }
 
