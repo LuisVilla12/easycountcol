@@ -1,21 +1,21 @@
+#Importa la clase FastAPI para crear la aplicación.
 from fastapi import FastAPI, HTTPException,Form,File,UploadFile
+# Importa los modelos a utilizar
 from models.user_model import RegistroUsuario, registrar_usuario
 from models.login_model import LoginUsuario, login_usuario 
 from models.sample_model import RegistarMuestraA 
 from fastapi.responses import FileResponse
-import uuid
 import shutil
 import os
 from db import get_db
 
-
+#Crea una instancia de la aplicación FastAPI.
 app = FastAPI()
-
+#Define una ruta raíz
 @app.get("/")
 def home():
     return {"mensaje": "Bienvenido a la API"}
-
-
+#Ruta para el registro de un usuario
 @app.post("/registro")
 def registrar(data: RegistroUsuario):
     try:
@@ -23,11 +23,11 @@ def registrar(data: RegistroUsuario):
         return {"mensaje": "Usuario registrado con éxito"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
+#Ruta para inicio de sesión
 @app.post("/login")
 def login(usuario: LoginUsuario):
     return login_usuario(usuario)
-
+#Ruta para registro de una muestra
 @app.post("/registrar-muestra-file")
 async def registrar_muestra_file(
     sample_name: str = Form(...),
@@ -35,8 +35,7 @@ async def registrar_muestra_file(
     type_sample: str = Form(...),
     volumen_sample: str = Form(...),
     factor_sample: str = Form(...),
-    sample_file: UploadFile = File(...)
-):
+    sample_file: UploadFile = File(...)):
     return RegistarMuestraA.save_with_file(
         sample_name=sample_name,
         id_user=id_user,
@@ -45,6 +44,7 @@ async def registrar_muestra_file(
         factor_sample=factor_sample,
         sample_file=sample_file
     )
+#Ruta para mostar la imagen procesada
 @app.get("/imagen-procesada/{id_muestra}")
 def get_processed_image(id_muestra: int):
     try:
@@ -72,8 +72,7 @@ def get_processed_image(id_muestra: int):
     except Exception as e:
         print(f"ERROR AL CARGAR IMAGEN procesada: {e}") 
         raise HTTPException(status_code=400, detail=f"Error al cargar imagen procesada: {e}")
-
-
+#Ruta para mostar la imagen original
 @app.get("/imagen-original/{id_muestra}")
 def get_original_image(id_muestra: int):
     try:
@@ -101,3 +100,18 @@ def get_original_image(id_muestra: int):
     except Exception as e:
         print(f"ERROR AL CARGAR IMAGEN ORIGINAL: {e}")  # <-- log
         raise HTTPException(status_code=400, detail=f"Error al cargar imagen original: {e}")
+#Ruta para mostar la informacion de la muestra
+@app.get("/muestra-info/{id_muestra}")
+def get_sample_info(id_muestra: int):
+    conn = get_db()
+    cursor = conn.cursor()
+    sql = "SELECT processing_time FROM samples WHERE id_sample = %s"
+    cursor.execute(sql, (id_muestra,))
+    result = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    if not result:
+        raise HTTPException(status_code=404, detail="Muestra no encontrada")
+    
+    return {"processing_time": result[0]}

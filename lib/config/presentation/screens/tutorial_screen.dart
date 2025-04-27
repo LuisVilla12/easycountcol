@@ -1,5 +1,5 @@
 import 'package:animate_do/animate_do.dart';
-import 'package:easycoutcol/config/presentation/screens/home_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/auth/demo_login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -99,7 +99,7 @@ class _TutorialScreenState extends State<TutorialScreen> {
               right: 20,
               top: 50,
               child: TextButton(
-                  onPressed: () => context.pushNamed(HomeScreen.name),
+                  onPressed: () => context.pushNamed(LoginScreen.name),
                   child: const Text('Saltar'))),
                   Positioned(
                 bottom: 150,
@@ -132,7 +132,7 @@ class _TutorialScreenState extends State<TutorialScreen> {
                   from: 15,
                   // Retraso
                   delay: const Duration(seconds: 1),
-                  child: FilledButton(onPressed: ()=>context.pushNamed(HomeScreen.name), child: const Text('Comenzar')))):const SizedBox()
+                  child: FilledButton(onPressed: ()=>context.pushNamed(LoginScreen.name), child: const Text('Comenzar')))):const SizedBox()
         ],
       ),
     );

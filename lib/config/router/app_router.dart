@@ -9,7 +9,7 @@ import 'package:go_router/go_router.dart';
 
 // Definir rutas
 final appRouter = GoRouter(
-  initialLocation: '/home',
+  initialLocation: '/tutorial',
   routes: [
      GoRoute(
       path: '/tutorial',
@@ -40,14 +40,9 @@ final appRouter = GoRouter(
       builder: (context, state) => ConfigScreen(),
     ),
     GoRoute(
-      path: '/login:id',
+      path: '/login',
       name: LoginScreen.name,
       builder: (context, state) => LoginScreen(),
-    ),
-    GoRoute(
-      path: '/new-user',
-      name: NewUserScreen.name,
-      builder: (context, state) => NewUserScreen(),
     ),
   ],
 );

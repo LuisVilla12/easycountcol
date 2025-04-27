@@ -14,12 +14,11 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Saber la referencia actual
     final scaffoldKey=GlobalKey<ScaffoldState>();
-    return SafeArea(
-      child: Scaffold(
+    return 
+      Scaffold(
         appBar: AppBar(title: const Text('Inicio'),),
         drawer: SideMenu(scaffoldKey: scaffoldKey),
         body: _viewCamera() ,
-      ),
     );
   }
 }
@@ -253,13 +252,16 @@ Widget buildImageView() {
                       actions: [
                         TextButton(
                           onPressed: () {
-                            Navigator.pop(context); // Cierra el diálogo
+                            Navigator.pop(context);
+                             // Cierra el diálogo
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => ResultsScreen(idMuestra: idSample),
                               ),
                             );
+                            // Reiniciar formulario
+                            formKeySample.currentState!.reset();
                           },
                           child: const Text("OK"),
                         ),
@@ -282,7 +284,7 @@ Widget buildImageView() {
                 }
               }
               catch(e){
-
+                print(e);
               }          // Verificar que el wiget este montado
               },
               icon: const Icon(Icons.save), 

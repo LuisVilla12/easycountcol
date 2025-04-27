@@ -35,12 +35,6 @@ const appMenuItems=<MenuItem>[
     link: '/history',
     icon:Icons.menu_book_sharp ,
   ),  
-  MenuItem(
-    title:'Resultados' ,
-    subtitle: 'Analisis de la muestra',
-    link: '/results',
-    icon:Icons.analytics ,
-  ),
     MenuItem(
     title:'Iniciar sesión' ,
     subtitle: 'Accede a tu cuenta',

@@ -1,12 +1,13 @@
 from pydantic import BaseModel
 from datetime import date
+from passlib.context import CryptContext
 from db import get_db
 from fastapi import HTTPException, UploadFile
+from PIL import Image  # <-- ¡IMPORTANTE! necesitas importar PILLOW
 import shutil
 import os
 import uuid
-from PIL import Image  # <-- ¡IMPORTANTE! necesitas importar PILLOW
-from passlib.context import CryptContext
+import time
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -28,24 +29,28 @@ class RegistarMuestraA(BaseModel):
                        factor_sample: str,
                        sample_file: UploadFile):
         try:
-            # 1. Guardar el archivo original
+            #Verificar existencia de las carpetas donde esta almacenada las imagenes
             os.makedirs("uploads", exist_ok=True)
-            os.makedirs("processed", exist_ok=True)  # Asegurar carpeta para procesados
-
+            os.makedirs("processed", exist_ok=True)
+            "Asignar un nombre unico"
             filename = f"{uuid.uuid4().hex}_{sample_file.filename}"
             file_location = f"uploads/{filename}"
-
-            sample_file.file.seek(0)  # Reiniciar lectura del archivo
+            sample_file.file.seek(0) 
+            # Reiniciar lectura del archivo
             with open(file_location, "wb") as buffer:
                 shutil.copyfileobj(sample_file.file, buffer)
-
-            # 2. Crear y guardar la imagen en escala de grises
+            # Inicio de tiempo para procesamiento a escala de grises
+            start_time = time.time()  
+            # Crear y guardar la imagen en escala de grises
             processed_location = f"processed/{filename}"
             with Image.open(file_location) as image:
                 image = image.convert("L")  # Convertir a escala de grises
                 image.save(processed_location)
-
-            # 3. Crear la instancia de RegistarMuestraA
+            #Fin del tiempo para la escala de grises
+            end_time = time.time()  
+            # Resta del tiempo de fin y el inicio
+            processing_time = end_time - start_time 
+            # Crear la instancia de RegistarMuestraA
             muestra = cls(
                 sample_name=sample_name,
                 id_user=id_user,
@@ -63,9 +68,9 @@ class RegistarMuestraA(BaseModel):
             sql = """
                 INSERT INTO samples (
                     sample_name, id_user, type_sample, volumen_sample,
-                    factor_sample, sample_route, creation_date
+                    factor_sample, sample_route, creation_date,processing_time
                 ) 
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s,%s)
             """
             cursor.execute(sql, (
                 muestra.sample_name,
@@ -74,7 +79,8 @@ class RegistarMuestraA(BaseModel):
                 muestra.volumen_sample,
                 muestra.factor_sample,
                 muestra.sample_route,
-                muestra.creation_date
+                muestra.creation_date,
+                processing_time
             ))
             sample_id = cursor.lastrowid
 
