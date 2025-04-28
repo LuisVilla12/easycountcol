@@ -268,7 +268,7 @@ Widget build(BuildContext context) {
           const SizedBox(height: 20,),
           InputCustom(
             labelInput: 'Apellidos',hintInput: 'Ingrese los apellidos',
-            iconInput: const Icon(Icons.person),
+            iconInput: const Icon(Icons.account_circle),
             onChanged: (value){
               lastname=value;
               formKeySingin.currentState?.validate();
@@ -282,7 +282,7 @@ Widget build(BuildContext context) {
           const SizedBox(height: 20,),
           InputCustom(
             labelInput: 'Nombre de usuario',hintInput: 'Ingrese el nombre de usuario',
-            iconInput: const Icon(Icons.person),
+            iconInput: const Icon(Icons.badge),
             onChanged: (value){
               username=value;
               formKeySingin.currentState?.validate();

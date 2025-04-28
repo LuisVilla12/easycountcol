@@ -58,7 +58,7 @@ class _viewCameraState extends State<_viewCamera> with TickerProviderStateMixin 
   }
 
 Widget buildImageView() {
-  if (imagePath == null) return const SizedBox.shrink();
+  if (imagePath == '') return const SizedBox.shrink();
 
   final file = File(imagePath);
   if (!file.existsSync()) {
@@ -90,10 +90,10 @@ Widget buildImageView() {
           children: [
             const Text(
               'Registro de muestra',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            const Text('Complete la información necesaria'),
+            const Text('Complete la información necesaria',style: TextStyle(fontSize: 17),),
             const SizedBox(height: 12),
             InputCustom(
               labelInput: 'Nombre de la muestra',hintInput: 'Ingrese el nombre de la muestra',
@@ -238,12 +238,6 @@ Widget buildImageView() {
                   );
               if (result['success']) {
                   final int idSample = result['id_sample'];
-                  // Borrar los datos el formulario
-                  nameSample='';
-                  typeSample='';
-                  volumenSample='';
-                  factorSample='';
-                  imagePath='';
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
@@ -262,6 +256,7 @@ Widget buildImageView() {
                             );
                             // Reiniciar formulario
                             formKeySample.currentState!.reset();
+                            imagePath='';
                           },
                           child: const Text("OK"),
                         ),

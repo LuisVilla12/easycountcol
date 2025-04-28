@@ -34,11 +34,11 @@ class _SideMenuState extends State<SideMenu> {
          // Saber que opcion del arreglo es
           final menuItem=appMenuItems[value];
           // Cerrar el side_menu
-          widget.scaffoldKey.currentState?.closeDrawer();
-
           Future.delayed(const Duration(milliseconds: 150), () {
             context.push(menuItem.link);
           });
+           widget.scaffoldKey.currentState?.closeDrawer();
+          
       },
       children: [
         // Adaptar el padding de arriba

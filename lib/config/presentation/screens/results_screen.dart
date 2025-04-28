@@ -1,3 +1,4 @@
+import 'package:easycoutcol/config/presentation/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -16,7 +17,7 @@ class ResultsScreen extends StatefulWidget {
 
 class _ResultsScreenState extends State<ResultsScreen> {
   late Future<Map<String, dynamic>> data;
-   @override
+  @override
   void initState() {
     super.initState();
     data = fetchData();
@@ -39,17 +40,17 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
     final originalImage = responses[0].bodyBytes;
     final processedImage = responses[1].bodyBytes;
-    final infoData = jsonDecode(responses[2].body);
-
+    final sample = jsonDecode(responses[2].body);
     return {
       'originalImage': originalImage,
       'processedImage': processedImage,
-      'processingTime': infoData['processing_time'], // segundos
+      'sample': sample['sample'],
     };
   }
 
   @override
   Widget build(BuildContext context) {
+    final colors=Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
             automaticallyImplyLeading: false,// Desactiva el botón de retroceso
@@ -64,31 +65,120 @@ class _ResultsScreenState extends State<ResultsScreen> {
           } else if (snapshot.hasData) {
             final originalImage = snapshot.data!['originalImage'] as Uint8List;
             final processedImage = snapshot.data!['processedImage'] as Uint8List;
-            final processingTime = snapshot.data!['processingTime'];
-
+            final name = snapshot.data!['sample'][1];
+            final typeSample = snapshot.data!['sample'][3];
+            final volumenSample = snapshot.data!['sample'][4];
+            final factorSample = snapshot.data!['sample'][5];
+            final dateSample = snapshot.data!['sample'][7];
+            final processingTime = snapshot.data!['sample'][8];
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Imagen Original:', style: TextStyle(fontSize: 18)),
-                  const SizedBox(height: 10),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.memory(originalImage),
-                  ),
-                  const SizedBox(height: 30),
-                  const Text('Imagen Procesada (Escala de Grises):', style: TextStyle(fontSize: 18)),
-                  const SizedBox(height: 10),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.memory(processedImage),
-                  ),
-                  const SizedBox(height: 30),
-                  Text('⏱ Tiempo de procesamiento: ${processingTime.toString()} segundos', style: const TextStyle(fontSize: 16)),
-                  const SizedBox(height: 20,)
-                ],
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [      
+      // Tarjeta de Información
+      Container(
+        padding: const EdgeInsets.all(20),
+        margin: const EdgeInsets.symmetric(horizontal: 5),
+        decoration: BoxDecoration(
+          color: colors.primary,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.blue.shade100),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+                  // Título principal
+      Center(
+        child: Text(
+          name,
+          style: const TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+            color: Colors.white
+          ),
+        ),
+      ),
+      const SizedBox(height: 20),
+            const Text(
+              'Detalles',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white
               ),
+            ),            
+            const SizedBox(height: 16),
+            _infoItem(Icons.calendar_today_rounded, 'Fecha de realización', dateSample),
+            const SizedBox(height: 12),
+            _infoItem(Icons.science, 'Tipo de muestra', typeSample),
+            const SizedBox(height: 12),
+            _infoItem(Icons.local_drink, 'Factor de dilución', factorSample),
+            const SizedBox(height: 12),
+            _infoItem(Icons.water, 'Volumen de la muestra', volumenSample),
+            const SizedBox(height: 12),
+            _processingTimeItem(processingTime),
+              const SizedBox(height: 30),
+
+      // Imagen Original
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Imagen original:',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 10),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.memory(
+                originalImage,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ],
+        ),
+      ),
+        const SizedBox(height: 30),
+
+      // Imagen Original
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Imagen procesada:',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 10),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.memory(
+                processedImage,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ],
+        ),
+      ),
+          ],
+        ),
+      ),
+      
+      const SizedBox(height: 30),
+    ],
+  ),
             );
           } else {
             return const Center(child: Text('No se encontraron datos.'));
@@ -97,7 +187,89 @@ class _ResultsScreenState extends State<ResultsScreen> {
       ),
       floatingActionButton: FloatingActionButton(onPressed: (){
         Navigator.pop(context);
-      }, child: const Icon(Icons.arrow_back_ios_new_rounded),),
+      }, child: Icon(Icons.arrow_back_ios_new_rounded, color: colors.primary,),),
     );
   }
+}
+
+Widget _infoItem(IconData icon, String title, String value) {
+  return Row(
+    children: [
+      Icon(icon, color: Colors.white, size: 24),
+      const SizedBox(width: 10),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.white,
+              ),
+            ),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _processingTimeItem(double time) {
+  return Row(
+    children: [
+      const Icon(Icons.timer, color: Colors.white, size: 24),
+      const SizedBox(width: 10),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Tiempo de procesamiento',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.white,
+              ),
+            ),
+            Row(
+              children: [
+                Text(
+                  '${time.toStringAsFixed(6)} segundos',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    'Rápido',
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
 }

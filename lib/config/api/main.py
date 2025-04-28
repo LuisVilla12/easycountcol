@@ -105,13 +105,29 @@ def get_original_image(id_muestra: int):
 def get_sample_info(id_muestra: int):
     conn = get_db()
     cursor = conn.cursor()
-    sql = "SELECT processing_time FROM samples WHERE id_sample = %s"
+    sql = "SELECT * FROM samples WHERE id_sample = %s"
     cursor.execute(sql, (id_muestra,))
-    result = cursor.fetchone()
+    result = cursor.fetchall()
     cursor.close()
     conn.close()
 
     if not result:
         raise HTTPException(status_code=404, detail="Muestra no encontrada")
     
-    return {"processing_time": result[0]}
+    return {"sample": result[0]}
+
+#Ruta para mostar todas las muestras
+@app.get("/samples")
+def getSamples():
+    conn = get_db()
+    cursor = conn.cursor()
+    sql = "SELECT * FROM samples"
+    cursor.execute(sql)
+    result = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    if not result:
+        raise HTTPException(status_code=404, detail="Muestras no encontradas")
+    
+    return {"samples": result}
