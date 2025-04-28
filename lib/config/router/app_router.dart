@@ -1,4 +1,3 @@
-import 'package:easycoutcol/config/presentation/screens/auth/demo_new_user_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/auth/login_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/config_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/history_screen.dart';
