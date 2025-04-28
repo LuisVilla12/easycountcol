@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:easycoutcol/config/api/registerUser.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
