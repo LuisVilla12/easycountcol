@@ -6,6 +6,7 @@ import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
 import 'package:easycoutcol/config/presentation/wigets/input_custom.dart';
 import 'package:easycoutcol/config/services/camera_services_implementation.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 class HomeScreen extends StatelessWidget {
   static const String name='home_screen';
   const HomeScreen({super.key});
@@ -24,6 +25,7 @@ class HomeScreen extends StatelessWidget {
 }
 
 class _viewCamera extends StatefulWidget {
+  
   const _viewCamera({
     super.key,
   });
@@ -31,6 +33,7 @@ class _viewCamera extends StatefulWidget {
   @override
   State<_viewCamera> createState() => _viewCameraState();
 }
+
 
 
 class _viewCameraState extends State<_viewCamera> with TickerProviderStateMixin {
@@ -41,16 +44,28 @@ class _viewCameraState extends State<_viewCamera> with TickerProviderStateMixin 
   String factorSample='';  
   String volumenSample='';  
   String imagePath='';  
+  int? idUser;
+  String? nameUser;
 
   @override
   void initState() {
     super.initState();
+    _cargarDatosUsuario(); // Cargar los datos cuando inicie la pantalla
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener((){
       // cambiar el state del tab
       setState(() {});
     });
   }
+  // Saber los datos del usuario del Login
+    Future<void> _cargarDatosUsuario() async {
+    final sharedDatosUsuario = await SharedPreferences.getInstance();
+    setState(() {
+      idUser = sharedDatosUsuario.getInt('id_usuario');
+      nameUser = sharedDatosUsuario.getString('name');
+    });
+  }
+
   @override
   void dispose() {
     _tabController.dispose();
@@ -88,6 +103,8 @@ Widget buildImageView() {
         key: formKeySample,
         child: Column(
           children: [
+            // Mostar el id del shared preferences
+            // Text(idUser != null ? idUser.toString() : 'Cargando...'),
             const Text(
               'Registro de muestra',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -234,7 +251,7 @@ Widget buildImageView() {
                     type_sample: typeSample,
                     volumen_sample: volumenSample,
                     factor_sample: factorSample,
-                    sample_file: imagePath, // recuerda que es el path
+                    sample_file: imagePath,
                   );
               if (result['success']) {
                   final int idSample = result['id_sample'];

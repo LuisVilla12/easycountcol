@@ -28,7 +28,7 @@ def login_usuario(data: LoginUsuario):
     if not user:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-    user_id, name, hashed_password = user
+    id, name, hashed_password = user
 
     # Verificar contraseña
     if not verificar_password(data.password, hashed_password):
@@ -40,5 +40,6 @@ def login_usuario(data: LoginUsuario):
     return {
         "success": True,
         "message": f"Bienvenido {name}",
-        "user_id": user_id
+        "name": name,
+        "id_user": id
     }

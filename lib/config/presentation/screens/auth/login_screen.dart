@@ -4,6 +4,7 @@ import 'package:easycoutcol/config/presentation/screens/home_screen.dart';
 import 'package:easycoutcol/config/presentation/wigets/input_custom.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatelessWidget {
   static const  String name='login_screen';
@@ -195,7 +196,13 @@ Widget build(BuildContext context) {
                         email: email,
                         password: password,
                       );
+                      print('----------$resultado--------');
                       if (resultado['ok']) {
+                      // Instancia del almacenamiento del usuario que inicio sesión
+                      final sharedDatosUsuario = await SharedPreferences.getInstance();
+                       // Almacenamiento del nombre de usuario
+                      await sharedDatosUsuario.setString('name', resultado['name']);
+                      await sharedDatosUsuario.setInt('id_usuario', resultado['id_user']);
                       // Mostrar modal de éxito y navegar
                       showDialog(
                         context: context,
