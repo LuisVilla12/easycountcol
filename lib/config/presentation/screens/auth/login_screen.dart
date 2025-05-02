@@ -196,7 +196,7 @@ Widget build(BuildContext context) {
                         email: email,
                         password: password,
                       );
-                      print('----------$resultado--------');
+                      // print('----------$resultado--------');
                       if (resultado['ok']) {
                       // Instancia del almacenamiento del usuario que inicio sesión
                       final sharedDatosUsuario = await SharedPreferences.getInstance();
@@ -215,6 +215,7 @@ Widget build(BuildContext context) {
                                 // Una vez que se registre solicitar iniciar sesión
                                 Navigator.pop(context);
                                 context.pushNamed(HomeScreen.name);
+                                formKeyLogin.currentState!.reset();
                               },
                               child: const Text('Continuar'),
                             ),

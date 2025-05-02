@@ -8,6 +8,7 @@ class Sample {
   final String image;
   final String date;
   final double result;
+  final int count;
 
   Sample({
     required this.id,
@@ -19,6 +20,7 @@ class Sample {
     required this.image,
     required this.date,
     required this.result,
+    required this.count,
   });
 
   // Método para crear un Sample a partir de la sublista
@@ -33,6 +35,7 @@ class Sample {
       image: json[6],
       date: json[7],
       result: json[8],
+      count: json[9],
     );
   }
 }

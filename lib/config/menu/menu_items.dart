@@ -35,16 +35,16 @@ const appMenuItems=<MenuItem>[
     link: '/history',
     icon:Icons.menu_book_sharp ,
   ),  
-    MenuItem(
-    title:'Iniciar sesión' ,
-    subtitle: 'Accede a tu cuenta',
-    link: '/login',
-    icon:Icons.login_rounded,
-  ), 
   MenuItem(
     title:'Configuración' ,
     subtitle: 'Personalización de la aplicación',
     link: '/config',
     icon:Icons.settings,
+  ),
+    MenuItem(
+    title:'Cerrar sesión' ,
+    subtitle: 'Cerrar sesión',
+    link: '/logout',
+    icon:Icons.logout_outlined ,
   ),   
 ];

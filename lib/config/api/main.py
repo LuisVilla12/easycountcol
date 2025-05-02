@@ -100,6 +100,7 @@ def get_original_image(id_muestra: int):
     except Exception as e:
         print(f"ERROR AL CARGAR IMAGEN ORIGINAL: {e}")  # <-- log
         raise HTTPException(status_code=400, detail=f"Error al cargar imagen original: {e}")
+
 #Ruta para mostar la informacion de la muestra
 @app.get("/muestra-info/{id_muestra}")
 def get_sample_info(id_muestra: int):
@@ -131,3 +132,23 @@ def getSamples():
         raise HTTPException(status_code=404, detail="Muestras no encontradas")
     
     return {"samples": result}
+
+#Ruta para mostar las muestras de un usuario
+@app.get("/samples/{id_user}")
+def getSamplesUser(id_user: int):
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+
+        sql = "SELECT * FROM samples WHERE id_user = %s"
+        cursor.execute(sql, (id_user,))
+        result = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        # if not result:
+        #     raise HTTPException(status_code=404, detail="No cuenta con muestras")
+        
+        return {"samples": result}
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Eror: {e}") 

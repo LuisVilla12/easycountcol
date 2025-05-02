@@ -1,4 +1,5 @@
 import 'package:easycoutcol/config/presentation/screens/auth/login_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/auth/logout_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/config_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/history_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/home_screen.dart';
@@ -8,22 +9,22 @@ import 'package:go_router/go_router.dart';
 
 // Definir rutas
 final appRouter = GoRouter(
-  initialLocation: '/login',
+  initialLocation: '/home',
   routes: [
-     GoRoute(
+    GoRoute(
       path: '/tutorial',
       name: TutorialScreen.name,
-      builder: (context, state) => TutorialScreen(),
+      builder: (context, state) => const TutorialScreen(),
     ),
     GoRoute(
       path: '/home',
       name: HomeScreen.name,
-      builder: (context, state) => HomeScreen(),
+      builder: (context, state) => const HomeScreen(),
     ),
     GoRoute(
       path: '/history',
       name: HistoryScreen.name,
-      builder: (context, state) => HistoryScreen(),
+      builder: (context, state)=> const HistoryScreen(),
     ),
     GoRoute(
       path: '/results:id',
@@ -36,12 +37,17 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/config',
       name: ConfigScreen.name,
-      builder: (context, state) => ConfigScreen(),
+      builder: (context, state) => const ConfigScreen(),
     ),
     GoRoute(
       path: '/login',
       name: LoginScreen.name,
-      builder: (context, state) => LoginScreen(),
+      builder: (context, state) => const LoginScreen(),
+    ),
+    GoRoute(
+      path: '/logout',
+      name: LogoutScreen.name,
+      builder: (context, state) => const LogoutScreen(),
     ),
   ],
 );

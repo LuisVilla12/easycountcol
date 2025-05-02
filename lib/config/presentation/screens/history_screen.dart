@@ -3,6 +3,7 @@ import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HistoryScreen extends StatefulWidget {
   static const String name ='history_screen';
@@ -13,9 +14,22 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-Future<List<Sample>> fetchSamples() async {
-  final response = await http.get(Uri.parse('http://10.0.2.2:8000/samples'));
+  int? idUser;
+  @override
+  void initState() {
+    super.initState();
+    _cargarDatosUsuario();
+    }
+  // Saber los datos del usuario del Login
+    Future<void> _cargarDatosUsuario() async {
+    final sharedDatosUsuario = await SharedPreferences.getInstance();
+    setState(() {
+      idUser = sharedDatosUsuario.getInt('id_usuario');
+      });
+  }
 
+Future<List<Sample>> fetchSamples() async {
+  final response = await http.get(Uri.parse('http://10.0.2.2:8000/samples/$idUser'));
   if (response.statusCode == 200) {
     final Map<String, dynamic> jsonData = jsonDecode(response.body);
     final List<dynamic> samplesList = jsonData['samples'];
@@ -26,6 +40,8 @@ Future<List<Sample>> fetchSamples() async {
     throw Exception('Error al cargar las muestras');
   }
 }
+
+
 
 @override
 Widget build(BuildContext context) {

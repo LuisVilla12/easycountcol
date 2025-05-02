@@ -17,7 +17,7 @@ class HomeScreen extends StatelessWidget {
     final scaffoldKey=GlobalKey<ScaffoldState>();
     return 
       Scaffold(
-        appBar: AppBar(title: const Text('Inicio'),),
+        appBar: AppBar(title: const Text('Registar muestra '),),
         drawer: SideMenu(scaffoldKey: scaffoldKey),
         body: _viewCamera() ,
     );
@@ -105,10 +105,10 @@ Widget buildImageView() {
           children: [
             // Mostar el id del shared preferences
             // Text(idUser != null ? idUser.toString() : 'Cargando...'),
-            const Text(
-              'Registro de muestra',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
+            // const Text(
+            //   'Registro de muestra',
+            //   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            // ),
             const SizedBox(height: 8),
             const Text('Complete la información necesaria',style: TextStyle(fontSize: 17),),
             const SizedBox(height: 12),
@@ -247,7 +247,8 @@ Widget buildImageView() {
               try{
                   final result = await uploadSampleWithFile(
                     sample_name: nameSample,
-                    id_user: 3,
+                    // En caso de no contar con user_id asignar el 1
+                    id_user: idUser??1,
                     type_sample: typeSample,
                     volumen_sample: volumenSample,
                     factor_sample: factorSample,

@@ -7,7 +7,7 @@ Future<Map<String, dynamic>> uploadSampleWithFile({
   required String type_sample,
   required String volumen_sample,
   required String factor_sample,
-  required String sample_file,  // Asegúrate de tener el paquete "dart:io" para trabajar con archivos.
+  required String sample_file, 
 }) async {
   final uri = Uri.parse('http://10.0.2.2:8000/registrar-muestra-file'); // Asegúrate de que coincida con tu ruta
 
