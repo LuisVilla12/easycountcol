@@ -37,7 +37,7 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/config',
       name: ConfigScreen.name,
-      builder: (context, state) => const ConfigScreen(),
+      builder: (context, state) => ConfigScreen(),
     ),
     GoRoute(
       path: '/login',
