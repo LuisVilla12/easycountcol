@@ -2,10 +2,12 @@ import 'dart:io';
 
 import 'package:easycoutcol/config/api/RegisterSample.dart';
 import 'package:easycoutcol/config/menu/side_menu.dart';
+import 'package:easycoutcol/config/presentation/providers/login_provider.dart';
 import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
 import 'package:easycoutcol/config/presentation/wigets/input_custom.dart';
 import 'package:easycoutcol/config/services/camera_services_implementation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class HomeScreen extends StatelessWidget {
   static const String name='home_screen';
@@ -19,16 +21,14 @@ class HomeScreen extends StatelessWidget {
       Scaffold(
         appBar: AppBar(title: const Text('Registar muestra '),),
         drawer: SideMenu(scaffoldKey: scaffoldKey),
-        body: _viewCamera() ,
+        body: const _viewCamera() ,
     );
   }
 }
 
 class _viewCamera extends StatefulWidget {
   
-  const _viewCamera({
-    super.key,
-  });
+  const _viewCamera();
 
   @override
   State<_viewCamera> createState() => _viewCameraState();
@@ -50,21 +50,22 @@ class _viewCameraState extends State<_viewCamera> with TickerProviderStateMixin 
   @override
   void initState() {
     super.initState();
-    _cargarDatosUsuario(); // Cargar los datos cuando inicie la pantalla
+    // Saber los datos del usuario con shared preferences
+    // _cargarDatosUsuario();
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener((){
       // cambiar el state del tab
       setState(() {});
     });
   }
-  // Saber los datos del usuario del Login
-    Future<void> _cargarDatosUsuario() async {
-    final sharedDatosUsuario = await SharedPreferences.getInstance();
-    setState(() {
-      idUser = sharedDatosUsuario.getInt('id_usuario');
-      nameUser = sharedDatosUsuario.getString('name');
-    });
-  }
+  // Saber los datos del usuario del Login con shared preferences
+  //   Future<void> _cargarDatosUsuario() async {
+  //   final sharedDatosUsuario = await SharedPreferences.getInstance();
+  //   setState(() {
+  //     idUser = sharedDatosUsuario.getInt('id_usuario');
+  //     nameUser = sharedDatosUsuario.getString('name');
+  //   });
+  // }
 
   @override
   void dispose() {
@@ -216,97 +217,104 @@ Widget buildImageView() {
               ]),
               ),
             ), buildImageView(),
-
           const SizedBox(height: 20,),
           SizedBox(
             width: double.infinity,
-            child: FilledButton.icon(
-              onPressed: () async {
-              // Verificar si esta validado o no
-              final isValid=formKeySample.currentState!.validate();
-              // Sino esta validado  no hacer nada
-              if(!isValid) return;
-              // Validar que tenga una imagen
-              if (imagePath == '') {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text('Imagen requerida'),
-                      content: const Text('Por favor selecciona o toma una imagen antes de continuar.'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          child: const Text('Aceptar'),
+            child: Consumer(
+  builder: (context, ref, child) {
+    final idUser = ref.watch(idUserProvider); // Obtener el ID de Riverpod
+    return FilledButton.icon(
+      onPressed: () async {
+        final isValid = formKeySample.currentState!.validate();
+        if (!isValid) return;
+
+        if (imagePath == '') {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Imagen requerida'),
+              content: const Text('Por favor selecciona o toma una imagen antes de continuar.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Aceptar'),
+                ),
+              ],
+            ),
+          );
+          return;
+        }
+
+        if (!context.mounted) return;
+
+        try {
+          final result = await uploadSampleWithFile(
+            sample_name: nameSample,
+            id_user: idUser ?? 1,
+            type_sample: typeSample,
+            volumen_sample: volumenSample,
+            factor_sample: factorSample,
+            sample_file: imagePath,
+          );
+
+          if (result['success']) {
+            final int idSample = result['id_sample'];
+
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text("Éxito"),
+                content: const Text("Muestra almacenada correctamente, continúa su análisis."),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ResultsScreen(idMuestra: idSample),
                         ),
-                      ],
-                    ),
-                  );
-                  return; // Detener ejecución
-                }
-              if (!context.mounted) return;
-              try{
-                  final result = await uploadSampleWithFile(
-                    sample_name: nameSample,
-                    // En caso de no contar con user_id asignar el 1
-                    id_user: idUser??1,
-                    type_sample: typeSample,
-                    volumen_sample: volumenSample,
-                    factor_sample: factorSample,
-                    sample_file: imagePath,
-                  );
-              if (result['success']) {
-                  final int idSample = result['id_sample'];
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text("Éxito"),
-                      content: const Text("Muestra almacenada correctamente, continúa su análisis."),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                             // Cierra el diálogo
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ResultsScreen(idMuestra: idSample),
-                              ),
-                            );
-                            // Reiniciar formulario
-                            formKeySample.currentState!.reset();
-                            imagePath='';
-                          },
-                          child: const Text("OK"),
-                        ),
-                      ],
-                    ),
-                  );
-                } else {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text("Error"),
-                      content: const Text('Ocurrio un error al registarse'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text("OK"),
-                        ),
-                      ],
-                    ));
-                }
-              }
-              catch(e){
-                print(e);
-              }          // Verificar que el wiget este montado
-              },
-              icon: const Icon(Icons.save), 
-              label:const Text('Registarse' ),
-              style: FilledButton.styleFrom(    
-                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15), 
-                // Sin bordes redondeados
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), ),)),
-          ),
+                      );
+                      formKeySample.currentState!.reset();
+                      imagePath = '';
+                    },
+                    child: const Text("OK"),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text("Error"),
+                content: const Text('Ocurrió un error al registrarse'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("OK"),
+                  ),
+                ],
+              ),
+            );
+          }
+        } catch (e) {
+          print(e);
+        }
+      },
+      icon: const Icon(Icons.save),
+      label: const Text('Registrarse'),
+      style: FilledButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+  },
+)
+
+            ),
             const SizedBox(height: 20,)
             ],
         ),

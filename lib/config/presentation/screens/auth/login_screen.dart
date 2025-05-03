@@ -1,8 +1,10 @@
 import 'package:easycoutcol/config/api/login.dart';
 import 'package:easycoutcol/config/api/RegisterUser.dart';
+import 'package:easycoutcol/config/presentation/providers/login_provider.dart';
 import 'package:easycoutcol/config/presentation/screens/home_screen.dart';
 import 'package:easycoutcol/config/presentation/wigets/input_custom.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -186,62 +188,71 @@ Widget build(BuildContext context) {
           ),
           const SizedBox(height: 16),
             Center(
-              child: FilledButton.tonalIcon(
-                    onPressed: () async {
-                      // Verificar si esta validado o no
-                      final isValid=formKeyLogin.currentState!.validate();
-                      // Sino esta vlialoidadno no hacer nada
-                      if(!isValid) return;
-                      final resultado = await loginUsuario(
-                        email: email,
-                        password: password,
-                      );
-                      // print('----------$resultado--------');
-                      if (resultado['ok']) {
-                      // Instancia del almacenamiento del usuario que inicio sesión
-                      final sharedDatosUsuario = await SharedPreferences.getInstance();
-                       // Almacenamiento del nombre de usuario
-                      await sharedDatosUsuario.setString('name', resultado['name']);
-                      await sharedDatosUsuario.setInt('id_usuario', resultado['id_user']);
-                      // Mostrar modal de éxito y navegar
-                      showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          title: const Text('Éxito'),
-                          content: Text(resultado['message']),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                // Una vez que se registre solicitar iniciar sesión
-                                Navigator.pop(context);
-                                context.pushNamed(HomeScreen.name);
-                                formKeyLogin.currentState!.reset();
-                              },
-                              child: const Text('Continuar'),
-                            ),
-                          ],
-                        ),
-                      );
-                    } else {
-                      // Mostrar modal de error
-                      showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          title: const Text('Error'),
-                          content: Text(resultado['message']),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('Cerrar'),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-                    },
-                    icon: const Icon(Icons.arrow_forward), 
-                    label:const Text('Entrar'),
-                    style: FilledButton.styleFrom(    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),)),
+              child: Consumer(
+  builder: (context, ref, child) {
+    return FilledButton.tonalIcon(
+      onPressed: () async {
+        final isValid = formKeyLogin.currentState!.validate();
+        if (!isValid) return;
+
+        final resultado = await loginUsuario(
+          email: email,
+          password: password,
+        );
+
+        if (resultado['ok']) {
+          final sharedDatosUsuario = await SharedPreferences.getInstance();
+
+          // Almacenar en Riverpod
+          ref.read(userNameProvider.notifier).state = resultado['name'];
+          ref.read(idUserProvider.notifier).state = resultado['id_user'];
+
+          //Guardar en SharedPreferences
+          await sharedDatosUsuario.setString('name', resultado['name']);
+          await sharedDatosUsuario.setInt('id_usuario', resultado['id_user']);
+
+          showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+              title: const Text('Éxito'),
+              content: Text(resultado['message']),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    context.pushNamed(HomeScreen.name);
+                    formKeyLogin.currentState!.reset();
+                  },
+                  child: const Text('Continuar'),
+                ),
+              ],
+            ),
+          );
+        } else {
+          showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+              title: const Text('Error'),
+              content: Text(resultado['message']),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cerrar'),
+                ),
+              ],
+            ),
+          );
+        }
+      },
+      icon: const Icon(Icons.arrow_forward),
+      label: const Text('Entrar'),
+      style: FilledButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+      ),
+    );
+  },
+),
+
             ),
         ],
       ),

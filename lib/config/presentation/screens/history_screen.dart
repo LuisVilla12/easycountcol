@@ -1,32 +1,34 @@
 import 'package:easycoutcol/config/api/models/Samples.dart';
+import 'package:easycoutcol/config/presentation/providers/login_provider.dart';
 import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
-
-class HistoryScreen extends StatefulWidget {
+class HistoryScreen extends ConsumerStatefulWidget  {
   static const String name ='history_screen';
   const HistoryScreen({super.key});
 
   @override
-  State<HistoryScreen> createState() => _HistoryScreenState();
+  ConsumerState<HistoryScreen> createState() => _HistoryScreenState();
 }
 
-class _HistoryScreenState extends State<HistoryScreen> {
+class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   int? idUser;
   @override
   void initState() {
     super.initState();
-    _cargarDatosUsuario();
+    // Saber el calor actual del id_usuario que inicio sesión directamente desde riverpod
+      idUser = ref.read(idUserProvider);
+    // _cargarDatosUsuario(); // Cargar los datos desde el sharedpreferences
     }
-  // Saber los datos del usuario del Login
-    Future<void> _cargarDatosUsuario() async {
-    final sharedDatosUsuario = await SharedPreferences.getInstance();
-    setState(() {
-      idUser = sharedDatosUsuario.getInt('id_usuario');
-      });
-  }
+  // Saber los datos directamente del shared preferences
+  //   Future<void> _cargarDatosUsuario() async {
+  //   final sharedDatosUsuario = await SharedPreferences.getInstance();
+  //   setState(() {
+  //     idUser = sharedDatosUsuario.getInt('id_usuario');
+  //     });
+  // }
 
 Future<List<Sample>> fetchSamples() async {
   final response = await http.get(Uri.parse('http://10.0.2.2:8000/samples/$idUser'));
