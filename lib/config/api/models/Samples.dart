@@ -9,6 +9,7 @@ class Sample {
   final String date;
   final double result;
   final int count;
+  final double creationTime;
 
   Sample({
     required this.id,
@@ -21,6 +22,7 @@ class Sample {
     required this.date,
     required this.result,
     required this.count,
+    required this.creationTime
   });
 
   // Método para crear un Sample a partir de la sublista
@@ -36,6 +38,7 @@ class Sample {
       date: json[7],
       result: json[8],
       count: json[9],
+      creationTime: json[10],
     );
   }
 }

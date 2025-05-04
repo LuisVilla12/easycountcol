@@ -21,22 +21,22 @@ class HomeScreen extends StatelessWidget {
       Scaffold(
         appBar: AppBar(title: const Text('Registar muestra '),),
         drawer: SideMenu(scaffoldKey: scaffoldKey),
-        body: const _viewCamera() ,
+        body: const _ViewCamera() ,
     );
   }
 }
 
-class _viewCamera extends StatefulWidget {
+class _ViewCamera extends StatefulWidget {
   
-  const _viewCamera();
+  const _ViewCamera();
 
   @override
-  State<_viewCamera> createState() => _viewCameraState();
+  State<_ViewCamera> createState() => _ViewCameraState();
 }
 
 
 
-class _viewCameraState extends State<_viewCamera> with TickerProviderStateMixin {
+class _ViewCameraState extends State<_ViewCamera> with TickerProviderStateMixin {
   late final TabController _tabController;
   final GlobalKey<FormState> formKeySample = GlobalKey<FormState>();
   String nameSample='';  
@@ -104,12 +104,6 @@ Widget buildImageView() {
         key: formKeySample,
         child: Column(
           children: [
-            // Mostar el id del shared preferences
-            // Text(idUser != null ? idUser.toString() : 'Cargando...'),
-            // const Text(
-            //   'Registro de muestra',
-            //   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            // ),
             const SizedBox(height: 8),
             const Text('Complete la información necesaria',style: TextStyle(fontSize: 17),),
             const SizedBox(height: 12),
@@ -250,7 +244,7 @@ Widget buildImageView() {
         try {
           final result = await uploadSampleWithFile(
             sample_name: nameSample,
-            id_user: idUser ?? 1,
+            id_user: idUser,
             type_sample: typeSample,
             volumen_sample: volumenSample,
             factor_sample: factorSample,
@@ -299,7 +293,7 @@ Widget buildImageView() {
             );
           }
         } catch (e) {
-          print(e);
+          // print(e);
         }
       },
       icon: const Icon(Icons.save),

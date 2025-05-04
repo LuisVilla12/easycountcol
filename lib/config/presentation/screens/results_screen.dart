@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:intl/intl.dart';
+
 class ResultsScreen extends StatefulWidget {
   static const String name = 'results_screen';
   
@@ -71,6 +73,14 @@ class _ResultsScreenState extends State<ResultsScreen> {
             final factorSample = snapshot.data!['sample'][5];
             final dateSample = snapshot.data!['sample'][7];
             final processingTime = snapshot.data!['sample'][8];
+            final count = snapshot.data!['sample'][9];
+            final timeSample = snapshot.data!['sample'][10];
+            // Convertir el dato que viene de la base de datos a datatime
+            final DateTime now = DateTime.now();
+            final DateTime creationTime = DateTime(now.year,now.month,now.day).add(Duration(seconds: timeSample.toInt()));
+            // Convertir el datatime a time formateado            
+            final String formattedTime = DateFormat('HH:mm:ss').format(creationTime);
+
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -111,11 +121,15 @@ class _ResultsScreenState extends State<ResultsScreen> {
             const SizedBox(height: 16),
             _infoItem(Icons.calendar_today_rounded, 'Fecha de realización', dateSample),
             const SizedBox(height: 12),
+            _infoItem(Icons.timer, 'Hora de realización', formattedTime),
+            const SizedBox(height: 12),
             _infoItem(Icons.science, 'Tipo de muestra', typeSample),
             const SizedBox(height: 12),
             _infoItem(Icons.local_drink, 'Factor de dilución', factorSample),
             const SizedBox(height: 12),
             _infoItem(Icons.water, 'Volumen de la muestra', volumenSample),
+            const SizedBox(height: 12),
+            _infoItem(Icons.zoom_in_sharp, 'Unidades formadoras de colonias', count.toString()),
             const SizedBox(height: 12),
             _processingTimeItem(processingTime),
               const SizedBox(height: 30),
@@ -226,7 +240,7 @@ Widget _infoItem(IconData icon, String title, String value) {
 Widget _processingTimeItem(double time) {
   return Row(
     children: [
-      const Icon(Icons.timer, color: Colors.white, size: 24),
+      const Icon(Icons.av_timer, color: Colors.white, size: 24),
       const SizedBox(width: 10),
       Expanded(
         child: Column(

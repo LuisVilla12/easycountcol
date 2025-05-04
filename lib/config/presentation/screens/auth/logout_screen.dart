@@ -40,7 +40,6 @@ class LogoutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors=Theme.of(context).colorScheme;
     // Espera al primer frame para mostrar el diálogo
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _mostrarAlerta(context);

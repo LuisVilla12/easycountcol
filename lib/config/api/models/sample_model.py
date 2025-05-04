@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import date
+from datetime import datetime
 from passlib.context import CryptContext
 from db import get_db
 from fastapi import HTTPException, UploadFile
@@ -18,7 +19,10 @@ class RegistarMuestraA(BaseModel):
     volumen_sample: str
     factor_sample: str
     sample_route: str
+    processing_time: float
+    count: int
     creation_date: date
+    creation_time: str
 
     @classmethod
     def save_with_file(cls, 
@@ -32,7 +36,7 @@ class RegistarMuestraA(BaseModel):
             #Verificar existencia de las carpetas donde esta almacenada las imagenes
             os.makedirs("uploads", exist_ok=True)
             os.makedirs("processed", exist_ok=True)
-            "Asignar un nombre unico"
+            # Asignar un nombre unico
             filename = f"{uuid.uuid4().hex}_{sample_file.filename}"
             file_location = f"uploads/{filename}"
             sample_file.file.seek(0) 
@@ -50,6 +54,11 @@ class RegistarMuestraA(BaseModel):
             end_time = time.time()  
             # Resta del tiempo de fin y el inicio
             processing_time = end_time - start_time 
+            # Conteo de UFC
+            count=5
+            # Determinar la hora
+            ahoraActual = datetime.now()
+            creation_time = ahoraActual.strftime("%H:%M:%S")
             # Crear la instancia de RegistarMuestraA
             muestra = cls(
                 sample_name=sample_name,
@@ -57,10 +66,12 @@ class RegistarMuestraA(BaseModel):
                 type_sample=type_sample,
                 volumen_sample=volumen_sample,
                 factor_sample=factor_sample,
-                sample_route=filename,  # Solo guardamos ruta original en DB
-                creation_date=date.today()
+                sample_route=filename,
+                count=count,
+                processing_time=processing_time,
+                creation_date=date.today(),
+                creation_time=creation_time,
             )
-
             # 4. Guardar en la base de datos
             conn = get_db()
             cursor = conn.cursor()
@@ -68,9 +79,9 @@ class RegistarMuestraA(BaseModel):
             sql = """
                 INSERT INTO samples (
                     sample_name, id_user, type_sample, volumen_sample,
-                    factor_sample, sample_route, creation_date,processing_time
+                    factor_sample, sample_route, creation_date,processing_time,count,creation_time
                 ) 
-                VALUES (%s, %s, %s, %s, %s, %s, %s,%s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s,%s,%s,%s)
             """
             cursor.execute(sql, (
                 muestra.sample_name,
@@ -80,7 +91,9 @@ class RegistarMuestraA(BaseModel):
                 muestra.factor_sample,
                 muestra.sample_route,
                 muestra.creation_date,
-                processing_time
+                muestra.processing_time,
+                muestra.count,
+                muestra.creation_time,
             ))
             sample_id = cursor.lastrowid
 
