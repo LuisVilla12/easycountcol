@@ -22,7 +22,7 @@ class _SideMenuState extends ConsumerState<SideMenu> {
     );
     // Saber el usuario con riverpod
     final userName = ref.watch(userNameProvider);
-    final idUser = ref.watch(idUserProvider);
+    // final idUser = ref.watch(idUserProvider);
 
     return NavigationDrawer(
       selectedIndex: navDrawerIndex,
@@ -41,7 +41,7 @@ class _SideMenuState extends ConsumerState<SideMenu> {
         const SizedBox(height: 10),
         Padding(
           padding: EdgeInsets.fromLTRB(28, hasNotch ? 10 : 40, 10, 10),
-          child: Text('Hola $userName', style: titleStyle),
+          child: Text('Bienvenido  $userName', style: titleStyle),
         ),
         const SizedBox(height: 20),
         ...appMenuItems.asMap().entries.map((entry) {
