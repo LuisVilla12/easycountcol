@@ -9,7 +9,7 @@ import 'package:go_router/go_router.dart';
 
 // Definir rutas
 final appRouter = GoRouter(
-  initialLocation: '/home',
+  initialLocation: '/tutorial',
   routes: [
     GoRoute(
       path: '/tutorial',

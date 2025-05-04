@@ -1,4 +1,4 @@
-package com.example.easycoutcol
+package com.luisvilla.Easycountcol
 
 import io.flutter.embedding.android.FlutterActivity
 

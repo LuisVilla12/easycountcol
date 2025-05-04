@@ -2,9 +2,18 @@ import 'package:easycoutcol/config/presentation/providers/theme_provider.dart';
 import 'package:easycoutcol/config/router/app_router.dart';
 import 'package:easycoutcol/config/theme/app_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async{
+  // Ejecutar el splash home cuando incio la app 
+  // WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding); 
+
+  //remover el splashome
+  // FlutterNativeSplash.remove();
+  
+  // Habilita riverpodsen toda la aplicaición
   WidgetsFlutterBinding.ensureInitialized();
   runApp( 
     // Buscara todos  providers

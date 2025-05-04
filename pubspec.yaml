@@ -13,6 +13,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.0
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: 2.4.4
   flutter_riverpod: ^2.6.1
   go_router: ^15.0.0
   http: ^1.3.0
@@ -25,6 +27,15 @@ dev_dependencies:
   flutter_lints: ^4.0.0
   flutter_test:
     sdk: flutter
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/logo.png"
+  min_sdk_android: 21
+
+flutter_native_splash:
+  color: "#42a5f5"
 
 flutter:
   uses-material-design: true
