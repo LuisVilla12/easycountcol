@@ -26,9 +26,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
 
   Future<Map<String, dynamic>> fetchData() async {
-    final originalUrl = 'http://10.0.2.2:8000/imagen-original/${widget.idMuestra}';
-    final processedUrl = 'http://10.0.2.2:8000/imagen-procesada/${widget.idMuestra}';
-    final infoUrl = 'http://10.0.2.2:8000/muestra-info/${widget.idMuestra}'; 
+    final originalUrl = 'http://13.59.165.189:8000/imagen-original/${widget.idMuestra}';
+    final processedUrl = 'http://13.59.165.189:8000/imagen-procesada/${widget.idMuestra}';
+    final infoUrl = 'http://13.59.165.189:8000/muestra-info/${widget.idMuestra}'; 
 
     final responses = await Future.wait([
       http.get(Uri.parse(originalUrl)),

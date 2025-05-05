@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 final conexionProvider = FutureProvider<bool>((ref) async {
   try {
     final response = await http
-        .get(Uri.parse('http://10.0.2.2:8000/ping'))
+        .get(Uri.parse('http://13.59.165.189:8000/ping'))
         .timeout(const Duration(seconds: 1));
     return response.statusCode == 200;
   } catch (_) {

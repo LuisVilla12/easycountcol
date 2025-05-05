@@ -8,7 +8,7 @@ Future<bool> sentUserRegister({
   required String email,
   required String password,
 }) async {
-  final url = Uri.parse('http://10.0.2.2:8000/registro'); // Cambia por IP real si usas emulador
+  final url = Uri.parse('http://13.59.165.189:8000/registro'); // Cambia por IP real si usas emulador
 
   final response = await http.post(
     url,

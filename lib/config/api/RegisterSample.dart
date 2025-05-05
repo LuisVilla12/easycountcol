@@ -9,7 +9,7 @@ Future<Map<String, dynamic>> uploadSampleWithFile({
   required String factor_sample,
   required String sample_file, 
 }) async {
-  final uri = Uri.parse('http://10.0.2.2:8000/registrar-muestra-file'); // Asegúrate de que coincida con tu ruta
+  final uri = Uri.parse('http://13.59.165.189:8000/registrar-muestra-file'); // Asegúrate de que coincida con tu ruta
 
   // Prepara la solicitud con multipart/form-data.
   final request = http.MultipartRequest('POST', uri)

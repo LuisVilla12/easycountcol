@@ -5,7 +5,7 @@ Future<Map<String, dynamic>> loginUsuario({
   required String email,
   required String password,
 }) async {
-  final url = Uri.parse('http://10.0.2.2:8000/login'); // o tu IP en red local
+  final url = Uri.parse('http://13.59.165.189:8000/login'); // o tu IP en red local
 
   final response = await http.post(
     url,

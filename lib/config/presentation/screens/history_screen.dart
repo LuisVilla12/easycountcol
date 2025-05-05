@@ -35,7 +35,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
 
   Future<List<Sample>> fetchSamples() async {
     final response =
-        await http.get(Uri.parse('http://10.0.2.2:8000/samples/$idUser'));
+        await http.get(Uri.parse('http://13.59.165.189:8000/samples/$idUser'));
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonData = jsonDecode(response.body);
       final List<dynamic> samplesList = jsonData['samples'];
