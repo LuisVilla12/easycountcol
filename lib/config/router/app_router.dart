@@ -4,13 +4,19 @@ import 'package:easycoutcol/config/presentation/screens/config_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/history_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/home_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/splash_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/tutorial_screen.dart';
 import 'package:go_router/go_router.dart';
 
 // Definir rutas
 final appRouter = GoRouter(
-  initialLocation: '/tutorial',
+  initialLocation: '/splash',
   routes: [
+    GoRoute(
+      path: '/splash',
+      name: SplashScreen.name,
+      builder: (context, state) => const SplashScreen(),
+    ),
     GoRoute(
       path: '/tutorial',
       name: TutorialScreen.name,

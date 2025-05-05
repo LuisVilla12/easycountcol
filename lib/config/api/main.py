@@ -1,5 +1,6 @@
 #Importa la clase FastAPI para crear la aplicación.
 from fastapi import FastAPI, HTTPException,Form,File,UploadFile
+from fastapi.responses import JSONResponse
 # Importa los modelos a utilizar
 from models.user_model import RegistroUsuario, registrar_usuario
 from models.login_model import LoginUsuario, login_usuario 
@@ -152,3 +153,7 @@ def getSamplesUser(id_user: int):
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Eror: {e}") 
+
+@app.get("/ping")
+async def ping():
+    return JSONResponse(content={"status": "ok"})
