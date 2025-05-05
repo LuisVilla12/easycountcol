@@ -17,11 +17,12 @@ CREATE TABLE `samples` (
   `sample_route` varchar(255) NOT NULL,
   `creation_date` date NOT NULL,
   `processing_time` float NOT NULL,
-  `count` int(4) DEFAULT NULL,
+  `count` int(4) NOT NULL,
+  `creation_time` time DEFAULT NULL,
   UNIQUE KEY `id_sample` (`id_sample`),
   KEY `fk_users` (`id_user`),
   CONSTRAINT `fk_users` FOREIGN KEY (`id_user`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -33,7 +34,7 @@ CREATE TABLE `users` (
   `type` int(11) DEFAULT 1,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 
