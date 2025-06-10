@@ -1,7 +1,10 @@
-import 'package:camera/camera.dart';
+import 'package:easycoutcol/config/services/camera_test.dart';
 import 'package:flutter/material.dart';
+import 'package:camera/camera.dart';
 
 class CircularCameraGuide extends StatefulWidget {
+  static const String name='test_camera';
+  
   @override
   _CircularCameraGuideState createState() => _CircularCameraGuideState();
 }
@@ -35,6 +38,7 @@ class _CircularCameraGuideState extends State<CircularCameraGuide> {
     }
 
     return Scaffold(
+      appBar: AppBar(title: Text('camara'),),
       body: Stack(
         children: [
           CameraPreview(controller!),

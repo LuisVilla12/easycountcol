@@ -1,5 +1,6 @@
 import 'package:easycoutcol/config/presentation/screens/auth/login_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/auth/logout_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/camera_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/config_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/history_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/home_screen.dart';
@@ -10,8 +11,13 @@ import 'package:go_router/go_router.dart';
 
 // Definir rutas
 final appRouter = GoRouter(
-  initialLocation: '/splash',
+  initialLocation: '/test-camera',
   routes: [
+     GoRoute(
+      path: '/test-camera',
+      name: CircularCameraGuide.name,
+      builder: (context, state) => CircularCameraGuide(),
+    ),
     GoRoute(
       path: '/splash',
       name: SplashScreen.name,

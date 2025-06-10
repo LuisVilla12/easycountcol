@@ -47,4 +47,10 @@ const appMenuItems=<MenuItem>[
     link: '/logout',
     icon:Icons.logout_outlined ,
   ),   
+   MenuItem(
+    title:'Prueba' ,
+    subtitle: 'Prueba',
+    link: '/test-camara',
+    icon:Icons.camera ,
+  ),  
 ];
