@@ -11,9 +11,9 @@ import 'package:go_router/go_router.dart';
 
 // Definir rutas
 final appRouter = GoRouter(
-  initialLocation: '/test-camera',
+  initialLocation: '/splash',
   routes: [
-     GoRoute(
+    GoRoute(
       path: '/test-camera',
       name: CircularCameraGuide.name,
       builder: (context, state) => CircularCameraGuide(),
@@ -36,16 +36,15 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/history',
       name: HistoryScreen.name,
-      builder: (context, state)=> const HistoryScreen(),
+      builder: (context, state) => const HistoryScreen(),
     ),
     GoRoute(
-      path: '/results:id',
-      name: ResultsScreen.name,
-      builder: (context, state) {
+        path: '/results:id',
+        name: ResultsScreen.name,
+        builder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
-          return ResultsScreen(idMuestra: id); 
-      }
-    ),
+          return ResultsScreen(idMuestra: id);
+        }),
     GoRoute(
       path: '/config',
       name: ConfigScreen.name,
