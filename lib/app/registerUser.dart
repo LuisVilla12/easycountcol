@@ -1,3 +1,4 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -8,7 +9,9 @@ Future<bool> sentUserRegister({
   required String email,
   required String password,
 }) async {
-  final url = Uri.parse('http://13.59.165.189:8000/registro'); // Cambia por IP real si usas emulador
+  // Utilizar dotenv para manejar la URL de la API
+  final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:8000';
+  final url = Uri.parse('$apiUrl/registro');
 
   final response = await http.post(
     url,
@@ -25,7 +28,6 @@ Future<bool> sentUserRegister({
   if (response.statusCode == 200) {
     return true;
   } else {
-    print('Error al registrar: ${response.body}');
     return false;
   }
 }

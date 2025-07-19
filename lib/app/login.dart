@@ -1,11 +1,14 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 Future<Map<String, dynamic>> loginUsuario({
   required String email,
   required String password,
 }) async {
-  final url = Uri.parse('http://13.59.165.189:8000/login'); // o tu IP en red local
+  // Utilizar dotenv para manejar la URL de la API
+  final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:8000';
+  final url = Uri.parse('$apiUrl/login');
 
   final response = await http.post(
     url,
@@ -21,7 +24,7 @@ Future<Map<String, dynamic>> loginUsuario({
     return {
       'ok': true,
       'message': data['message'],
-      'id_user': data['id_user'],
+      'idUser': data['idUser'],
       'name': data['name'],
     };
   } else {

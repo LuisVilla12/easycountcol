@@ -1,8 +1,8 @@
 services:
   fastapi:
     build:
-      context: .
-      dockerfile: services/backend/Dockerfile
+      context: ./API
+      dockerfile: Dockerfile   # Ya no necesitas poner API/ porque ahora el context es API/
     ports:
       - "8000:8000"
     depends_on:
@@ -22,7 +22,7 @@ services:
       - "3360:3306"
     volumes:
       - db_data:/var/lib/mysql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/anki.sql
 
 volumes:
   db_data:

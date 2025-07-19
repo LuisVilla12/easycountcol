@@ -12,26 +12,20 @@ import time
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-class RegistarMuestraA(BaseModel):
-    sample_name: str
-    id_user: int
-    type_sample: str
-    volumen_sample: str
-    factor_sample: str
-    sample_route: str
-    processing_time: float
+class RegistarMuestra(BaseModel):
+    sampleName: str
+    idUser: int
+    typeSample: str
+    volumenSample: str
+    factorSample: str
+    sampleRoute: str
+    processingTime: float
     count: int
-    creation_date: date
-    creation_time: str
+    creationDate: date
+    creationTime: str
 
     @classmethod
-    def save_with_file(cls, 
-                       sample_name: str, 
-                       id_user: int, 
-                       type_sample: str,
-                       volumen_sample: str,
-                       factor_sample: str,
-                       sample_file: UploadFile):
+    def save_with_file(cls, sampleName: str, idUser: int, typeSample: str,volumenSample: str,factorSample: str,sample_file: UploadFile):
         try:
             #Verificar existencia de las carpetas donde esta almacenada las imagenes
             os.makedirs("uploads", exist_ok=True)
@@ -59,41 +53,42 @@ class RegistarMuestraA(BaseModel):
             # Determinar la hora
             ahoraActual = datetime.now()
             creation_time = ahoraActual.strftime("%H:%M:%S")
-            # Crear la instancia de RegistarMuestraA
+            # Crear la instancia de RegistarMuestra
             muestra = cls(
-                sample_name=sample_name,
-                id_user=id_user,
-                type_sample=type_sample,
-                volumen_sample=volumen_sample,
-                factor_sample=factor_sample,
-                sample_route=filename,
+                sampleName=sampleName,
+                idUser=idUser,
+                typeSample=typeSample,
+                volumenSample=volumenSample,
+                factorSample=factorSample,
+                sampleRoute=filename,
                 count=count,
-                processing_time=processing_time,
-                creation_date=date.today(),
-                creation_time=creation_time,
+                processingTime=processing_time,
+                creationDate=date.today(),
+                creationTime=creation_time,
             )
+            print(f"Registro de muestra: {muestra}")
             # 4. Guardar en la base de datos
             conn = get_db()
             cursor = conn.cursor()
 
             sql = """
                 INSERT INTO samples (
-                    sample_name, id_user, type_sample, volumen_sample,
-                    factor_sample, sample_route, creation_date,processing_time,count,creation_time
+                    sampleName, idUser, typeSample, volumenSample,
+                    factorSample, sampleRoute, creationDate,processingTime,count,creationTime
                 ) 
                 VALUES (%s, %s, %s, %s, %s, %s, %s,%s,%s,%s)
             """
             cursor.execute(sql, (
-                muestra.sample_name,
-                muestra.id_user,
-                muestra.type_sample,
-                muestra.volumen_sample,
-                muestra.factor_sample,
-                muestra.sample_route,
-                muestra.creation_date,
-                muestra.processing_time,
+                muestra.sampleName,
+                muestra.idUser,
+                muestra.typeSample,
+                muestra.volumenSample,
+                muestra.factorSample,
+                muestra.sampleRoute,
+                muestra.creationDate,
+                muestra.processingTime,
                 muestra.count,
-                muestra.creation_time,
+                muestra.creationTime,
             ))
             sample_id = cursor.lastrowid
 
@@ -104,7 +99,7 @@ class RegistarMuestraA(BaseModel):
             # Regresar el id de la muestra y mensaje
             return {
                 "success": True,
-                "id_sample": sample_id,
+                "idSample": sample_id,
                 "message": "Muestra registrada correctamente."
             }
         except Exception as e:

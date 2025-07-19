@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:easycoutcol/config/api/RegisterSample.dart';
+import 'package:easycoutcol/app/registerSample.dart';
 import 'package:easycoutcol/config/menu/side_menu.dart';
 import 'package:easycoutcol/config/presentation/providers/login_provider.dart';
 import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
@@ -8,42 +8,42 @@ import 'package:easycoutcol/config/presentation/wigets/input_custom.dart';
 import 'package:easycoutcol/config/services/camera_services_implementation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 // import 'package:shared_preferences/shared_preferences.dart';
 class HomeScreen extends StatelessWidget {
-  static const String name='home_screen';
+  static const String name = 'home_screen';
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     // Saber la referencia actual
-    final scaffoldKey=GlobalKey<ScaffoldState>();
-    return 
-      Scaffold(
-        appBar: AppBar(title: const Text('Registar muestra '),),
-        drawer: SideMenu(scaffoldKey: scaffoldKey),
-        body: const _ViewCamera() ,
+    final scaffoldKey = GlobalKey<ScaffoldState>();
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Registar muestra '),
+      ),
+      drawer: SideMenu(scaffoldKey: scaffoldKey),
+      body: const _ViewCamera(),
     );
   }
 }
 
 class _ViewCamera extends StatefulWidget {
-  
   const _ViewCamera();
 
   @override
   State<_ViewCamera> createState() => _ViewCameraState();
 }
 
-
-
-class _ViewCameraState extends State<_ViewCamera> with TickerProviderStateMixin {
+class _ViewCameraState extends State<_ViewCamera>
+    with TickerProviderStateMixin {
   late final TabController _tabController;
   final GlobalKey<FormState> formKeySample = GlobalKey<FormState>();
-  String nameSample='';  
-  String typeSample='';  
-  String factorSample='';  
-  String volumenSample='';  
-  String imagePath='';  
+  String nameSample = '';
+  String typeSample = '';
+  String factorSample = '';
+  String volumenSample = '';
+  String imagePath = '';
   int? idUser;
   String? nameUser;
 
@@ -53,7 +53,7 @@ class _ViewCameraState extends State<_ViewCamera> with TickerProviderStateMixin 
     // Saber los datos del usuario con shared preferences
     // _cargarDatosUsuario();
     _tabController = TabController(length: 2, vsync: this);
-    _tabController.addListener((){
+    _tabController.addListener(() {
       // cambiar el state del tab
       setState(() {});
     });
@@ -73,90 +73,111 @@ class _ViewCameraState extends State<_ViewCamera> with TickerProviderStateMixin 
     super.dispose();
   }
 
-Widget buildImageView() {
-  if (imagePath == '') return const SizedBox.shrink();
+  Widget buildImageView() {
+    if (imagePath == '') return const SizedBox.shrink();
 
-  final file = File(imagePath);
-  if (!file.existsSync()) {
-    return const Padding(
-      padding: EdgeInsets.only(top: 20),
-      child: Text("La imagen no existe o no se pudo cargar."),
+    final file = File(imagePath);
+    if (!file.existsSync()) {
+      return const Padding(
+        padding: EdgeInsets.only(top: 20),
+        child: Text("La imagen no existe o no se pudo cargar."),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: Image.file(
+        file,
+        width: 200,
+        height: 200,
+        fit: BoxFit.cover,
+      ),
     );
   }
-
-  return Padding(
-    padding: const EdgeInsets.only(top: 20),
-    child: Image.file(
-      file,
-      width: 200,
-      height: 200,
-      fit: BoxFit.cover,
-    ),
-  );
-}
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     return SingleChildScrollView(
-      padding:  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Form(
         key: formKeySample,
         child: Column(
           children: [
             const SizedBox(height: 8),
-            const Text('Complete la información necesaria',style: TextStyle(fontSize: 17),),
-            const SizedBox(height: 12),
-            InputCustom(
-              labelInput: 'Nombre de la muestra',hintInput: 'Ingrese el nombre de la muestra',
-              iconInput: Icon(Icons.label_important,color: colors.primary),
-              onChanged: (value){
-                nameSample=value;
-                formKeySample.currentState?.validate();
-              },
-              validator: (value){
-                if(value==null || value.isEmpty) return 'El campo es requerido.';
-                if(value.length<1) return 'El campo debe  tener una longitud valida.';              return null;
-              } ,
+            const Text(
+              'Complete la información necesaria',
+              style: TextStyle(fontSize: 17),
             ),
             const SizedBox(height: 12),
             InputCustom(
-              labelInput: 'Tipo de muestra',hintInput: 'Ingrese el tipo de muestra',
-              iconInput: Icon(Icons.category,color: colors.primary),
-              onChanged: (value){
-                typeSample=value;
+              labelInput: 'Nombre de la muestra',
+              hintInput: 'Ingrese el nombre de la muestra',
+              iconInput: Icon(Icons.label_important, color: colors.primary),
+              onChanged: (value) {
+                nameSample = value;
                 formKeySample.currentState?.validate();
               },
-              validator: (value){
-                if(value==null || value.isEmpty) return 'El campo es requerido.';
-                if(value.length<2) return 'El campo debe  tener una longitud valida.';              return null;
-              } ,
+              validator: (value) {
+                if (value == null || value.isEmpty)
+                  return 'El campo es requerido.';
+                if (value.length < 1)
+                  return 'El campo debe  tener una longitud valida.';
+                return null;
+              },
             ),
             const SizedBox(height: 12),
             InputCustom(
-              labelInput: 'Volumen de sembrado',hintInput: 'Ingrese el volumen de sembrado de la muestra',
-              iconInput: Icon(Icons.local_drink,color: colors.primary),
-              onChanged: (value){
-                volumenSample=value;
+              labelInput: 'Tipo de muestra',
+              hintInput: 'Ingrese el tipo de muestra',
+              iconInput: Icon(Icons.category, color: colors.primary),
+              onChanged: (value) {
+                typeSample = value;
                 formKeySample.currentState?.validate();
               },
-              validator: (value){
-                if(value==null || value.isEmpty) return 'El campo es requerido.';
-                if(value.length<2) return 'El campo debe  tener una longitud valida.';              return null;
-              } ,
+              validator: (value) {
+                if (value == null || value.isEmpty)
+                  return 'El campo es requerido.';
+                if (value.length < 2)
+                  return 'El campo debe  tener una longitud valida.';
+                return null;
+              },
             ),
-            const SizedBox(height: 12,),
+            const SizedBox(height: 12),
             InputCustom(
-              labelInput: 'Factor de dilución',hintInput: 'Ingrese el factor de dilución la muestra',
-              iconInput: Icon(Icons.science,color: colors.primary),
-              onChanged: (value){
-                factorSample=value;
+              labelInput: 'Volumen de sembrado',
+              hintInput: 'Ingrese el volumen de sembrado de la muestra',
+              iconInput: Icon(Icons.local_drink, color: colors.primary),
+              onChanged: (value) {
+                volumenSample = value;
                 formKeySample.currentState?.validate();
               },
-              validator: (value){
-                if(value==null || value.isEmpty) return 'El campo es requerido.';
-                if(value.length<2) return 'El campo debe  tener una longitud valida.';              return null;
-              } ,
+              validator: (value) {
+                if (value == null || value.isEmpty)
+                  return 'El campo es requerido.';
+                if (value.length < 2)
+                  return 'El campo debe  tener una longitud valida.';
+                return null;
+              },
+            ),
+            const SizedBox(
+              height: 12,
+            ),
+            InputCustom(
+              labelInput: 'Factor de dilución',
+              hintInput: 'Ingrese el factor de dilución la muestra',
+              iconInput: Icon(Icons.science, color: colors.primary),
+              onChanged: (value) {
+                factorSample = value;
+                formKeySample.currentState?.validate();
+              },
+              validator: (value) {
+                if (value == null || value.isEmpty)
+                  return 'El campo es requerido.';
+                if (value.length < 2)
+                  return 'El campo debe  tener una longitud valida.';
+                return null;
+              },
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 16),
@@ -185,211 +206,235 @@ Widget buildImageView() {
                   ),
                 );
               },
-              
-              child: _tabController.index == 0?
-            Center(
-              child:  Column(
-                children: [
-                  const SizedBox(height: 5,),
-                  FilledButton.icon(onPressed: (){
-                    showCaptureRecommendations(context);
-                    
-                  },icon: const Icon(Icons.camera_alt_rounded), label: imagePath==''? const Text('Capturar una imagen'):const Text('Volver a tomar una imagen')),
-              ]),     
-              ): Center(
-                child:  Column(
-                  children: [
-                  const SizedBox(height: 5,),
-                  FilledButton.icon(onPressed: () async{
-                  final photoPath=await CameraServicesImplementation().selectPhoto();
-                    if(photoPath==null) return null;
-                    photoPath;
-                    setState(() {
-                    imagePath = photoPath;
-                    });
-                  },icon: const Icon(Icons.photo_library_sharp), label: imagePath==''? const Text('Seleccionar una imagen'):const Text('Volver a seleccionar una imagen')),
-              ]),
-              ),
-            ), buildImageView(),
-          const SizedBox(height: 20,),
-          SizedBox(
-            width: double.infinity,
-            child: Consumer(
-  builder: (context, ref, child) {
-    final idUser = ref.watch(idUserProvider); // Obtener el ID de Riverpod
-    return FilledButton.icon(
-      onPressed: () async {
-        final isValid = formKeySample.currentState!.validate();
-        if (!isValid) return;
-
-        if (imagePath == '') {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Imagen requerida'),
-              content: const Text('Por favor selecciona o toma una imagen antes de continuar.'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Aceptar'),
-                ),
-              ],
-            ),
-          );
-          return;
-        }
-
-        if (!context.mounted) return;
-
-        try {
-          final result = await uploadSampleWithFile(
-            sample_name: nameSample,
-            id_user: idUser,
-            type_sample: typeSample,
-            volumen_sample: volumenSample,
-            factor_sample: factorSample,
-            sample_file: imagePath,
-          );
-
-          if (result['success']) {
-            final int idSample = result['id_sample'];
-
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: const Text("Éxito"),
-                content: const Text("Muestra almacenada correctamente, continúa su análisis."),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ResultsScreen(idMuestra: idSample),
+              child: _tabController.index == 0
+                  ? Center(
+                      child: Column(children: [
+                        const SizedBox(
+                          height: 5,
                         ),
-                      );
-                      formKeySample.currentState!.reset();
-                      imagePath = '';
-                    },
-                    child: const Text("OK"),
-                  ),
-                ],
-              ),
-            );
-          } else {
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: const Text("Error"),
-                content: const Text('Ocurrió un error al registrarse'),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text("OK"),
-                  ),
-                ],
-              ),
-            );
-          }
-        } catch (e) {
-          // print(e);
-        }
-      },
-      icon: const Icon(Icons.save),
-      label: const Text('Registrarse'),
-      style: FilledButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
-  },
-)
-
+                        FilledButton.icon(
+                            onPressed: () {
+                              showCaptureRecommendations(context);
+                            },
+                            icon: const Icon(Icons.camera_alt_rounded),
+                            label: imagePath == ''
+                                ? const Text('Capturar una imagen')
+                                : const Text('Volver a tomar una imagen')),
+                      ]),
+                    )
+                  : Center(
+                      child: Column(children: [
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        FilledButton.icon(
+                            onPressed: () async {
+                              final photoPath =
+                                  await CameraServicesImplementation()
+                                      .selectPhoto();
+                              if (photoPath == null) return null;
+                              photoPath;
+                              setState(() {
+                                imagePath = photoPath;
+                              });
+                            },
+                            icon: const Icon(Icons.photo_library_sharp),
+                            label: imagePath == ''
+                                ? const Text('Seleccionar una imagen')
+                                : const Text(
+                                    'Volver a seleccionar una imagen')),
+                      ]),
+                    ),
             ),
-            const SizedBox(height: 20,)
-            ],
+            buildImageView(),
+            const SizedBox(
+              height: 20,
+            ),
+            SizedBox(
+                width: double.infinity,
+                child: Consumer(
+                  builder: (context, ref, child) {
+                    final idUser =
+                        ref.watch(idUserProvider); // Obtener el ID de Riverpod
+                    return FilledButton.icon(
+                      onPressed: () async {
+                        final isValid = formKeySample.currentState!.validate();
+                        if (!isValid) return;
+
+                        if (imagePath == '') {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Imagen requerida'),
+                              content: const Text(
+                                  'Por favor selecciona o toma una imagen antes de continuar.'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text('Aceptar'),
+                                ),
+                              ],
+                            ),
+                          );
+                          return;
+                        }
+
+                        if (!context.mounted) return;
+
+                        try {
+                          final result = await uploadSampleWithFile(
+                            sampleName: nameSample,
+                            idUser: idUser,
+                            typeSample: typeSample,
+                            volumenSample: volumenSample,
+                            factorSample: factorSample,
+                            sampleFile: imagePath,
+                          );
+
+                          if (result['success']) {
+                            final int idSample = result['idSample'];
+
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text("Éxito"),
+                                content: const Text(
+                                    "Muestra almacenada correctamente, continúa su análisis."),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ResultsScreen(
+                                              idMuestra: idSample),
+                                        ),
+                                      );
+                                      formKeySample.currentState!.reset();
+                                      imagePath = '';
+                                    },
+                                    child: const Text("OK"),
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text("Error"),
+                                content: const Text(
+                                    'Ocurrió un error al registrarse'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text("OK"),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          // print(e);
+                        }
+                      },
+                      icon: const Icon(Icons.save),
+                      label: const Text('Registrarse'),
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    );
+                  },
+                )),
+            const SizedBox(
+              height: 20,
+            )
+          ],
         ),
       ),
     );
   }
+
   void showCaptureRecommendations(BuildContext context) {
-  final colors=Theme.of(context).colorScheme;
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: Row(
-        children: [
-          Icon(Icons.tips_and_updates_outlined, color: colors.primary),
-          const SizedBox(width: 8),
-          const Text('Recomendaciones'),
-        ],
-      ),
-      content: const SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    final colors = Theme.of(context).colorScheme;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
           children: [
-            ListTile(
-              leading: Icon(Icons.wb_sunny_outlined, color: Colors.amber),
-              title: Text('Iluminación'),
-              subtitle: Text(
-                'Asegúrate de tener buena iluminación uniforme. Evita sombras y reflejos directos sobre la placa.',
+            Icon(Icons.tips_and_updates_outlined, color: colors.primary),
+            const SizedBox(width: 8),
+            const Text('Recomendaciones'),
+          ],
+        ),
+        content: const SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ListTile(
+                leading: Icon(Icons.wb_sunny_outlined, color: Colors.amber),
+                title: Text('Iluminación'),
+                subtitle: Text(
+                  'Asegúrate de tener buena iluminación uniforme. Evita sombras y reflejos directos sobre la placa.',
+                ),
               ),
-            ),
-            ListTile(
-              leading: Icon(Icons.social_distance, color: Colors.green),
-              title: Text('Distancia'),
-              subtitle: Text(
-                'Mantén la cámara a una distancia de 15–20 cm de la placa para capturar todos los detalles.',
+              ListTile(
+                leading: Icon(Icons.social_distance, color: Colors.green),
+                title: Text('Distancia'),
+                subtitle: Text(
+                  'Mantén la cámara a una distancia de 15–20 cm de la placa para capturar todos los detalles.',
+                ),
               ),
-            ),
-            ListTile(
-              leading: Icon(Icons.center_focus_strong, color: Colors.blue),
-              title: Text('Enfoque'),
-              subtitle: Text(
-                'Asegúrate de que la imagen esté bien enfocada. Toca la pantalla para ajustar el enfoque si es necesario.',
+              ListTile(
+                leading: Icon(Icons.center_focus_strong, color: Colors.blue),
+                title: Text('Enfoque'),
+                subtitle: Text(
+                  'Asegúrate de que la imagen esté bien enfocada. Toca la pantalla para ajustar el enfoque si es necesario.',
+                ),
               ),
-            ),
-            ListTile(
-              leading: Icon(Icons.crop_square, color: Colors.purple),
-              title: Text('Posición'),
-              subtitle: Text(
-                'Coloca la placa de Petri dentro del marco guía. Mantén la cámara paralela a la superficie de la placa.',
+              ListTile(
+                leading: Icon(Icons.crop_square, color: Colors.purple),
+                title: Text('Posición'),
+                subtitle: Text(
+                  'Coloca la placa de Petri dentro del marco guía. Mantén la cámara paralela a la superficie de la placa.',
+                ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              child: Card(
-                color: Color(0xFFF0F4F8),
-                child: Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Text(
-                    '💡 Consejo profesional: Para obtener resultados óptimos, utiliza un fondo blanco o negro uniforme detrás de la placa.',
-                    style: TextStyle(fontStyle: FontStyle.italic),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: Card(
+                  color: Color(0xFFF0F4F8),
+                  child: Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Text(
+                      '💡 Consejo profesional: Para obtener resultados óptimos, utiliza un fondo blanco o negro uniforme detrás de la placa.',
+                      style: TextStyle(fontStyle: FontStyle.italic),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop(); // Cierra el modal
+              final photoPath =
+                  await CameraServicesImplementation().takePhoto();
+              if (photoPath == null) return;
+              setState(() {
+                imagePath = photoPath;
+              });
+            },
+            child: const Text('Entendido, capturar imagen'),
+          ),
+        ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () async {
-            Navigator.of(context).pop(); // Cierra el modal
-            final photoPath = await CameraServicesImplementation().takePhoto();
-            if (photoPath == null) return;
-            setState(() {
-              imagePath = photoPath;
-            });
-          },
-          child: const Text('Entendido, capturar imagen'),
-        ),
-      ],
-    ),
-  );
-}
-
+    );
+  }
 }

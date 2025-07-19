@@ -1,10 +1,11 @@
 #Importa la clase FastAPI para crear la aplicación.
 from fastapi import FastAPI, HTTPException,Form,File,UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 # Importa los modelos a utilizar
-from models.user_model import RegistroUsuario, registrar_usuario
-from models.login_model import LoginUsuario, login_usuario 
-from models.sample_model import RegistarMuestraA 
+from API.models.User import RegistroUsuario, registrar_usuario
+from API.models.Login import LoginUsuario, login_usuario 
+from API.models.Sample import RegistarMuestra 
 from fastapi.responses import FileResponse
 import shutil
 import os
@@ -12,6 +13,14 @@ from db import get_db
 
 #Crea una instancia de la aplicación FastAPI.
 app = FastAPI()
+# ✅ Configuración de CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 #Define una ruta raíz
 @app.get("/")
 def home():
@@ -31,18 +40,18 @@ def login(usuario: LoginUsuario):
 #Ruta para registro de una muestra
 @app.post("/registrar-muestra-file")
 async def registrar_muestra_file(
-    sample_name: str = Form(...),
-    id_user: int = Form(...),
-    type_sample: str = Form(...),
-    volumen_sample: str = Form(...),
-    factor_sample: str = Form(...),
+    sampleName: str = Form(...),
+    idUser: int = Form(...),
+    typeSample: str = Form(...),
+    volumenSample: str = Form(...),
+    factorSample: str = Form(...),
     sample_file: UploadFile = File(...)):
-    return RegistarMuestraA.save_with_file(
-        sample_name=sample_name,
-        id_user=id_user,
-        type_sample=type_sample,
-        volumen_sample=volumen_sample,
-        factor_sample=factor_sample,
+    return RegistarMuestra.save_with_file(
+        sampleName=sampleName,
+        idUser=idUser,
+        typeSample=typeSample,
+        volumenSample=volumenSample,
+        factorSample=factorSample,
         sample_file=sample_file
     )
 #Ruta para mostar la imagen procesada
@@ -52,7 +61,7 @@ def get_processed_image(id_muestra: int):
         conn = get_db()
         cursor = conn.cursor()
 
-        sql = "SELECT sample_route FROM samples WHERE id_sample = %s"
+        sql = "SELECT sampleRoute FROM samples WHERE id = %s"
         cursor.execute(sql, (id_muestra,))
         result = cursor.fetchone()
 
@@ -73,6 +82,7 @@ def get_processed_image(id_muestra: int):
     except Exception as e:
         print(f"ERROR AL CARGAR IMAGEN procesada: {e}") 
         raise HTTPException(status_code=400, detail=f"Error al cargar imagen procesada: {e}")
+
 #Ruta para mostar la imagen original
 @app.get("/imagen-original/{id_muestra}")
 def get_original_image(id_muestra: int):
@@ -80,7 +90,7 @@ def get_original_image(id_muestra: int):
         conn = get_db()
         cursor = conn.cursor()
 
-        sql = "SELECT sample_route FROM samples WHERE id_sample = %s"
+        sql = "SELECT sampleRoute FROM samples WHERE id = %s"
         cursor.execute(sql, (id_muestra,))
         result = cursor.fetchone()
 
@@ -107,7 +117,7 @@ def get_original_image(id_muestra: int):
 def get_sample_info(id_muestra: int):
     conn = get_db()
     cursor = conn.cursor()
-    sql = "SELECT * FROM samples WHERE id_sample = %s"
+    sql = "SELECT * FROM samples WHERE id = %s"
     cursor.execute(sql, (id_muestra,))
     result = cursor.fetchall()
     cursor.close()
@@ -135,14 +145,14 @@ def getSamples():
     return {"samples": result}
 
 #Ruta para mostar las muestras de un usuario
-@app.get("/samples/{id_user}")
-def getSamplesUser(id_user: int):
+@app.get("/samples/{idUser}")
+def getSamplesUser(idUser: int):
     try:
         conn = get_db()
         cursor = conn.cursor()
 
-        sql = "SELECT * FROM samples WHERE id_user = %s"
-        cursor.execute(sql, (id_user,))
+        sql = "SELECT * FROM samples WHERE idUser = %s"
+        cursor.execute(sql, (idUser,))
         result = cursor.fetchall()
         cursor.close()
         conn.close()

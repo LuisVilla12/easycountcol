@@ -3,13 +3,10 @@ from fastapi import HTTPException
 from db import get_db
 from passlib.context import CryptContext
 
-
-
 class LoginUsuario(BaseModel):
     email: EmailStr
     password: str
-
-
+    
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def verificar_password(plain_password: str, hashed_password: str) -> bool:
@@ -41,5 +38,5 @@ def login_usuario(data: LoginUsuario):
         "success": True,
         "message": f"Bienvenido {name}",
         "name": name,
-        "id_user": id
+        "idUser": id
     }
