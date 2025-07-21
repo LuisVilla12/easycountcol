@@ -19,13 +19,13 @@ def login_usuario(data: LoginUsuario):
     cursor = conn.cursor()
 
     # Buscar usuario por email
-    cursor.execute("SELECT id, name, password FROM users WHERE email = %s", (data.email,))
+    cursor.execute("SELECT id,name,lastname,username,password  FROM users WHERE email = %s", (data.email,))
     user = cursor.fetchone()
 
     if not user:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-    id, name, hashed_password = user
+    id, name,lastname,username, hashed_password = user
 
     # Verificar contraseña
     if not verificar_password(data.password, hashed_password):
@@ -38,5 +38,7 @@ def login_usuario(data: LoginUsuario):
         "success": True,
         "message": f"Bienvenido {name}",
         "name": name,
+        "lastname": lastname,  # Assuming lastname is stored in the user table
+        "username": username,  # Assuming userName is stored in the user table
         "idUser": id
     }

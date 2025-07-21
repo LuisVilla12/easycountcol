@@ -23,9 +23,10 @@ class RegistarMuestra(BaseModel):
     count: int
     creationDate: date
     creationTime: str
+    medioSample: str
 
     @classmethod
-    def save_with_file(cls, sampleName: str, idUser: int, typeSample: str,volumenSample: str,factorSample: str,sample_file: UploadFile):
+    def save_with_file(cls, sampleName: str, idUser: int, typeSample: str,volumenSample: str,factorSample: str,sample_file: UploadFile, medioSample: str = "N/A"):
         try:
             #Verificar existencia de las carpetas donde esta almacenada las imagenes
             os.makedirs("uploads", exist_ok=True)
@@ -65,8 +66,9 @@ class RegistarMuestra(BaseModel):
                 processingTime=processing_time,
                 creationDate=date.today(),
                 creationTime=creation_time,
+                medioSample=medioSample,
             )
-            print(f"Registro de muestra: {muestra}")
+            # print(f"Registro de muestra: {muestra}")
             # 4. Guardar en la base de datos
             conn = get_db()
             cursor = conn.cursor()
@@ -74,9 +76,9 @@ class RegistarMuestra(BaseModel):
             sql = """
                 INSERT INTO samples (
                     sampleName, idUser, typeSample, volumenSample,
-                    factorSample, sampleRoute, creationDate,processingTime,count,creationTime
+                    factorSample, sampleRoute, creationDate,processingTime,count,creationTime, medioSample
                 ) 
-                VALUES (%s, %s, %s, %s, %s, %s, %s,%s,%s,%s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s,%s,%s,%s,%s)
             """
             cursor.execute(sql, (
                 muestra.sampleName,
@@ -89,6 +91,7 @@ class RegistarMuestra(BaseModel):
                 muestra.processingTime,
                 muestra.count,
                 muestra.creationTime,
+                muestra.medioSample
             ))
             sample_id = cursor.lastrowid
 

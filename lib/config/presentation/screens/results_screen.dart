@@ -77,6 +77,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
             final processingTime = snapshot.data!['sample'][8];
             final count = snapshot.data!['sample'][9];
             final timeSample = snapshot.data!['sample'][10];
+            final medioSample = snapshot.data!['sample'][11];
             // Convertir el dato que viene de la base de datos a datatime
             final DateTime now = DateTime.now();
             final DateTime creationTime = DateTime(now.year, now.month, now.day)
@@ -134,6 +135,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
                         const SizedBox(height: 12),
                         _infoItem(Icons.water, 'Volumen de la muestra',
                             volumenSample),
+                        const SizedBox(height: 12),
+                        _infoItem(Icons.trending_up, 'Medio de crecimiento',
+                            medioSample),
                         const SizedBox(height: 12),
                         _infoItem(
                             Icons.zoom_in_sharp,

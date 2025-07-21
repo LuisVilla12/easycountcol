@@ -11,7 +11,7 @@ Future<bool> sentUserRegister({
 }) async {
   // Utilizar dotenv para manejar la URL de la API
   final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:8000';
-  final url = Uri.parse('$apiUrl/registro');
+  final url = Uri.parse('$apiUrl/registrar-usuario');
 
   final response = await http.post(
     url,

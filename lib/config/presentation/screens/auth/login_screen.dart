@@ -212,11 +212,14 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                       final sharedDatosUsuario =
                           await SharedPreferences.getInstance();
 
-                      // Almacenar en Riverpod
-                      ref.read(userNameProvider.notifier).state =
-                          resultado['name'];
+                      // Almacenar en Riverpod los datos del usuario
+                      ref.read(usernameProvider.notifier).state =
+                          resultado['username'];
                       ref.read(idUserProvider.notifier).state =
                           resultado['idUser'];
+                      ref.read(nameProvider.notifier).state = resultado['name'];
+                      ref.read(lastnameProvider.notifier).state =
+                          resultado['lastname'];
 
                       //Guardar en SharedPreferences
                       await sharedDatosUsuario.setString(

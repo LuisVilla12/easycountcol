@@ -3,9 +3,9 @@ from fastapi import FastAPI, HTTPException,Form,File,UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 # Importa los modelos a utilizar
-from API.models.User import RegistroUsuario, registrar_usuario
-from API.models.Login import LoginUsuario, login_usuario 
-from API.models.Sample import RegistarMuestra 
+from models.User import usuario, registrar_usuario
+from models.Login import LoginUsuario, login_usuario 
+from models.Sample import RegistarMuestra 
 from fastapi.responses import FileResponse
 import shutil
 import os
@@ -26,8 +26,8 @@ app.add_middleware(
 def home():
     return {"mensaje": "Bienvenido a la API"}
 #Ruta para el registro de un usuario
-@app.post("/registro")
-def registrar(data: RegistroUsuario):
+@app.post("/registrar-usuario")
+def registrarUsuario(data: usuario):
     try:
         registrar_usuario(data)
         return {"mensaje": "Usuario registrado con éxito"}
@@ -114,7 +114,7 @@ def get_original_image(id_muestra: int):
 
 #Ruta para mostar la informacion de la muestra
 @app.get("/muestra-info/{id_muestra}")
-def get_sample_info(id_muestra: int):
+def getSample(id_muestra: int):
     conn = get_db()
     cursor = conn.cursor()
     sql = "SELECT * FROM samples WHERE id = %s"

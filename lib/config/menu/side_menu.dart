@@ -3,6 +3,7 @@ import 'package:easycoutcol/config/presentation/providers/login_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 class SideMenu extends ConsumerStatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
   const SideMenu({super.key, required this.scaffoldKey});
@@ -10,6 +11,7 @@ class SideMenu extends ConsumerStatefulWidget {
   @override
   ConsumerState<SideMenu> createState() => _SideMenuState();
 }
+
 class _SideMenuState extends ConsumerState<SideMenu> {
   int navDrawerIndex = 0;
 
@@ -18,11 +20,13 @@ class _SideMenuState extends ConsumerState<SideMenu> {
     final colors = Theme.of(context).colorScheme;
     final hasNotch = MediaQuery.of(context).viewPadding.top > 25;
     final titleStyle = Theme.of(context).textTheme.titleLarge?.copyWith(
-      fontWeight: FontWeight.bold,
-    );
+          fontWeight: FontWeight.bold,
+        );
     // Saber el usuario con riverpod
-    final userName = ref.watch(userNameProvider);
-    // final idUser = ref.watch(idUserProvider);
+    final username = ref.watch(usernameProvider);
+    final name = ref.watch(nameProvider);
+    final lastName = ref
+        .watch(lastnameProvider); // final idUser = ref.watch(idUserProvider);
 
     return NavigationDrawer(
       selectedIndex: navDrawerIndex,
@@ -41,7 +45,7 @@ class _SideMenuState extends ConsumerState<SideMenu> {
         const SizedBox(height: 10),
         Padding(
           padding: EdgeInsets.fromLTRB(28, hasNotch ? 10 : 40, 10, 10),
-          child: Text('Bienvenido  $userName', style: titleStyle),
+          child: Text('Bienvenido  $name $lastName ', style: titleStyle),
         ),
         const SizedBox(height: 20),
         ...appMenuItems.asMap().entries.map((entry) {

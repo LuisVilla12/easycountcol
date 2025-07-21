@@ -8,14 +8,14 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
-class RegistroUsuario(BaseModel):
+class usuario(BaseModel):
     name: str
     lastname: str
     username: str
     email: EmailStr
     password: str
 
-def registrar_usuario(data: RegistroUsuario):
+def registrar_usuario(data: usuario):
     try:
         conn = get_db()
         cursor = conn.cursor()

@@ -58,14 +58,6 @@ class _ViewCameraState extends State<_ViewCamera>
       setState(() {});
     });
   }
-  // Saber los datos del usuario del Login con shared preferences
-  //   Future<void> _cargarDatosUsuario() async {
-  //   final sharedDatosUsuario = await SharedPreferences.getInstance();
-  //   setState(() {
-  //     idUser = sharedDatosUsuario.getInt('id_usuario');
-  //     nameUser = sharedDatosUsuario.getString('name');
-  //   });
-  // }
 
   @override
   void dispose() {
@@ -293,7 +285,6 @@ class _ViewCameraState extends State<_ViewCamera>
 
                           if (result['success']) {
                             final int idSample = result['idSample'];
-
                             showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
