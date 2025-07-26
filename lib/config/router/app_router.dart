@@ -1,9 +1,9 @@
 import 'package:easycoutcol/config/presentation/screens/auth/login_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/auth/logout_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/camera_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/config_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/history_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/home_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/overlay_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/splash_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/tutorial_screen.dart';
@@ -11,13 +11,8 @@ import 'package:go_router/go_router.dart';
 
 // Definir rutas
 final appRouter = GoRouter(
-  initialLocation: '/splash',
+  initialLocation: '/home',
   routes: [
-    GoRoute(
-      path: '/test-camera',
-      name: CircularCameraGuide.name,
-      builder: (context, state) => CircularCameraGuide(),
-    ),
     GoRoute(
       path: '/splash',
       name: SplashScreen.name,
@@ -60,5 +55,10 @@ final appRouter = GoRouter(
       name: LogoutScreen.name,
       builder: (context, state) => const LogoutScreen(),
     ),
+    GoRoute(
+       path: '/overlay',
+       name: OverlayScreen.name,
+       builder: (context, state) => const OverlayScreen(),
+     ),
   ],
 );

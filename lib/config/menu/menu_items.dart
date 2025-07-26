@@ -41,16 +41,16 @@ const appMenuItems=<MenuItem>[
     link: '/config',
     icon:Icons.settings,
   ),
+  MenuItem(
+    title:'Iniciar sesión' ,
+    subtitle: 'Iniciar sesión',
+    link: '/login',
+    icon:Icons.login_outlined ,
+  ),   
     MenuItem(
     title:'Cerrar sesión' ,
     subtitle: 'Cerrar sesión',
     link: '/logout',
     icon:Icons.logout_outlined ,
   ),   
-   MenuItem(
-    title:'Prueba' ,
-    subtitle: 'Prueba',
-    link: '/test-camara',
-    icon:Icons.camera ,
-  ),  
 ];

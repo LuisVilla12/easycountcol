@@ -1,3 +1,4 @@
+import 'package:easycoutcol/app/resultadoMuestra.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -56,8 +57,11 @@ class _ResultsScreenState extends State<ResultsScreen> {
     final colors = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-          automaticallyImplyLeading: false, // Desactiva el botón de retroceso
-          title: const Text('Resultados')),
+        automaticallyImplyLeading: true, // Desactiva el botón de retroceso
+        foregroundColor: Colors.white,
+        title: const Text('Resultados', style: TextStyle(color: Colors.white)),
+        backgroundColor: colors.primary,
+      ),
       body: FutureBuilder<Map<String, dynamic>>(
         future: data,
         builder: (context, snapshot) {
@@ -66,35 +70,18 @@ class _ResultsScreenState extends State<ResultsScreen> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (snapshot.hasData) {
-            final originalImage = snapshot.data!['originalImage'] as Uint8List;
-            final processedImage =
-                snapshot.data!['processedImage'] as Uint8List;
-            final name = snapshot.data!['sample'][1];
-            final typeSample = snapshot.data!['sample'][3];
-            final volumenSample = snapshot.data!['sample'][4];
-            final factorSample = snapshot.data!['sample'][5];
-            final dateSample = snapshot.data!['sample'][7];
-            final processingTime = snapshot.data!['sample'][8];
-            final count = snapshot.data!['sample'][9];
-            final timeSample = snapshot.data!['sample'][10];
-            final medioSample = snapshot.data!['sample'][11];
-            // Convertir el dato que viene de la base de datos a datatime
-            final DateTime now = DateTime.now();
-            final DateTime creationTime = DateTime(now.year, now.month, now.day)
-                .add(Duration(seconds: timeSample.toInt()));
-            // Convertir el datatime a time formateado
-            final String formattedTime =
-                DateFormat('HH:mm:ss').format(creationTime);
+            // Usamos el modelo para parsear los datos
+            final resultado = ResultadoMuestra.fromMap(snapshot.data!);
 
             return SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(4),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Tarjeta de Información
                   Container(
                     padding: const EdgeInsets.all(20),
-                    margin: const EdgeInsets.symmetric(horizontal: 5),
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
                     decoration: BoxDecoration(
                       color: colors.primary,
                       borderRadius: BorderRadius.circular(12),
@@ -103,49 +90,31 @@ class _ResultsScreenState extends State<ResultsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Título principal
-                        Center(
-                          child: Text(
-                            name,
-                            style: const TextStyle(
-                                fontSize: 26,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          'Detalles',
-                          style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
-                        ),
-                        const SizedBox(height: 16),
                         _infoItem(Icons.calendar_today_rounded,
-                            'Fecha de realización', dateSample),
+                            'Fecha de realización', resultado.dateSample),
                         const SizedBox(height: 12),
-                        _infoItem(
-                            Icons.timer, 'Hora de realización', formattedTime),
+                        _infoItem(Icons.timer, 'Hora de realización',
+                            resultado.formattedTime),
                         const SizedBox(height: 12),
-                        _infoItem(Icons.science, 'Tipo de muestra', typeSample),
+                        _infoItem(Icons.science, 'Tipo de muestra',
+                            resultado.typeSample),
                         const SizedBox(height: 12),
                         _infoItem(Icons.local_drink, 'Factor de dilución',
-                            factorSample),
+                            resultado.factorSample),
                         const SizedBox(height: 12),
                         _infoItem(Icons.water, 'Volumen de la muestra',
-                            volumenSample),
+                            resultado.volumenSample),
                         const SizedBox(height: 12),
                         _infoItem(Icons.trending_up, 'Medio de crecimiento',
-                            medioSample),
+                            resultado.medioSample),
                         const SizedBox(height: 12),
                         _infoItem(
                             Icons.zoom_in_sharp,
                             'Unidades formadoras de colonias',
-                            count.toString()),
+                            resultado.count.toString()),
                         const SizedBox(height: 12),
-                        _processingTimeItem(processingTime),
-                        const SizedBox(height: 30),
+                        _processingTimeItem(resultado.processingTime),
+                        const SizedBox(height: 12),
 
                         // Imagen Original
                         Padding(
@@ -165,14 +134,14 @@ class _ResultsScreenState extends State<ResultsScreen> {
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(12),
                                 child: Image.memory(
-                                  originalImage,
+                                  resultado.originalImage,
                                   fit: BoxFit.cover,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 30),
+                        const SizedBox(height: 10),
 
                         // Imagen Original
                         Padding(
@@ -192,7 +161,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(12),
                                 child: Image.memory(
-                                  processedImage,
+                                  resultado.processedImage,
                                   fit: BoxFit.cover,
                                 ),
                               ),

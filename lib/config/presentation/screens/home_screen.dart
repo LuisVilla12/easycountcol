@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:easycoutcol/app/registerSample.dart';
 import 'package:easycoutcol/config/menu/side_menu.dart';
 import 'package:easycoutcol/config/presentation/providers/login_provider.dart';
+import 'package:easycoutcol/config/presentation/screens/overlay_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
 import 'package:easycoutcol/config/presentation/wigets/input_custom.dart';
 import 'package:easycoutcol/config/services/camera_services_implementation.dart';
@@ -19,6 +20,7 @@ class HomeScreen extends StatelessWidget {
     // Saber la referencia actual
     final scaffoldKey = GlobalKey<ScaffoldState>();
     return Scaffold(
+      // resizeToAvoidBottomInset: true, // permite que se ajuste con el teclado
       appBar: AppBar(
         title: const Text('Registar muestra '),
       ),
@@ -39,10 +41,11 @@ class _ViewCameraState extends State<_ViewCamera>
     with TickerProviderStateMixin {
   late final TabController _tabController;
   final GlobalKey<FormState> formKeySample = GlobalKey<FormState>();
-  String nameSample = '';
-  String typeSample = '';
-  String factorSample = '';
-  String volumenSample = '';
+  final TextEditingController nameSampleController = TextEditingController();
+  final TextEditingController typeSampleController = TextEditingController();
+  final TextEditingController factorSampleController = TextEditingController();
+  final TextEditingController volumenSampleController = TextEditingController();
+
   String imagePath = '';
   int? idUser;
   String? nameUser;
@@ -50,8 +53,6 @@ class _ViewCameraState extends State<_ViewCamera>
   @override
   void initState() {
     super.initState();
-    // Saber los datos del usuario con shared preferences
-    // _cargarDatosUsuario();
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
       // cambiar el state del tab
@@ -62,6 +63,10 @@ class _ViewCameraState extends State<_ViewCamera>
   @override
   void dispose() {
     _tabController.dispose();
+    nameSampleController.dispose();
+    typeSampleController.dispose();
+    factorSampleController.dispose();
+    volumenSampleController.dispose();
     super.dispose();
   }
 
@@ -96,24 +101,15 @@ class _ViewCameraState extends State<_ViewCamera>
         key: formKeySample,
         child: Column(
           children: [
-            const SizedBox(height: 8),
-            const Text(
-              'Complete la información necesaria',
-              style: TextStyle(fontSize: 17),
-            ),
-            const SizedBox(height: 12),
             InputCustom(
               labelInput: 'Nombre de la muestra',
               hintInput: 'Ingrese el nombre de la muestra',
               iconInput: Icon(Icons.label_important, color: colors.primary),
-              onChanged: (value) {
-                nameSample = value;
-                formKeySample.currentState?.validate();
-              },
+              controller: nameSampleController,
               validator: (value) {
                 if (value == null || value.isEmpty)
                   return 'El campo es requerido.';
-                if (value.length < 1)
+                if (value.length < 2)
                   return 'El campo debe  tener una longitud valida.';
                 return null;
               },
@@ -123,10 +119,7 @@ class _ViewCameraState extends State<_ViewCamera>
               labelInput: 'Tipo de muestra',
               hintInput: 'Ingrese el tipo de muestra',
               iconInput: Icon(Icons.category, color: colors.primary),
-              onChanged: (value) {
-                typeSample = value;
-                formKeySample.currentState?.validate();
-              },
+              controller: typeSampleController,
               validator: (value) {
                 if (value == null || value.isEmpty)
                   return 'El campo es requerido.';
@@ -140,10 +133,7 @@ class _ViewCameraState extends State<_ViewCamera>
               labelInput: 'Volumen de sembrado',
               hintInput: 'Ingrese el volumen de sembrado de la muestra',
               iconInput: Icon(Icons.local_drink, color: colors.primary),
-              onChanged: (value) {
-                volumenSample = value;
-                formKeySample.currentState?.validate();
-              },
+              controller: volumenSampleController,
               validator: (value) {
                 if (value == null || value.isEmpty)
                   return 'El campo es requerido.';
@@ -159,10 +149,7 @@ class _ViewCameraState extends State<_ViewCamera>
               labelInput: 'Factor de dilución',
               hintInput: 'Ingrese el factor de dilución la muestra',
               iconInput: Icon(Icons.science, color: colors.primary),
-              onChanged: (value) {
-                factorSample = value;
-                formKeySample.currentState?.validate();
-              },
+              controller: factorSampleController,
               validator: (value) {
                 if (value == null || value.isEmpty)
                   return 'El campo es requerido.';
@@ -270,22 +257,19 @@ class _ViewCameraState extends State<_ViewCamera>
                           );
                           return;
                         }
-
                         if (!context.mounted) return;
-
                         try {
                           final result = await uploadSampleWithFile(
-                            sampleName: nameSample,
+                            sampleName: nameSampleController.text,
                             idUser: idUser,
-                            typeSample: typeSample,
-                            volumenSample: volumenSample,
-                            factorSample: factorSample,
+                            typeSample: typeSampleController.text,
+                            volumenSample: volumenSampleController.text,
+                            factorSample: factorSampleController.text,
                             sampleFile: imagePath,
                           );
-
                           if (result['success']) {
                             final int idSample = result['idSample'];
-                            showDialog(
+                            await showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
                                 title: const Text("Éxito"),
@@ -294,20 +278,25 @@ class _ViewCameraState extends State<_ViewCamera>
                                 actions: [
                                   TextButton(
                                     onPressed: () {
-                                      Navigator.pop(context);
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ResultsScreen(
-                                              idMuestra: idSample),
-                                        ),
-                                      );
-                                      formKeySample.currentState!.reset();
-                                      imagePath = '';
+                                      Navigator.of(context).pop(
+                                          true); // Devuelve un valor al cerrar el diálogo
                                     },
                                     child: const Text("OK"),
                                   ),
                                 ],
+                              ),
+                            );
+                            nameSampleController.clear();
+                            typeSampleController.clear();
+                            volumenSampleController.clear();
+                            factorSampleController.clear();
+                            formKeySample.currentState!.reset();
+                            imagePath = '';
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ResultsScreen(idMuestra: idSample),
                               ),
                             );
                           } else {
@@ -414,13 +403,16 @@ class _ViewCameraState extends State<_ViewCamera>
         actions: [
           TextButton(
             onPressed: () async {
-              Navigator.of(context).pop(); // Cierra el modal
-              final photoPath =
-                  await CameraServicesImplementation().takePhoto();
-              if (photoPath == null) return;
-              setState(() {
-                imagePath = photoPath;
-              });
+              Navigator.pop(context);
+              final imagePathOverlay = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const OverlayScreen()),
+              );
+              if (imagePath != null) {
+                setState(() {
+                  imagePath = imagePathOverlay;
+                });
+              }
             },
             child: const Text('Entendido, capturar imagen'),
           ),

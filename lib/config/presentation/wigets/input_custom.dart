@@ -10,7 +10,8 @@ class InputCustom extends StatelessWidget {
   final IconButton? suffixIcon;
   final Function(String)? onChanged;
   final String? Function(String?)? validator;
-  const InputCustom({super.key, required this.labelInput, this.hintInput, this.errorMessageInput, this.onChanged, this.validator, this.obscureTextInput=false, this.iconInput,this.keyboardType=TextInputType.text, this.suffixIcon});
+  final TextEditingController? controller; 
+  const InputCustom({super.key, required this.labelInput, this.hintInput, this.errorMessageInput, this.onChanged, this.validator, this.obscureTextInput=false, this.iconInput,this.keyboardType=TextInputType.text, this.suffixIcon, this.controller});
 
 
   @override
@@ -22,6 +23,7 @@ class InputCustom extends StatelessWidget {
       // borderSide: BorderSide(color: colors.primary)
     );
     return TextFormField(
+      controller: controller,
       onChanged: onChanged,
       // Validar el campo
       validator: validator,
