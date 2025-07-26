@@ -20,7 +20,7 @@ class HomeScreen extends StatelessWidget {
     // Saber la referencia actual
     final scaffoldKey = GlobalKey<ScaffoldState>();
     return Scaffold(
-      // resizeToAvoidBottomInset: true, // permite que se ajuste con el teclado
+      resizeToAvoidBottomInset: true, // permite que se ajuste con el teclado
       appBar: AppBar(
         title: const Text('Registar muestra '),
       ),
