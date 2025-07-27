@@ -73,7 +73,8 @@ class _OverlayScreenState extends State<OverlayScreen> {
                     height: 320,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: colors.primary, width: 4),),
+                      border: Border.all(color: colors.primary, width: 4),
+                    ),
                     child: Center(
                       child: Text(
                         "Coloca aquí la muestra",
@@ -91,28 +92,28 @@ class _OverlayScreenState extends State<OverlayScreen> {
                       heroTag: 'take_photo',
                       backgroundColor: colors.primary,
                       onPressed: () async {
-  try {
-    await _initializeControllerFuture;
-    final picture = await _controller!.takePicture();
+                        try {
+                          await _initializeControllerFuture;
+                          final picture = await _controller!.takePicture();
 
-    if (context.mounted) {
-      final result = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => PreviewScreen(imagePath: picture.path),
-        ),
-      );
-
-      // Solo si se confirmó la imagen
-      if (result != null && result is String) {
-        Navigator.pop(context, result); // Regresa a Home con la imagen
-      }
-    }
-  } catch (e) {
-    print('Error al tomar foto: $e');
-  }
-},
-
+                          if (context.mounted) {
+                            final result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    PreviewScreen(imagePath: picture.path),
+                              ),
+                            );
+                            // Solo si se confirmó la imagen
+                            if (result != null && result is String) {
+                              Navigator.pop(context,
+                                  result); // Regresa a Home con la imagen
+                            }
+                          }
+                        } catch (e) {
+                          print('Error al tomar foto: $e');
+                        }
+                      },
                       child: Icon(Icons.camera, color: Colors.white),
                     ),
                   ),
@@ -137,18 +138,18 @@ class PreviewScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Vista previa")),
-      body:  Column(
-          children: [
-            // Imagen en la parte superior (toma todo el espacio disponible arriba)
-             Center(
-                child: Image.file(
-                  File(imagePath),
-                  fit: BoxFit.contain,
-                  width: double.infinity,
-                ),
-              ),
-          ],
-        ),
+      body: Column(
+        children: [
+          // Imagen en la parte superior (toma todo el espacio disponible arriba)
+          Center(
+            child: Image.file(
+              File(imagePath),
+              fit: BoxFit.contain,
+              width: double.infinity,
+            ),
+          ),
+        ],
+      ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -158,7 +159,7 @@ class PreviewScreen extends StatelessWidget {
               Navigator.pop(context); // Volver a tomar
             },
             icon: const Icon(Icons.refresh),
-            label: const Text("Repetir2"),
+            label: const Text("Repetir"),
             backgroundColor: Colors.red,
           ),
           FloatingActionButton.extended(

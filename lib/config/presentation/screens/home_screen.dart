@@ -39,10 +39,10 @@ class _ViewCameraState extends State<_ViewCamera>
     with TickerProviderStateMixin {
   late final TabController _tabController;
   final GlobalKey<FormState> formKeySample = GlobalKey<FormState>();
-  String nameSample = '';
-  String typeSample = '';
-  String factorSample = '';
-  String volumenSample = '';
+  final TextEditingController nameSampleController = TextEditingController();
+  final TextEditingController typeSampleController = TextEditingController();
+  final TextEditingController factorSampleController = TextEditingController();
+  final TextEditingController volumenSampleController = TextEditingController();
   String imagePath = '';
   int? idUser;
   String? nameUser;
@@ -62,7 +62,12 @@ class _ViewCameraState extends State<_ViewCamera>
   @override
   void dispose() {
     _tabController.dispose();
+      nameSampleController.dispose();
+  typeSampleController.dispose();
+  factorSampleController.dispose();
+  volumenSampleController.dispose();
     super.dispose();
+    
   }
 
   Widget buildImageView() {
@@ -96,20 +101,11 @@ class _ViewCameraState extends State<_ViewCamera>
         key: formKeySample,
         child: Column(
           children: [
-            const SizedBox(height: 8),
-            const Text(
-              'Complete la información necesaria',
-              style: TextStyle(fontSize: 17),
-            ),
-            const SizedBox(height: 12),
             InputCustom(
               labelInput: 'Nombre de la muestra',
               hintInput: 'Ingrese el nombre de la muestra',
               iconInput: Icon(Icons.label_important, color: colors.primary),
-              onChanged: (value) {
-                nameSample = value;
-                formKeySample.currentState?.validate();
-              },
+              controller: nameSampleController,
               validator: (value) {
                 if (value == null || value.isEmpty)
                   return 'El campo es requerido.';
@@ -123,10 +119,7 @@ class _ViewCameraState extends State<_ViewCamera>
               labelInput: 'Tipo de muestra',
               hintInput: 'Ingrese el tipo de muestra',
               iconInput: Icon(Icons.category, color: colors.primary),
-              onChanged: (value) {
-                typeSample = value;
-                formKeySample.currentState?.validate();
-              },
+              controller: typeSampleController,
               validator: (value) {
                 if (value == null || value.isEmpty)
                   return 'El campo es requerido.';
@@ -140,10 +133,7 @@ class _ViewCameraState extends State<_ViewCamera>
               labelInput: 'Volumen de sembrado',
               hintInput: 'Ingrese el volumen de sembrado de la muestra',
               iconInput: Icon(Icons.local_drink, color: colors.primary),
-              onChanged: (value) {
-                volumenSample = value;
-                formKeySample.currentState?.validate();
-              },
+              controller: volumenSampleController,
               validator: (value) {
                 if (value == null || value.isEmpty)
                   return 'El campo es requerido.';
@@ -159,10 +149,7 @@ class _ViewCameraState extends State<_ViewCamera>
               labelInput: 'Factor de dilución',
               hintInput: 'Ingrese el factor de dilución la muestra',
               iconInput: Icon(Icons.science, color: colors.primary),
-              onChanged: (value) {
-                factorSample = value;
-                formKeySample.currentState?.validate();
-              },
+              controller: factorSampleController,
               validator: (value) {
                 if (value == null || value.isEmpty)
                   return 'El campo es requerido.';
@@ -275,11 +262,11 @@ class _ViewCameraState extends State<_ViewCamera>
 
                         try {
                           final result = await uploadSampleWithFile(
-                            sampleName: nameSample,
+                            sampleName: nameSampleController.text,
                             idUser: idUser,
-                            typeSample: typeSample,
-                            volumenSample: volumenSample,
-                            factorSample: factorSample,
+                            typeSample: typeSampleController.text,
+                            volumenSample: volumenSampleController.text,
+                            factorSample: factorSampleController.text,
                             sampleFile: imagePath,
                           );
 
