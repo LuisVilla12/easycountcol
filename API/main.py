@@ -45,6 +45,7 @@ async def registrar_muestra_file(
     typeSample: str = Form(...),
     volumenSample: str = Form(...),
     factorSample: str = Form(...),
+    medioSample: str = Form(...),
     sample_file: UploadFile = File(...)):
     return RegistarMuestra.save_with_file(
         sampleName=sampleName,
@@ -52,6 +53,7 @@ async def registrar_muestra_file(
         typeSample=typeSample,
         volumenSample=volumenSample,
         factorSample=factorSample,
+        medioSample=medioSample,
         sample_file=sample_file
     )
 #Ruta para mostar la imagen procesada

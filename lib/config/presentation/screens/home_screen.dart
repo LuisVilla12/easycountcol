@@ -1,15 +1,15 @@
 import 'dart:io';
-
+import 'package:dotted_border/dotted_border.dart';
 import 'package:easycoutcol/app/registerSample.dart';
 import 'package:easycoutcol/config/menu/side_menu.dart';
 import 'package:easycoutcol/config/presentation/providers/login_provider.dart';
+import 'package:easycoutcol/config/presentation/screens/overlay_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
 import 'package:easycoutcol/config/presentation/wigets/input_custom.dart';
 import 'package:easycoutcol/config/services/camera_services_implementation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// import 'package:shared_preferences/shared_preferences.dart';
 class HomeScreen extends StatelessWidget {
   static const String name = 'home_screen';
   const HomeScreen({super.key});
@@ -18,18 +18,50 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Saber la referencia actual
     final scaffoldKey = GlobalKey<ScaffoldState>();
+    final GlobalKey<_ViewCameraState> cameraKey = GlobalKey<_ViewCameraState>();
+
     return Scaffold(
+      resizeToAvoidBottomInset: true, // permite que se ajuste con el teclado
       appBar: AppBar(
-        title: const Text('Registar muestra '),
+        title: const Text('Registrar muestra'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh), // ícono de reset
+            tooltip: 'Resetear formulario',
+            onPressed: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('¿Estás seguro?'),
+                  content: const Text(
+                      'Esto limpiará todos los campos del formulario.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text('Cancelar'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text('Confirmar'),
+                    ),
+                  ],
+                ),
+              );
+              if (confirm == true) {
+                cameraKey.currentState?.cleanControllers();
+              }
+            },
+          ),
+        ],
       ),
       drawer: SideMenu(scaffoldKey: scaffoldKey),
-      body: const _ViewCamera(),
+      body: _ViewCamera(key: cameraKey),
     );
   }
 }
 
 class _ViewCamera extends StatefulWidget {
-  const _ViewCamera();
+  const _ViewCamera({super.key});
 
   @override
   State<_ViewCamera> createState() => _ViewCameraState();
@@ -43,15 +75,24 @@ class _ViewCameraState extends State<_ViewCamera>
   final TextEditingController typeSampleController = TextEditingController();
   final TextEditingController factorSampleController = TextEditingController();
   final TextEditingController volumenSampleController = TextEditingController();
+  final TextEditingController mediumController = TextEditingController();
+  String? selectedMedium;
   String imagePath = '';
   int? idUser;
   String? nameUser;
 
+  final List<String> mediaOptions = [
+    'Sin seleccionar',
+    'Agar nutritivo',
+    'Agar MacConkey',
+    'Agar sangre',
+    'Agar Sabouraud',
+    'TSB',
+  ];
+
   @override
   void initState() {
     super.initState();
-    // Saber los datos del usuario con shared preferences
-    // _cargarDatosUsuario();
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
       // cambiar el state del tab
@@ -62,17 +103,28 @@ class _ViewCameraState extends State<_ViewCamera>
   @override
   void dispose() {
     _tabController.dispose();
-      nameSampleController.dispose();
-  typeSampleController.dispose();
-  factorSampleController.dispose();
-  volumenSampleController.dispose();
+    nameSampleController.dispose();
+    typeSampleController.dispose();
+    factorSampleController.dispose();
+    volumenSampleController.dispose();
+    mediumController.dispose();
     super.dispose();
-    
   }
 
-  Widget buildImageView() {
-    if (imagePath == '') return const SizedBox.shrink();
+  void cleanControllers() {
+    nameSampleController.clear();
+    typeSampleController.clear();
+    factorSampleController.clear();
+    volumenSampleController.clear();
+    mediumController.clear();
+    imagePath = '';
+    setState(() {
+      selectedMedium = null;
+    });
+  }
 
+  Widget ShowImageView() {
+    if (imagePath == '') return const SizedBox.shrink();
     final file = File(imagePath);
     if (!file.existsSync()) {
       return const Padding(
@@ -96,7 +148,7 @@ class _ViewCameraState extends State<_ViewCamera>
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 5),
       child: Form(
         key: formKeySample,
         child: Column(
@@ -109,7 +161,7 @@ class _ViewCameraState extends State<_ViewCamera>
               validator: (value) {
                 if (value == null || value.isEmpty)
                   return 'El campo es requerido.';
-                if (value.length < 1)
+                if (value.length < 2)
                   return 'El campo debe  tener una longitud valida.';
                 return null;
               },
@@ -130,17 +182,16 @@ class _ViewCameraState extends State<_ViewCamera>
             ),
             const SizedBox(height: 12),
             InputCustom(
-              labelInput: 'Volumen de sembrado',
-              hintInput: 'Ingrese el volumen de sembrado de la muestra',
+              labelInput: 'Volumen de sembrado (mL)',
+              hintInput: 'Ingrese el volumen de sembrado de la muestra (mL)',
               iconInput: Icon(Icons.local_drink, color: colors.primary),
               controller: volumenSampleController,
               validator: (value) {
                 if (value == null || value.isEmpty)
                   return 'El campo es requerido.';
-                if (value.length < 2)
-                  return 'El campo debe  tener una longitud valida.';
                 return null;
               },
+              keyboardType: TextInputType.number,
             ),
             const SizedBox(
               height: 12,
@@ -153,13 +204,41 @@ class _ViewCameraState extends State<_ViewCamera>
               validator: (value) {
                 if (value == null || value.isEmpty)
                   return 'El campo es requerido.';
-                if (value.length < 2)
-                  return 'El campo debe  tener una longitud valida.';
                 return null;
               },
               keyboardType: TextInputType.number,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(
+              height: 15,
+            ),
+            DropdownButtonFormField<String>(
+              decoration: InputDecoration(
+                labelText: 'Medio de cultivo',
+                prefixIcon: Icon(Icons.science, color: colors.primary),
+                border: UnderlineInputBorder(
+                  borderSide: BorderSide(color: colors.primary, width: 2),
+                ),
+              ),
+              items: mediaOptions.map((String medium) {
+                return DropdownMenuItem<String>(
+                  value: medium,
+                  child: Text(medium),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedMedium = value;
+                  mediumController.text = value ?? '';
+                });
+              },
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Seleccione un medio de cultivo.';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 5),
             TabBar(
               controller: _tabController,
               onTap: (_) => setState(() {}), // Importante para refrescar
@@ -168,7 +247,7 @@ class _ViewCameraState extends State<_ViewCamera>
                 Tab(text: 'Subir'),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
               switchInCurve: Curves.easeInOut,
@@ -186,46 +265,9 @@ class _ViewCameraState extends State<_ViewCamera>
                 );
               },
               child: _tabController.index == 0
-                  ? Center(
-                      child: Column(children: [
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        FilledButton.icon(
-                            onPressed: () {
-                              showCaptureRecommendations(context);
-                            },
-                            icon: const Icon(Icons.camera_alt_rounded),
-                            label: imagePath == ''
-                                ? const Text('Capturar una imagen')
-                                : const Text('Volver a tomar una imagen')),
-                      ]),
-                    )
-                  : Center(
-                      child: Column(children: [
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        FilledButton.icon(
-                            onPressed: () async {
-                              final photoPath =
-                                  await CameraServicesImplementation()
-                                      .selectPhoto();
-                              if (photoPath == null) return null;
-                              photoPath;
-                              setState(() {
-                                imagePath = photoPath;
-                              });
-                            },
-                            icon: const Icon(Icons.photo_library_sharp),
-                            label: imagePath == ''
-                                ? const Text('Seleccionar una imagen')
-                                : const Text(
-                                    'Volver a seleccionar una imagen')),
-                      ]),
-                    ),
+                  ? takeAPhoto(context, imagePath)
+                  : uploadAPhoto(context, imagePath),
             ),
-            buildImageView(),
             const SizedBox(
               height: 20,
             ),
@@ -237,9 +279,50 @@ class _ViewCameraState extends State<_ViewCamera>
                         ref.watch(idUserProvider); // Obtener el ID de Riverpod
                     return FilledButton.icon(
                       onPressed: () async {
+                        // Solicita al usuario la confirmación antes de registrar la muestra
+                        final confirmSendSample = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Confirmar'),
+                          content: const Text(
+                              '¿Deseas registrar la muestra?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () =>
+                                  Navigator.of(context).pop(
+                                      false),
+                              child: const Text('Cancelar'),
+                            ),
+                            TextButton(
+                              onPressed: () =>
+                                  Navigator.of(context).pop(
+                                      true),
+                              child: const Text('Aceptar'),
+                            ),
+                          ],
+                        ),                        
+                        );
+                        if (confirmSendSample == true) {
                         final isValid = formKeySample.currentState!.validate();
                         if (!isValid) return;
-
+                        if (selectedMedium == null ||
+                            selectedMedium == 'Sin seleccionar') {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Medio de cultivo requerido'),
+                              content: const Text(
+                                  'Por favor selecciona un medio de cultivo antes de continuar.'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text('Aceptar'),
+                                ),
+                              ],
+                            ),
+                          );
+                          return;
+                        }
                         if (imagePath == '') {
                           showDialog(
                             context: context,
@@ -257,9 +340,7 @@ class _ViewCameraState extends State<_ViewCamera>
                           );
                           return;
                         }
-
                         if (!context.mounted) return;
-
                         try {
                           final result = await uploadSampleWithFile(
                             sampleName: nameSampleController.text,
@@ -267,12 +348,12 @@ class _ViewCameraState extends State<_ViewCamera>
                             typeSample: typeSampleController.text,
                             volumenSample: volumenSampleController.text,
                             factorSample: factorSampleController.text,
+                            medioSample: mediumController.text,
                             sampleFile: imagePath,
                           );
-
                           if (result['success']) {
                             final int idSample = result['idSample'];
-                            showDialog(
+                            await showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
                                 title: const Text("Éxito"),
@@ -281,20 +362,20 @@ class _ViewCameraState extends State<_ViewCamera>
                                 actions: [
                                   TextButton(
                                     onPressed: () {
-                                      Navigator.pop(context);
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ResultsScreen(
-                                              idMuestra: idSample),
-                                        ),
-                                      );
-                                      formKeySample.currentState!.reset();
-                                      imagePath = '';
+                                      Navigator.of(context).pop(
+                                          true); // Devuelve un valor al cerrar el diálogo
                                     },
                                     child: const Text("OK"),
                                   ),
                                 ],
+                              ),
+                            );
+                            cleanControllers();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ResultsScreen(idMuestra: idSample),
                               ),
                             );
                           } else {
@@ -316,9 +397,10 @@ class _ViewCameraState extends State<_ViewCamera>
                         } catch (e) {
                           // print(e);
                         }
+                      }
                       },
                       icon: const Icon(Icons.save),
-                      label: const Text('Registrarse'),
+                      label: const Text('Registrar muestra'),
                       style: FilledButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 15, vertical: 15),
@@ -332,6 +414,95 @@ class _ViewCameraState extends State<_ViewCamera>
             const SizedBox(
               height: 20,
             )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget takeAPhoto(BuildContext context, String imagenPath) {
+    final colors = Theme.of(context).colorScheme;
+    return DottedBorder(
+      options: RectDottedBorderOptions(
+        dashPattern: [10, 5],
+        strokeWidth: 2,
+        padding: EdgeInsets.all(30),
+        color: colors.primary,
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        color: colors.primary,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Si no hay imagen mostrar el icono de la camara, caso contrario mostrar el preview de la imagen
+            imagePath == ''?Icon(Icons.camera_alt_outlined, color: Colors.white, size: 40):ShowImageView(),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: colors.primary,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onPressed: () {
+                showCaptureRecommendations(context);
+              },
+              icon: const Icon(Icons.camera_alt_outlined),
+              label: imagePath == ''
+                  ? const Text('Capturar una imagen')
+                  : const Text('Volver a tomar una imagen'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget uploadAPhoto(BuildContext context, String imagenPath) {
+    final colors = Theme.of(context).colorScheme;
+    return DottedBorder(
+      options: RectDottedBorderOptions(
+        dashPattern: [10, 5],
+        strokeWidth: 2,
+        padding: EdgeInsets.all(30),
+        color: colors.primary,
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        color: colors.primary,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            imagePath == ''?Icon(Icons.upload_file_outlined, color: Colors.white, size: 40):ShowImageView(),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: colors.primary,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onPressed: () async {
+                final photoPath =
+                    await CameraServicesImplementation().selectPhoto();
+                if (photoPath == null) return null;
+                photoPath;
+                setState(() {
+                  imagePath = photoPath;
+                });
+              },
+              icon: const Icon(Icons.upload_outlined),
+              label: imagePath == ''
+                  ? const Text('Seleccionar una imagen')
+                  : const Text('Seleccionar otra una imagen'),
+            ),
           ],
         ),
       ),
@@ -401,13 +572,16 @@ class _ViewCameraState extends State<_ViewCamera>
         actions: [
           TextButton(
             onPressed: () async {
-              Navigator.of(context).pop(); // Cierra el modal
-              final photoPath =
-                  await CameraServicesImplementation().takePhoto();
-              if (photoPath == null) return;
-              setState(() {
-                imagePath = photoPath;
-              });
+              Navigator.pop(context);
+              final imagePathOverlay = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const OverlayScreen()),
+              );
+              if (imagePath != null) {
+                setState(() {
+                  imagePath = imagePathOverlay;
+                });
+              }
             },
             child: const Text('Entendido, capturar imagen'),
           ),

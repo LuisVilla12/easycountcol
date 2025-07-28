@@ -9,6 +9,8 @@ Future<Map<String, dynamic>> uploadSampleWithFile({
   required String volumenSample,
   required String factorSample,
   required String sampleFile,
+  required String medioSample,
+
 }) async {
   // Utilizar dotenv para manejar la URL de la API
   final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:8000';
@@ -22,6 +24,7 @@ Future<Map<String, dynamic>> uploadSampleWithFile({
     ..fields['typeSample'] = typeSample
     ..fields['volumenSample'] = volumenSample
     ..fields['factorSample'] = factorSample
+    ..fields['medioSample'] = medioSample
     ..files.add(await http.MultipartFile.fromPath('sample_file', sampleFile));
 
   final response = await request.send();

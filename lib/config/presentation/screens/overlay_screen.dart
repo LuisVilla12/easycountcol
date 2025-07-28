@@ -136,42 +136,88 @@ class PreviewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors=Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: const Text("Vista previa")),
-      body: Column(
-        children: [
-          // Imagen en la parte superior (toma todo el espacio disponible arriba)
-          Center(
-            child: Image.file(
-              File(imagePath),
-              fit: BoxFit.contain,
-              width: double.infinity,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Imagen en la parte superior (toma todo el espacio disponible arriba)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+              child: Center(
+                child: Image.file(
+                  File(imagePath),
+                  fit: BoxFit.contain,
+                  width: double.infinity,
+                ),
+              ),
             ),
-          ),
-        ],
-      ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton.extended(
-            heroTag: 'repetir',
-            onPressed: () {
-              Navigator.pop(context); // Volver a tomar
-            },
-            icon: const Icon(Icons.refresh),
-            label: const Text("Repetir"),
-            backgroundColor: Colors.red,
-          ),
-          FloatingActionButton.extended(
-            heroTag: 'usar',
-            onPressed: () {
-              Navigator.pop(context, imagePath); // Confirmar imagen
-            },
-            icon: const Icon(Icons.check),
-            label: const Text("Usar imagen"),
-            backgroundColor: Colors.green,
-          ),
-        ],
+            SizedBox(height: 20), // Espacio entre imagen y botones
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 6,
+                        offset: const Offset(2, 4), // desplazamiento
+                      ),
+                    ],
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: TextButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(Icons.refresh, color: Colors.white),
+                    label: const Text('Repetir',
+                        style: TextStyle(color: Colors.white)),
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.red.shade700,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 30, vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 16), // Espacio entre botones
+                Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 6,
+                        offset: const Offset(2, 4), // desplazamiento
+                      ),
+                    ],
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: TextButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context, imagePath); // Confirmar imagen
+                    },
+                    icon: const Icon(Icons.check, color: Colors.white),
+                    label: const Text('Confirmar',
+                        style: TextStyle(color: Colors.white)),
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.green.shade700,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 30, vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                  ),
+                ),    
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
