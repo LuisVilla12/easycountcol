@@ -29,6 +29,18 @@ class AppTheme {
     colorSchemeSeed: colorList[selectedColor],
     appBarTheme: const AppBarTheme(
       centerTitle: false
-    )
+    ),
+        navigationDrawerTheme: NavigationDrawerThemeData(
+      indicatorShape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(6), // 🔲 Bordes menos redondos
+      ),
+      indicatorColor: Colors.blue.shade300, // Color de fondo al seleccionar
+      labelTextStyle: WidgetStatePropertyAll(
+        TextStyle(color: Colors.black),
+      ),
+      iconTheme: WidgetStatePropertyAll(
+        IconThemeData(color: Colors.black),
+      ),
+    ),
   );
 }

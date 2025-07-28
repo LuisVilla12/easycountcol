@@ -123,7 +123,7 @@ class _ViewCameraState extends State<_ViewCamera>
     });
   }
 
-  Widget ShowImageView() {
+  Widget showImageView() {
     if (imagePath == '') return const SizedBox.shrink();
     final file = File(imagePath);
     if (!file.existsSync()) {
@@ -436,7 +436,7 @@ class _ViewCameraState extends State<_ViewCamera>
           mainAxisSize: MainAxisSize.min,
           children: [
             // Si no hay imagen mostrar el icono de la camara, caso contrario mostrar el preview de la imagen
-            imagePath == ''?Icon(Icons.camera_alt_outlined, color: Colors.white, size: 40):ShowImageView(),
+            imagePath == ''?Icon(Icons.camera_alt_outlined, color: Colors.white, size: 40):showImageView(),
             const SizedBox(height: 16),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
@@ -477,7 +477,7 @@ class _ViewCameraState extends State<_ViewCamera>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            imagePath == ''?Icon(Icons.upload_file_outlined, color: Colors.white, size: 40):ShowImageView(),
+            imagePath == ''?Icon(Icons.upload_file_outlined, color: Colors.white, size: 40):showImageView(),
             const SizedBox(height: 16),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(

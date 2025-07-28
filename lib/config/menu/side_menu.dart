@@ -23,7 +23,6 @@ class _SideMenuState extends ConsumerState<SideMenu> {
           fontWeight: FontWeight.bold,
         );
     // Saber el usuario con riverpod
-    final username = ref.watch(usernameProvider);
     final name = ref.watch(nameProvider);
     final lastName = ref
         .watch(lastnameProvider); // final idUser = ref.watch(idUserProvider);
@@ -45,13 +44,75 @@ class _SideMenuState extends ConsumerState<SideMenu> {
         const SizedBox(height: 10),
         Padding(
           padding: EdgeInsets.fromLTRB(28, hasNotch ? 10 : 40, 10, 10),
-          child: Text('Bienvenido  $name $lastName ', style: titleStyle),
+          child: Column(
+            children: [
+              Text('$name $lastName', style: titleStyle?.copyWith(fontSize: 20)),
+              Text('Bienvenido de nuevo', style: titleStyle?.copyWith(fontSize: 14,fontWeight:FontWeight.normal)),
+            ],
+          ),
         ),
-        const SizedBox(height: 20),
-        ...appMenuItems.asMap().entries.map((entry) {
+        const SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 16, 15),
+          child: const Text('NAVEGACIÓN', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+        ),
+        // Muestra las primeras tres opciones del menú
+        ...appMenuItems.asMap().entries.where((entry)=> entry.key<=2).map((entry) {
           final index = entry.key;
           final item = entry.value;
-
+          return NavigationDrawerDestination(
+            icon: Icon(
+              item.icon,
+              color: navDrawerIndex == index ? Colors.white : colors.primary,
+            ),
+            label: Text(
+              item.title,
+              style: TextStyle(
+                color: navDrawerIndex == index ? Colors.white : colors.primary, fontSize: 15,
+              ),
+            ),
+          );
+        }),
+        Padding(
+          padding: EdgeInsets.fromLTRB(28, 0, 16, 0),
+          child: Divider(
+            color: colors.primary.withOpacity(0.5),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 10, 16, 10),
+          child: const Text('PREFERENCIAS', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+        ),
+        // Muestra las siguientes opciones del menú 
+        ...appMenuItems.asMap().entries.where((entry)=> entry.key>2 && entry.key<4).map((entry) {
+          final index = entry.key;
+          final item = entry.value;
+          return NavigationDrawerDestination(
+            icon: Icon(
+              item.icon,
+              color: navDrawerIndex == index ? Colors.white : colors.primary,
+            ),
+            label: Text(
+              item.title,
+              style: TextStyle(
+                color: navDrawerIndex == index ? Colors.white : colors.primary,fontSize: 15,
+              ),
+            ),
+          );
+        }),
+        Padding(
+          padding: EdgeInsets.fromLTRB(28, 0, 16, 0),
+          child: Divider(
+            color: colors.primary.withOpacity(0.5),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 10, 16, 10),
+          child: const Text('CUENTA', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+        ),
+        ...appMenuItems.asMap().entries.where((entry)=> entry.key>3 && entry.key<6).map((entry) {
+          final index = entry.key;
+          final item = entry.value;
           return NavigationDrawerDestination(
             icon: Icon(
               item.icon,
@@ -65,10 +126,30 @@ class _SideMenuState extends ConsumerState<SideMenu> {
             ),
           );
         }),
-        const Padding(
-          padding: EdgeInsets.fromLTRB(28, 16, 16, 10),
-          child: Divider(),
+        Padding(
+          padding: EdgeInsets.fromLTRB(28, 0, 16, 0),
+          child: Divider(
+            color: colors.primary.withOpacity(0.5),
+          ),
         ),
+         ...appMenuItems.asMap().entries.where((entry)=> entry.key>5).map((entry) {
+          final index = entry.key;
+          final item = entry.value;
+          return NavigationDrawerDestination(
+            icon: Icon(
+              item.icon,
+              color: navDrawerIndex == index ? Colors.white : colors.primary,
+            ),
+            label: Text(
+              item.title,
+              style: TextStyle(
+                color: navDrawerIndex == index ? Colors.white : colors.primary,
+              ),
+            ),
+          );
+        }),
+        const SizedBox(height: 20),
+        Center(child: const Text('VERSION: 2.1.0', style: TextStyle(fontSize: 12)))
       ],
     );
   }

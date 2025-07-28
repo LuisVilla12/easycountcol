@@ -1,11 +1,13 @@
 import 'package:easycoutcol/config/presentation/screens/auth/login_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/auth/logout_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/config_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/help_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/history_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/home_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/overlay_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/splash_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/theme_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/tutorial_screen.dart';
 import 'package:go_router/go_router.dart';
 
@@ -46,6 +48,11 @@ final appRouter = GoRouter(
       builder: (context, state) => ConfigScreen(),
     ),
     GoRoute(
+      path: '/theme',
+      name: ThemeScreen.name,
+      builder: (context, state) => ThemeScreen(),
+    ),
+    GoRoute(
       path: '/login',
       name: LoginScreen.name,
       builder: (context, state) => const LoginScreen(),
@@ -56,9 +63,14 @@ final appRouter = GoRouter(
       builder: (context, state) => const LogoutScreen(),
     ),
     GoRoute(
-       path: '/overlay',
-       name: OverlayScreen.name,
-       builder: (context, state) => const OverlayScreen(),
-     ),
+      path: '/overlay',
+      name: OverlayScreen.name,
+      builder: (context, state) => const OverlayScreen(),
+    ),
+    GoRoute(
+      path: '/help',
+      name: HelpScreen.name,
+      builder: (context, state) => const HelpScreen(),
+    ),
   ],
 );

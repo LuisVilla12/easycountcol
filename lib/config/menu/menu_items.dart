@@ -17,29 +17,29 @@ const MenuItem({
 }
 // Definir los iteams
 const appMenuItems=<MenuItem>[
-  // MenuItem(
-  //   title:'Tutorial' ,
-  //   subtitle: 'Inicio de la aplicación móvil',
-  //   link: '/tutorial',
-  //   icon:Icons.school ,
-  // ),  
   MenuItem(
     title:'Inicio' ,
     subtitle: 'Pagina principal de la aplicación movil',
     link: '/home',
-    icon:Icons.home ,
+    icon:Icons.home_outlined ,
   ),    
   MenuItem(
     title:'Historial' ,
     subtitle: 'Registro de todas las muestras ',
     link: '/history',
-    icon:Icons.menu_book_sharp ,
-  ),  
+    icon:Icons.history_outlined ,
+  ), 
   MenuItem(
     title:'Configuración' ,
-    subtitle: 'Personalización de la aplicación',
+    subtitle: 'Configuración de la aplicación',
     link: '/config',
-    icon:Icons.settings,
+    icon:Icons.settings_outlined,
+  ), 
+  MenuItem(
+    title:'Personalizar tema' ,
+    subtitle: 'Personalización de la aplicación',
+    link: '/theme',
+    icon:Icons.color_lens_outlined,
   ),
   MenuItem(
     title:'Iniciar sesión' ,
@@ -52,5 +52,11 @@ const appMenuItems=<MenuItem>[
     subtitle: 'Cerrar sesión',
     link: '/logout',
     icon:Icons.logout_outlined ,
-  ),   
+  ),  
+    MenuItem(
+    title:'Ayuda y soporte' ,
+    subtitle: 'Apoyo y soporte técnico',
+    link: '/help',
+    icon:Icons.question_answer_outlined ,
+  ),  
 ];

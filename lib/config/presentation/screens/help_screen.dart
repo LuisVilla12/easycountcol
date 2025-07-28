@@ -2,24 +2,24 @@ import 'package:easycoutcol/config/presentation/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ConfigScreen extends ConsumerWidget {
-  static const String name='config_name';
-  const ConfigScreen({super.key});
+class HelpScreen extends ConsumerWidget {
+  static const String name='help_name';
+  const HelpScreen({super.key});
 
   @override
   Widget build(BuildContext context,ref) {
     final bool isDarkmode=ref.watch(isDarkModeProvider);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Configuración'),
+        title: const Text('Ayuda y soporte'),
         ),
-        body: const _ConfigCountScreen(),
+        body: const _HelpScreen(),
     );
   }
 }
 
-class _ConfigCountScreen extends ConsumerWidget {
-  const _ConfigCountScreen();
+class _HelpScreen extends ConsumerWidget {
+  const _HelpScreen();
 
   @override
   Widget build(BuildContext context,ref) {
