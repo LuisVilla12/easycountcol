@@ -28,6 +28,7 @@ Future<Map<String, dynamic>> loginUsuario({
       'name': data['name'],
       'lastname': data['lastname'],
       'username': data['username'],
+      'email': data['email'],
     };
   } else {
     final data = jsonDecode(response.body);

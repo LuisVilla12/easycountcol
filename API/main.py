@@ -25,6 +25,7 @@ app.add_middleware(
 @app.get("/")
 def home():
     return {"mensaje": "Bienvenido a la API"}
+
 #Ruta para el registro de un usuario
 @app.post("/registrar-usuario")
 def registrarUsuario(data: usuario):
@@ -33,10 +34,12 @@ def registrarUsuario(data: usuario):
         return {"mensaje": "Usuario registrado con éxito"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 #Ruta para inicio de sesión
 @app.post("/login")
 def login(usuario: LoginUsuario):
     return login_usuario(usuario)
+
 #Ruta para registro de una muestra
 @app.post("/registrar-muestra-file")
 async def registrar_muestra_file(

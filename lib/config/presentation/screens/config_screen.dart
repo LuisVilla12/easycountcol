@@ -1,4 +1,4 @@
-import 'package:easycoutcol/config/presentation/providers/theme_provider.dart';
+import 'package:easycoutcol/config/presentation/providers/login_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,8 +8,8 @@ class ConfigScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context,ref) {
-    final bool isDarkmode=ref.watch(isDarkModeProvider);
-    return Scaffold(
+      // Saber el usuario con riverpod
+   return Scaffold(
       appBar: AppBar(
         title: const Text('Configuración'),
         ),
@@ -23,6 +23,15 @@ class _ConfigCountScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context,ref) {
-    return Placeholder();
+    return Column(
+      children: [
+        const SizedBox(height: 20),
+        Text('Nombre: ${ref.watch(nameProvider)}'),
+        Text('Apellido: ${ref.watch(lastnameProvider)}'),
+        Text('Email: ${ref.watch(emailProvider)}'),
+        Text('ID Usuario: ${ref.watch(idUserProvider)}'),
+        Text('Username: ${ref.watch(usernameProvider)}'),
+      ],
+    );
   }
 }

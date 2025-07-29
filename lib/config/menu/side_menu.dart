@@ -24,8 +24,7 @@ class _SideMenuState extends ConsumerState<SideMenu> {
         );
     // Saber el usuario con riverpod
     final name = ref.watch(nameProvider);
-    final lastName = ref
-        .watch(lastnameProvider); // final idUser = ref.watch(idUserProvider);
+    final lastName = ref.watch(lastnameProvider); // final idUser = ref.watch(idUserProvider);
 
     return NavigationDrawer(
       selectedIndex: navDrawerIndex,
