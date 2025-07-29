@@ -1,4 +1,3 @@
-import 'package:easycoutcol/config/presentation/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,7 +7,6 @@ class HelpScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context,ref) {
-    final bool isDarkmode=ref.watch(isDarkModeProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Ayuda y soporte'),

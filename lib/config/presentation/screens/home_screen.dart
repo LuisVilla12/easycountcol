@@ -77,17 +77,24 @@ class _ViewCameraState extends State<_ViewCamera>
   final TextEditingController volumenSampleController = TextEditingController();
   final TextEditingController mediumController = TextEditingController();
   String? selectedMedium;
+  String? selectedClasification;
   String imagePath = '';
   int? idUser;
   String? nameUser;
 
-  final List<String> mediaOptions = [
-    'Sin seleccionar',
+  final List<String> mediumList = [
     'Agar nutritivo',
     'Agar MacConkey',
     'Agar sangre',
     'Agar Sabouraud',
-    'TSB',
+  ];
+  
+  final List<String> clasificationList = [
+    'Clinica - Biológica', //Sangre, saliva, orina, hisopados
+    'Ambiental',//Aire, superficies, agua, suelo
+    'Alimentos',//Leches, frutas, verduras, carnes
+    'Material',//Guantes, ropa de laboratorio, utensilios
+    'Otras muestras',//Otros tipos de muestras
   ];
 
   @override
@@ -120,6 +127,7 @@ class _ViewCameraState extends State<_ViewCamera>
     imagePath = '';
     setState(() {
       selectedMedium = null;
+      selectedClasification = null;
     });
   }
 
@@ -166,17 +174,43 @@ class _ViewCameraState extends State<_ViewCamera>
                 return null;
               },
             ),
-            const SizedBox(height: 12),
-            InputCustom(
-              labelInput: 'Tipo de muestra',
-              hintInput: 'Ingrese el tipo de muestra',
-              iconInput: Icon(Icons.category, color: colors.primary),
-              controller: typeSampleController,
+            // InputCustom(
+            //   labelInput: 'Tipo de muestra',
+            //   hintInput: 'Ingrese el tipo de muestra',
+            //   iconInput: Icon(Icons.category, color: colors.primary),
+            //   controller: typeSampleController,
+            //   validator: (value) {
+            //     if (value == null || value.isEmpty)
+            //       return 'El campo es requerido.';
+            //     if (value.length < 2)
+            //       return 'El campo debe  tener una longitud valida.';
+            //     return null;
+            //   },
+            // ),
+              DropdownButtonFormField<String>(
+              decoration: InputDecoration(
+                labelText: 'Tipo de muestra',
+                prefixIcon: Icon(Icons.science, color: colors.primary),
+                enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: colors.primary, width: 2), // cuando NO está enfocado
+                ),
+              ),
+              items: clasificationList.map((String medium) {
+                return DropdownMenuItem<String>(
+                  value: medium,
+                  child: Text(medium),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedClasification = value;
+                  typeSampleController.text = value ?? '';
+                });
+              },
               validator: (value) {
-                if (value == null || value.isEmpty)
-                  return 'El campo es requerido.';
-                if (value.length < 2)
-                  return 'El campo debe  tener una longitud valida.';
+                if (value == null || value.isEmpty) {
+                  return 'Seleccione el tipo de muestra.';
+                }
                 return null;
               },
             ),
@@ -184,7 +218,7 @@ class _ViewCameraState extends State<_ViewCamera>
             InputCustom(
               labelInput: 'Volumen de sembrado (mL)',
               hintInput: 'Ingrese el volumen de sembrado de la muestra (mL)',
-              iconInput: Icon(Icons.local_drink, color: colors.primary),
+              iconInput: Icon(Icons.water, color: colors.primary),
               controller: volumenSampleController,
               validator: (value) {
                 if (value == null || value.isEmpty)
@@ -199,7 +233,7 @@ class _ViewCameraState extends State<_ViewCamera>
             InputCustom(
               labelInput: 'Factor de dilución',
               hintInput: 'Ingrese el factor de dilución la muestra',
-              iconInput: Icon(Icons.science, color: colors.primary),
+              iconInput: Icon(Icons.local_drink, color: colors.primary),
               controller: factorSampleController,
               validator: (value) {
                 if (value == null || value.isEmpty)
@@ -209,17 +243,17 @@ class _ViewCameraState extends State<_ViewCamera>
               keyboardType: TextInputType.number,
             ),
             const SizedBox(
-              height: 15,
+              height: 8,
             ),
             DropdownButtonFormField<String>(
               decoration: InputDecoration(
                 labelText: 'Medio de cultivo',
-                prefixIcon: Icon(Icons.science, color: colors.primary),
-                border: UnderlineInputBorder(
-                  borderSide: BorderSide(color: colors.primary, width: 2),
+                prefixIcon: Icon(Icons.trending_up, color: colors.primary),
+                enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: colors.primary, width: 2), // cuando NO está enfocado
                 ),
               ),
-              items: mediaOptions.map((String medium) {
+              items: mediumList.map((String medium) {
                 return DropdownMenuItem<String>(
                   value: medium,
                   child: Text(medium),

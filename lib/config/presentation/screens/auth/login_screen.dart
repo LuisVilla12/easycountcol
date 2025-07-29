@@ -6,6 +6,7 @@ import 'package:easycoutcol/config/presentation/wigets/input_custom.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -25,6 +26,7 @@ class AuthScreen extends StatefulWidget {
   State<AuthScreen> createState() => _AuthScreenState();
 }
 
+
 class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   late final TabController _tabController;
   final GlobalKey<FormState> formKeyLogin = GlobalKey<FormState>();
@@ -42,6 +44,8 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    _verificarLoginBiometrico();
+    // Inicializar el TabController con 2 pestañas
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
       // cambiar el state del tab
@@ -49,6 +53,52 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
     });
   }
 
+Future<void> _verificarLoginBiometrico() async {
+  final sharedDatosUsuario = await SharedPreferences.getInstance();
+  final usarBiometria = sharedDatosUsuario.getBool('usarBiometria') ?? false;
+  final email = sharedDatosUsuario.getString('email');
+  final password = sharedDatosUsuario.getString('password');
+
+  if (!usarBiometria || email == null || password == null) return;
+
+  final auth = LocalAuthentication();
+  final puedeAutenticar = await auth.canCheckBiometrics;
+
+  if (!puedeAutenticar) return;
+
+  final autenticado = await auth.authenticate(
+    localizedReason: 'Inicia sesión con tu huella o Face ID',
+    options: const AuthenticationOptions(biometricOnly: true),
+  );
+
+  if (autenticado) {
+    final resultado = await loginUsuario(email: email, password: password);
+    if (resultado['ok']) {
+      // navegar al home
+      if (!mounted) return;
+      context.pushReplacement('/home');
+    } else {
+      // mostrar error si falla
+      if (!mounted) return;
+      mostrarError(context, 'Error al iniciar sesión');
+    }
+  }
+}
+void mostrarError(BuildContext context, String mensaje) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Error'),
+      content: Text(mensaje),
+      actions: [
+        TextButton(
+          child: const Text('Aceptar'),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ],
+    ),
+  );
+}
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
@@ -209,7 +259,6 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                     );
                     print(resultado);
                     if (resultado['ok']) {
-                      final sharedDatosUsuario = await SharedPreferences.getInstance();
                       // Almacenar en Riverpod los datos del usuario
                       ref.read(usernameProvider.notifier).state =
                           resultado['username'];
@@ -217,14 +266,17 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                           resultado['idUser'];
                       ref.read(nameProvider.notifier).state = resultado['name'];
                       ref.read(lastnameProvider.notifier).state = resultado['lastname'];
-                      ref.read(emailProvider.notifier).state = resultado['email'];
+                      ref.read(emailProvider.notifier).state = email;
                       //Guardar en SharedPreferences
-
+                      final sharedDatosUsuario = await SharedPreferences.getInstance();
                       await sharedDatosUsuario.setString(
                           'name', resultado['name']);
                       await sharedDatosUsuario.setInt(
                           'id_usuario', resultado['idUser']);
-
+                      await sharedDatosUsuario.setString('password', password);
+                      await sharedDatosUsuario.setBool('usarBiometria', true); // puedes mostrar un modal para confirmar
+                      await sharedDatosUsuario.setString('email', email);
+                      
                       showDialog(
                         context: context,
                         builder: (_) => AlertDialog(
@@ -492,3 +544,4 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
     );
   }
 }
+

@@ -136,7 +136,6 @@ class PreviewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors=Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: const Text("Vista previa")),
       body: SingleChildScrollView(

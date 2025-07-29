@@ -1,5 +1,6 @@
 import 'package:easycoutcol/app/Samples.dart';
 import 'package:easycoutcol/config/presentation/providers/login_provider.dart';
+import 'package:easycoutcol/config/presentation/providers/theme_provider.dart';
 import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -25,6 +26,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     // Saber el calor actual del id_usuario que inicio sesión directamente desde riverpod
     idUser = ref.read(idUserProvider);
   }
+  // Obtener las muestras de la API
   Future<List<Sample>> fetchSamples() async {
     // Utilizar dotenv para manejar la URL de la API
     final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:8000';
@@ -33,37 +35,41 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonData = jsonDecode(response.body);
       final List<dynamic> samplesList = jsonData['samples'];
-
       // Mapea cada sublista a un objeto Sample
       return samplesList.map((item) => Sample.fromJsonList(item)).toList();
     } else {
       throw Exception('Error al cargar las muestras');
     }
   }
+  // Colores de la clasificacion
+final Map<String, Map<String, dynamic>> classification = {
+  'Clinica - Biológica': {
+    'color': Colors.red.shade700,
+    'icon': Icons.medical_services_outlined,
+  },
+  'Ambiental': {
+    'color': Colors.green.shade700,
+    'icon': Icons.public_outlined,
+  },
+  'Alimentos': {
+    'color': Colors.purple.shade700,
+    'icon': Icons.restaurant_outlined,
+  },
+  'Material': {
+    'color': Colors.blue.shade700,
+    'icon': Icons.build_outlined,
+  },
+  'Otras muestras': {
+    'color': Colors.grey.shade700,
+    'icon': Icons.category_outlined,
+  },
+};
+String? _selectedFilter; // null significa "sin filtro"
 
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Scaffold(
-        appBar: AppBar(title: const Text('Historial'),
-        actions: [
-          Row(
-            children: [
-            IconButton(
-            icon: const Icon(Icons.filter_alt_outlined),
-            onPressed: () {
-              setState(() {}); // Refresca la pantalla al presionar el botón
-            },
-            ),
-            IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-            },
-            ),
-            ],
-          )
-        ],),
-        body:  FutureBuilder<List<Sample>>(
+  // Construir listado de muestras
+  Widget buildSampleList() {
+    final colors=Theme.of(context).colorScheme;
+    return FutureBuilder<List<Sample>>(
             future: fetchSamples(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -73,11 +79,17 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                 return const Center(child: Text('No hay muestras disponibles'));
               } else {
-                final samples = snapshot.data!;
+                // Obtener todas las muestras
+                final allSamples = snapshot.data!;
+                // Filtra las muestras según el filtro seleccionado
+                final samplesFilter = (_selectedFilter == null)? allSamples:allSamples.where((s) => s.typeSample == _selectedFilter).toList();
+                if (samplesFilter.isEmpty) {
+                  return const Center(child: Text('No hay muestras para esta categoría'));
+                }
                 return ListView.builder(
-                  itemCount: samples.length,
+                  itemCount: samplesFilter.length,
                   itemBuilder: (context, index) {
-                    final sample = samples[index];
+                    final sample = samplesFilter[index];
                     final timeSample = sample.creationTime;
                     // Convertir el dato que viene de la base de datos a datatime
                     final DateTime now = DateTime.now();
@@ -87,13 +99,10 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                     // Convertir el datatime a time formateado
                     final String formattedTime =
                         DateFormat('HH:mm:ss').format(creationTime);
-          
                     return sampleTile(
                       context,
                       sample,
-                      sample.typeSample == 'agua'
-                          ? colors.primary
-                          : Colors.green,
+                      classification[sample.typeSample]?['color'] ?? colors.primary,
                       DateFormat('dd/MM/yyyy').format(creationTime),
                       formattedTime,
                     );
@@ -101,8 +110,81 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                 );
               }
             },
+          );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDarkmode = ref.watch(isDarkModeProvider);
+    return Scaffold(
+        appBar: AppBar(title: const Text('Historial'),
+        actions: [
+          Row(
+            children: [
+              IconButton(
+  icon: const Icon(Icons.filter_alt_outlined),
+  onPressed: () {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: isDarkmode?Colors.black:Colors.white, // Cambia el color de fondo
+      shape: const RoundedRectangleBorder(
+    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+  ),
+    isScrollControlled: true, // permite ajustar el tamaño
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
+          // Ocupa solo el tamaño necesario
+          child: Wrap(
+            children: [
+              ...classification.entries.map((entry) {
+                final category = entry.key;
+                final color = entry.value['color'];
+                final icon = entry.value['icon'];
+                return Center(
+                  child: ListTile(
+                    selectedTileColor: color, // si deseas que al tocar se quede así
+                    leading: CircleAvatar(
+                      backgroundColor: color,
+                      child: Icon(icon, color: Colors.white),
+                    ),
+                    title: Text(category),
+                    onTap: () {
+                      setState(() {
+                        _selectedFilter = category;
+                      });
+                      Navigator.pop(context);
+                    },
+                  ),
+                );
+              }),
+              ListTile(
+                leading: const Icon(Icons.clear),
+                title: const Text('Quitar filtro'),
+                onTap: () {
+                  setState(() {
+                    _selectedFilter = null;
+                  });
+                  Navigator.pop(context);
+                },
+              ),
+            ],
           ),
         );
+      },
+    );
+  },
+),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              setState(() {}); // Refresca la pantalla al presionar el botón
+            },
+            ),
+            ],
+          )
+        ],),
+        body: buildSampleList());
   }
 }
 
@@ -114,7 +196,7 @@ Widget sampleTile(BuildContext context, Sample sample, Color tagColor, String fo
       elevation: 0,
       color: colors.primary.withOpacity(0.05),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
         leading: Stack(
           alignment: Alignment.bottomRight,
           children: [
@@ -123,7 +205,7 @@ Widget sampleTile(BuildContext context, Sample sample, Color tagColor, String fo
               radius: 24,
               child: Text(
                 sample.sampleName.substring(0, 1).toUpperCase(),
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
               ),
             ),
             Positioned(
@@ -156,7 +238,7 @@ Widget sampleTile(BuildContext context, Sample sample, Color tagColor, String fo
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                sample.typeSample == 'agua' ? 'Muestra' : 'Generación',
+                sample.typeSample,
                 style: TextStyle(
                   color: tagColor,
                   fontSize: 12,
