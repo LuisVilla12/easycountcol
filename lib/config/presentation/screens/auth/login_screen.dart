@@ -44,7 +44,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _verificarLoginBiometrico();
+    // _verificarLoginBiometrico();
     // Inicializar el TabController con 2 pestañas
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
@@ -257,7 +257,7 @@ void mostrarError(BuildContext context, String mensaje) {
                       email: email,
                       password: password,
                     );
-                    print(resultado);
+                    // print(resultado);
                     if (resultado['ok']) {
                       // Almacenar en Riverpod los datos del usuario
                       ref.read(usernameProvider.notifier).state =

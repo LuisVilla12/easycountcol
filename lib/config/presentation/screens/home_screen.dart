@@ -3,6 +3,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:easycoutcol/app/registerSample.dart';
 import 'package:easycoutcol/config/menu/side_menu.dart';
 import 'package:easycoutcol/config/presentation/providers/login_provider.dart';
+import 'package:easycoutcol/config/presentation/providers/theme_provider.dart';
 import 'package:easycoutcol/config/presentation/screens/overlay_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
 import 'package:easycoutcol/config/presentation/wigets/input_custom.dart';
@@ -590,9 +591,8 @@ class _ViewCameraState extends State<_ViewCamera>
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 10),
                 child: Card(
-                  color: Color(0xFFF0F4F8),
                   child: Padding(
-                    padding: EdgeInsets.all(10),
+                    padding: EdgeInsets.all(5),
                     child: Text(
                       '💡 Consejo profesional: Para obtener resultados óptimos, utiliza un fondo blanco o negro uniforme detrás de la placa.',
                       style: TextStyle(fontStyle: FontStyle.italic),
@@ -611,7 +611,7 @@ class _ViewCameraState extends State<_ViewCamera>
                 context,
                 MaterialPageRoute(builder: (_) => const OverlayScreen()),
               );
-              if (imagePath != null) {
+              if (imagePathOverlay != null) {
                 setState(() {
                   imagePath = imagePathOverlay;
                 });

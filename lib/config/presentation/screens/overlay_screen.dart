@@ -111,7 +111,7 @@ class _OverlayScreenState extends State<OverlayScreen> {
                             }
                           }
                         } catch (e) {
-                          print('Error al tomar foto: $e');
+                          // print('Error al tomar foto: $e');
                         }
                       },
                       child: Icon(Icons.camera, color: Colors.white),

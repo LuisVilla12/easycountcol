@@ -58,7 +58,7 @@ class _TutorialScreenState extends State<TutorialScreen> {
     // Añadir un add evelistener a la contoladora
     pageViewController.addListener((){
       // Saber en que pagina esta
-      print('${pageViewController.page}');
+      // print('${pageViewController.page}');
       final page=pageViewController.page??0;
       if(!endTutorial&& page>=(slides.length-1.4)){
         // Solo se va a utilizar una ves esa condicion

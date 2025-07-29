@@ -11,7 +11,7 @@ class ConfigScreen extends ConsumerWidget {
       // Saber el usuario con riverpod
    return Scaffold(
       appBar: AppBar(
-        title: const Text('Configuración'),
+        title: const Text('Datos del usuario'),
         ),
         body: const _ConfigCountScreen(),
     );
