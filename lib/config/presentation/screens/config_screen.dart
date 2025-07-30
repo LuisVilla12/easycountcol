@@ -9,7 +9,7 @@ class ConfigScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context,ref) {
       // Saber el usuario con riverpod
-   return Scaffold(
+  return Scaffold(
       appBar: AppBar(
         title: const Text('Datos del usuario'),
         ),
@@ -23,15 +23,27 @@ class _ConfigCountScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context,ref) {
-    return Column(
-      children: [
-        const SizedBox(height: 20),
-        Text('Nombre: ${ref.watch(nameProvider)}'),
-        Text('Apellido: ${ref.watch(lastnameProvider)}'),
-        Text('Email: ${ref.watch(emailProvider)}'),
-        Text('ID Usuario: ${ref.watch(idUserProvider)}'),
-        Text('Username: ${ref.watch(usernameProvider)}'),
-      ],
+    final colors=Theme.of(context).colorScheme;
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(5),
+                boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
+              )),
+            Text('Nombre: ${ref.watch(nameProvider)}'),
+            Text('Apellido: ${ref.watch(lastnameProvider)}'),
+            Text('Email: ${ref.watch(emailProvider)}'),
+            Text('ID Usuario: ${ref.watch(idUserProvider)}'),
+            Text('Username: ${ref.watch(usernameProvider)}'),
+          ],
+        ),
+      ),
     );
   }
 }
