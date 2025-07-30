@@ -4,6 +4,8 @@
 	<dict>
 		<key>NSCameraUsageDescription</key>
 		<string>La aplicación necesita acceder a la cámara para tomar fotos.</string>
+		<key>NSFaceIDUsageDescription</key>
+		<string>Esta app requiere Face ID para autenticación biométrica</string>
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>

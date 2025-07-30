@@ -44,8 +44,9 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    // _verificarLoginBiometrico();
-    // Inicializar el TabController con 2 pestañas
+    // Esperar al siguiente "frame" para asegurarse de que el contexto esté listo
+  Future.delayed(Duration.zero, _verificarLoginBiometrico);
+      // Inicializar el TabController con 2 pestañas
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
       // cambiar el state del tab
@@ -67,23 +68,27 @@ Future<void> _verificarLoginBiometrico() async {
   if (!puedeAutenticar) return;
 
   final autenticado = await auth.authenticate(
-    localizedReason: 'Inicia sesión con tu huella o Face ID',
-    options: const AuthenticationOptions(biometricOnly: true),
+    localizedReason: 'Autentícate para continuar',
+    options: const AuthenticationOptions(
+      biometricOnly: true, // permite fallback a PIN si falla biometría
+    ),
   );
 
   if (autenticado) {
     final resultado = await loginUsuario(email: email, password: password);
     if (resultado['ok']) {
-      // navegar al home
       if (!mounted) return;
-      context.pushReplacement('/home');
+
+      // Aquí cambias a navegación declarativa con GoRouter:
+      context.go('/home'); // O si tienes rutas nombradas: context.goNamed('home');
+
     } else {
-      // mostrar error si falla
       if (!mounted) return;
       mostrarError(context, 'Error al iniciar sesión');
     }
   }
 }
+
 void mostrarError(BuildContext context, String mensaje) {
   showDialog(
     context: context,
@@ -274,9 +279,8 @@ void mostrarError(BuildContext context, String mensaje) {
                       await sharedDatosUsuario.setInt(
                           'id_usuario', resultado['idUser']);
                       await sharedDatosUsuario.setString('password', password);
-                      await sharedDatosUsuario.setBool('usarBiometria', true); // puedes mostrar un modal para confirmar
                       await sharedDatosUsuario.setString('email', email);
-                      
+                      await preguntarActivarBiometria(context, sharedDatosUsuario);
                       showDialog(
                         context: context,
                         builder: (_) => AlertDialog(
@@ -286,7 +290,7 @@ void mostrarError(BuildContext context, String mensaje) {
                             TextButton(
                               onPressed: () {
                                 Navigator.pop(context);
-                                context.pushNamed(HomeScreen.name);
+context.goNamed(HomeScreen.name);
                                 formKeyLogin.currentState!.reset();
                               },
                               child: const Text('Continuar'),
@@ -545,3 +549,20 @@ void mostrarError(BuildContext context, String mensaje) {
   }
 }
 
+Future<void> preguntarActivarBiometria(BuildContext context, SharedPreferences sharedDatosUsuario) async {
+  final activar = await showDialog<bool>(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: Text('Activar biometría'),
+      content: Text('¿Deseas usar biometría para futuros inicios de sesión?'),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context, false), child: Text('No')),
+        TextButton(onPressed: () => Navigator.pop(context, true), child: Text('Sí')),
+      ],
+    ),
+  );
+  if (activar == true) {
+      await sharedDatosUsuario.setBool('usarBiometria', true); // puedes mostrar un modal para confirmar
+      print(sharedDatosUsuario.getBool('usarBiometria'));
+    }
+}

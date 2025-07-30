@@ -81,11 +81,12 @@ String? _selectedFilter; // null significa "sin filtro"
               } else {
                 // Obtener todas las muestras
                 final allSamples = snapshot.data!;
-                // Filtra las muestras según el filtro seleccionado
+                // Filtra las muestras según el fPiltro seleccionado
                 final samplesFilter = (_selectedFilter == null)? allSamples:allSamples.where((s) => s.typeSample == _selectedFilter).toList();
                 if (samplesFilter.isEmpty) {
                   return const Center(child: Text('No hay muestras para esta categoría'));
                 }
+                print(samplesFilter);
                 return ListView.builder(
                   itemCount: samplesFilter.length,
                   itemBuilder: (context, index) {
@@ -99,13 +100,81 @@ String? _selectedFilter; // null significa "sin filtro"
                     // Convertir el datatime a time formateado
                     final String formattedTime =
                         DateFormat('HH:mm:ss').format(creationTime);
-                    return sampleTile(
-                      context,
-                      sample,
-                      classification[sample.typeSample]?['color'] ?? colors.primary,
-                      DateFormat('dd/MM/yyyy').format(creationTime),
-                      formattedTime,
-                    );
+                        return Dismissible(
+  key: Key(sample.id.toString()), // Asegúrate que sample.id sea único
+
+  // Permitir swipe en ambos lados:
+  direction: DismissDirection.horizontal,
+
+  // Swipe de izquierda a derecha (startToEnd): editar
+  background: Container(
+    alignment: Alignment.centerLeft,
+    padding: const EdgeInsets.symmetric(horizontal: 20),
+    color: Colors.green,
+    child: const Icon(Icons.edit, color: Colors.white),
+  ),
+
+  // Swipe de derecha a izquierda (endToStart): borrar
+  secondaryBackground: Container(
+    alignment: Alignment.centerRight,
+    padding: const EdgeInsets.symmetric(horizontal: 20),
+    color: Colors.red,
+    child: const Icon(Icons.delete, color: Colors.white),
+  ),
+
+  confirmDismiss: (direction) async {
+    if (direction == DismissDirection.startToEnd) {
+      // Swipe para editar: aquí haces la acción de editar
+      // Por ejemplo abrir pantalla de edición
+      // No eliminar el item, solo abrir edición y cancelar dismiss
+      // editarSample(sample);
+      return false; // No eliminar
+    } else if (direction == DismissDirection.endToStart) {
+      // Swipe para borrar: confirmamos eliminar
+      final bool? confirmar = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Confirmar'),
+          content: const Text('¿Quieres eliminar esta muestra?'),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('No')),
+            TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Sí')),
+          ],
+        ),
+      );
+      return confirmar ?? false;
+    }
+    return false;
+  },
+
+  onDismissed: (direction) {
+    if (direction == DismissDirection.endToStart) {
+      // Solo borrar cuando swipe sea de derecha a izquierda
+      setState(() {
+        samplesFilter.removeAt(index);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Muestra eliminada')),
+      );
+      // Aquí podrías llamar a tu API para borrar permanentemente
+    }
+  },
+
+  child: sampleTile(
+    context,
+    sample,
+    classification[sample.typeSample]?['color'] ?? colors.primary,
+    DateFormat('dd/MM/yyyy').format(creationTime),
+    formattedTime,
+  ),
+);
+                    // return sampleTile(
+                    //   context,
+                    //   sample,
+                    //   classification[sample.typeSample]?['color'] ?? colors.primary,
+                    //   DateFormat('dd/MM/yyyy').format(creationTime),
+                    //   formattedTime,
+                    // );
                   },
                 );
               }

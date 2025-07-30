@@ -53,21 +53,21 @@ class _ThemeChangerScreen extends ConsumerWidget {
                       style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                     SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(3, (i) {
-                        final index = (selectedColor + i) % colors.length;
-                        return Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: colors[index]['color'],
-                            shape: BoxShape.circle,
-                          ),
-                        );
-                      }),
-                    ),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.center,
+                    //   children: List.generate(3, (i) {
+                    //     final index = (selectedColor + i) % colors.length;
+                    //     return Container(
+                    //       margin: const EdgeInsets.symmetric(horizontal: 4),
+                    //       width: 20,
+                    //       height: 20,
+                    //       decoration: BoxDecoration(
+                    //         color: colors[index]['color'],
+                    //         shape: BoxShape.circle,
+                    //       ),
+                    //     );
+                    //   }),
+                    // ),
                   ],
                 ),
               ),
