@@ -48,7 +48,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   Future<void> updateStateSample(Sample sample) async {
     final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:8000';
     final response = await http.put(
-      Uri.parse('$apiUrl/sample/${sample.id}'),
+      Uri.parse('$apiUrl/sample/state/${sample.id}'),
       headers: {'Content-Type': 'application/json'},
     );
 
@@ -191,7 +191,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    ResultsScreen(idMuestra: sample.id),
+                                    EditSample(idMuestra: sample.id),
                               ),
                             )
                               },

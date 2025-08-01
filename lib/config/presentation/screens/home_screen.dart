@@ -77,6 +77,7 @@ class _ViewCameraState extends State<_ViewCamera>
   final TextEditingController factorSampleController = TextEditingController();
   final TextEditingController volumenSampleController = TextEditingController();
   final TextEditingController mediumController = TextEditingController();
+  
   String? selectedMedium;
   String? selectedClasification;
   String imagePath = '';
@@ -175,19 +176,6 @@ class _ViewCameraState extends State<_ViewCamera>
                 return null;
               },
             ),
-            // InputCustom(
-            //   labelInput: 'Tipo de muestra',
-            //   hintInput: 'Ingrese el tipo de muestra',
-            //   iconInput: Icon(Icons.category, color: colors.primary),
-            //   controller: typeSampleController,
-            //   validator: (value) {
-            //     if (value == null || value.isEmpty)
-            //       return 'El campo es requerido.';
-            //     if (value.length < 2)
-            //       return 'El campo debe  tener una longitud valida.';
-            //     return null;
-            //   },
-            // ),
               DropdownButtonFormField<String>(
               decoration: InputDecoration(
                 labelText: 'Tipo de muestra',
@@ -247,6 +235,7 @@ class _ViewCameraState extends State<_ViewCamera>
               height: 8,
             ),
             DropdownButtonFormField<String>(
+              initialValue: selectedMedium,
               decoration: InputDecoration(
                 labelText: 'Medio de cultivo',
                 prefixIcon: Icon(Icons.trending_up, color: colors.primary),

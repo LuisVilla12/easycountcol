@@ -2,10 +2,14 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:easycoutcol/app/resultadoMuestra.dart';
+import 'package:easycoutcol/app/updateSample.dart';
+import 'package:easycoutcol/config/presentation/providers/login_provider.dart';
+import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
+import 'package:easycoutcol/config/presentation/wigets/input_custom.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
-
 
 class EditSample extends StatefulWidget {
   static const String name = 'edit_sample';
@@ -23,24 +27,29 @@ class _EditSampleState extends State<EditSample> {
   final TextEditingController factorSampleController = TextEditingController();
   final TextEditingController volumenSampleController = TextEditingController();
   final TextEditingController mediumController = TextEditingController();
+  final TextEditingController countController = TextEditingController();
+  final TextEditingController timeProcesingController = TextEditingController();
+  final TextEditingController dateController = TextEditingController();
+  final TextEditingController timeController = TextEditingController();
+
   String? selectedMedium;
   String? selectedClasification;
   String imagePath = '';
   int? idUser;
 
   final List<String> mediumList = [
-    'Agar nutritivo',
     'Agar MacConkey',
+    'Agar nutritivo',
     'Agar sangre',
     'Agar Sabouraud',
   ];
 
   final List<String> clasificationList = [
     'Clinica - Biológica', //Sangre, saliva, orina, hisopados
-    'Ambiental',//Aire, superficies, agua, suelo
-    'Alimentos',//Leches, frutas, verduras, carnes
-    'Material',//Guantes, ropa de laboratorio, utensilios
-    'Otras muestras',//Otros tipos de muestras
+    'Ambiental', //Aire, superficies, agua, suelo
+    'Alimentos', //Leches, frutas, verduras, carnes
+    'Material', //Guantes, ropa de laboratorio, utensilios
+    'Otras muestras', //Otros tipos de muestras
   ];
   late Future<Map<String, dynamic>> data;
   @override
@@ -56,14 +65,23 @@ class _EditSampleState extends State<EditSample> {
     factorSampleController.dispose();
     volumenSampleController.dispose();
     mediumController.dispose();
+    countController.dispose();
+    timeProcesingController.dispose();
+    dateController.dispose();
+    timeController.dispose();
     super.dispose();
   }
+
   void cleanControllers() {
     nameSampleController.clear();
     typeSampleController.clear();
     factorSampleController.clear();
     volumenSampleController.clear();
     mediumController.clear();
+    countController.clear();
+    timeProcesingController.clear();
+    dateController.clear();
+    timeController.clear();
     imagePath = '';
     setState(() {
       selectedMedium = null;
@@ -71,7 +89,7 @@ class _EditSampleState extends State<EditSample> {
     });
   }
 
-    Future<Map<String, dynamic>> fetchData() async {
+  Future<Map<String, dynamic>> fetchData() async {
     final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:8000';
     final originalUrl = '$apiUrl/imagen-original/${widget.idMuestra}';
     final processedUrl = '$apiUrl/imagen-procesada/${widget.idMuestra}';
@@ -96,7 +114,7 @@ class _EditSampleState extends State<EditSample> {
       'sample': sample['sample'],
     };
   }
-  
+
   Widget showImageView() {
     if (imagePath == '') return const SizedBox.shrink();
     final file = File(imagePath);
@@ -125,7 +143,8 @@ class _EditSampleState extends State<EditSample> {
       appBar: AppBar(
         automaticallyImplyLeading: true, // Desactiva el botón de retroceso
         foregroundColor: Colors.white,
-        title: const Text('Editar Muestra', style: TextStyle(color: Colors.white)),
+        title:
+            const Text('Editar Muestra', style: TextStyle(color: Colors.white)),
         backgroundColor: colors.primary,
       ),
       body: FutureBuilder<Map<String, dynamic>>(
@@ -138,108 +157,358 @@ class _EditSampleState extends State<EditSample> {
           } else if (snapshot.hasData) {
             // Usamos el modelo para parsear los datos
             final resultado = ResultadoMuestra.fromMap(snapshot.data!);
+            // Asignar el valor por defecto si aún no se ha seleccionado
+            nameSampleController.text = resultado.name;
+            volumenSampleController.text = resultado.volumenSample;
+            timeProcesingController.text = resultado.processingTime.toString();
+            countController.text = resultado.count.toString();
+            factorSampleController.text = resultado.factorSample;
+            timeController.text=resultado.formattedTime;
+            dateController.text=resultado.dateSample;
+            selectedMedium ??= resultado.medioSample;
+            mediumController.text = selectedMedium!;
+
+            selectedClasification ??= resultado.typeSample;
+            typeSampleController.text = selectedClasification!;
 
             return SingleChildScrollView(
               padding: const EdgeInsets.all(4),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Tarjeta de Información
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    margin: const EdgeInsets.symmetric(horizontal: 2),
-                    decoration: BoxDecoration(
-                      color: colors.primary,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.blue.shade100),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _infoItem(Icons.calendar_today_rounded,
-                            'Fecha de realización', resultado.dateSample),
-                        const SizedBox(height: 12),
-                        _infoItem(Icons.timer, 'Hora de realización',
-                            resultado.formattedTime),
-                        const SizedBox(height: 12),
-                        _infoItem(Icons.science, 'Tipo de muestra',
-                            resultado.typeSample),
-                        const SizedBox(height: 12),
-                        _infoItem(Icons.local_drink, 'Factor de dilución',
-                            resultado.factorSample),
-                        const SizedBox(height: 12),
-                        _infoItem(Icons.water, 'Volumen de la muestra',
-                            resultado.volumenSample),
-                        const SizedBox(height: 12),
-                        _infoItem(Icons.trending_up, 'Medio de crecimiento',
-                            resultado.medioSample),
-                        const SizedBox(height: 12),
-                        _infoItem(
-                            Icons.zoom_in_sharp,
-                            'Unidades formadoras de colonias',
-                            resultado.count.toString()),
-                        const SizedBox(height: 12),
-                        _processingTimeItem(resultado.processingTime),
-                        const SizedBox(height: 12),
-
-                        // Imagen Original
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Imagen original:',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
+              child: Form(
+                key: formKeySample,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Tarjeta de Información
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      margin: const EdgeInsets.symmetric(horizontal: 2),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          //Nombre de la muestra
+                          InputCustom(
+                            labelInput: 'Nombre de la muestra',
+                            iconInput: Icon(Icons.label_important,
+                                color: colors.primary),
+                            controller: nameSampleController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty)
+                                return 'El campo es requerido.';
+                              if (value.length < 2)
+                                return 'El campo debe  tener una longitud valida.';
+                              return null;
+                            },
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          // Tipo de muestra
+                          DropdownButtonFormField<String>(
+                            initialValue: selectedClasification,
+                            decoration: InputDecoration(
+                              labelText: 'Tipo de muestra',
+                              prefixIcon:
+                                  Icon(Icons.science, color: colors.primary),
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: colors.primary,
+                                    width: 2), // cuando NO está enfocado
                               ),
-                              const SizedBox(height: 10),
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.memory(
-                                  resultado.originalImage,
-                                  fit: BoxFit.cover,
+                            ),
+                            items: clasificationList.map((String medium) {
+                              return DropdownMenuItem<String>(
+                                value: medium,
+                                child: Text(medium),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedClasification = value;
+                                typeSampleController.text = value ?? '';
+                              });
+                            },
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Seleccione el tipo de muestra.';
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          InputCustom(
+                            labelInput: 'Volumen de sembrado (mL)',
+                            iconInput: Icon(Icons.water, color: colors.primary),
+                            controller: volumenSampleController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty)
+                                return 'El campo es requerido.';
+                              return null;
+                            },
+                            keyboardType: TextInputType.number,
+                          ),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          InputCustom(
+                            labelInput: 'Factor de dilución',
+                            iconInput:
+                                Icon(Icons.local_drink, color: colors.primary),
+                            controller: factorSampleController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty)
+                                return 'El campo es requerido.';
+                              return null;
+                            },
+                            keyboardType: TextInputType.number,
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          DropdownButtonFormField<String>(
+                            initialValue: selectedMedium,
+                            decoration: InputDecoration(
+                              labelText: 'Medio de cultivo',
+                              prefixIcon:
+                                  Icon(Icons.trending_up, color: colors.primary),
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: colors.primary,
+                                    width: 2), // cuando NO está enfocado
+                              ),
+                            ),
+                            items: mediumList.map((String medium) {
+                              return DropdownMenuItem<String>(
+                                value: medium,
+                                child: Text(medium),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedMedium = value;
+                                mediumController.text = value ?? '';
+                              });
+                            },
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Seleccione un medio de cultivo.';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          InputCustom(
+                            labelInput: 'Tiempo de procesamiento',
+                            readOnly: true,
+                            iconInput:
+                                Icon(Icons.timer_outlined, color: colors.primary),
+                            controller: timeProcesingController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty)
+                                return 'El campo es requerido.';
+                              return null;
+                            },
+                            keyboardType: TextInputType.number,
+                          ),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          InputCustom(
+                            labelInput: 'Conteo de UFC',
+                            readOnly: true,
+                            iconInput:
+                                Icon(Icons.calculate_outlined, color: colors.primary),
+                            controller: countController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty)
+                                return 'El campo es requerido.';
+                              return null;
+                            },
+                            keyboardType: TextInputType.number,
+                          ),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          InputCustom(
+                            labelInput: 'Fecha de realización',
+                            readOnly: true,
+                            iconInput:
+                                Icon(Icons.date_range_outlined, color: colors.primary),
+                            controller: dateController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty)
+                                return 'El campo es requerido.';
+                              return null;
+                            },
+                            keyboardType: TextInputType.number,
+                          ),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          InputCustom(
+                            labelInput: 'Hora de realización',
+                            readOnly: true,
+                            iconInput:
+                                Icon(Icons.date_range_outlined, color: colors.primary),
+                            controller: timeController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty)
+                                return 'El campo es requerido.';
+                              return null;
+                            },
+                            keyboardType: TextInputType.number,
+                          ),
+                          SizedBox(height: 20,),
+                          // Imagen Original
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 10),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.memory(
+                                    resultado.originalImage,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 30),
+                    SizedBox(
+                  width: double.infinity,
+                  child: Consumer(
+                    builder: (context, ref, child) {
+                      final idUser =
+                          ref.watch(idUserProvider); // Obtener el ID de Riverpod
+                      return FilledButton.icon(
+                        onPressed: () async {
+                          // Solicita al usuario la confirmación antes de registrar la muestra
+                          final confirmSendSample = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Confirmar'),
+                            content: const Text(
+                                '¿Deseas registrar la muestra?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(
+                                        false),
+                                child: const Text('Cancelar'),
+                              ),
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(
+                                        true),
+                                child: const Text('Aceptar'),
                               ),
                             ],
+                          ),                        
+                          );
+                          if (confirmSendSample == true) {
+                          final isValid = formKeySample.currentState!.validate();
+                          if (!isValid) return;
+                          if (selectedMedium == null ||
+                              selectedMedium == 'Sin seleccionar') {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('Medio de cultivo requerido'),
+                                content: const Text(
+                                    'Por favor selecciona un medio de cultivo antes de continuar.'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.of(context).pop(),
+                                    child: const Text('Aceptar'),
+                                  ),
+                                ],
+                              ),
+                            );
+                            return;
+                          }
+                          if (!context.mounted) return;
+                          try {
+                            final result = await updateSample(
+                              // idSample=
+                              sampleName: nameSampleController.text,
+                              idUser: idUser,
+                              typeSample: typeSampleController.text,
+                              volumenSample: volumenSampleController.text,
+                              factorSample: factorSampleController.text,
+                              medioSample: mediumController.text,
+                            );
+                            if (result['success']) {
+                              final int idSample = result['idSample'];
+                              await showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text("Éxito"),
+                                  content: const Text(
+                                      "Muestra almacenada correctamente, continúa su análisis."),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(
+                                            true); // Devuelve un valor al cerrar el diálogo
+                                      },
+                                      child: const Text("OK"),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              cleanControllers();
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      ResultsScreen(idMuestra: idSample),
+                                ),
+                              );
+                            } else {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text("Error"),
+                                  content: const Text(
+                                      'Ocurrió un error al registrarse'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: const Text("OK"),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            // print(e);
+                          }
+                        }
+                        },
+                        icon: const Icon(Icons.save),
+                        label: const Text('Registrar muestra'),
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        const SizedBox(height: 10),
-
-                        // Imagen Original
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 5),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Imagen procesada:',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.memory(
-                                  resultado.processedImage,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                      );
+                    },
+                  )),
+                  const SizedBox(height: 50),
+                        ],
+                      ),
                     ),
-                  ),
-
-                  const SizedBox(height: 30),
-                ],
+                  ],
+                ),
               ),
             );
           } else {
@@ -259,7 +528,6 @@ class _EditSampleState extends State<EditSample> {
     );
   }
 }
-
 
 Widget _infoItem(IconData icon, String title, String value) {
   return Row(

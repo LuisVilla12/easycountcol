@@ -11,7 +11,8 @@ class InputCustom extends StatelessWidget {
   final Function(String)? onChanged;
   final String? Function(String?)? validator;
   final TextEditingController? controller; 
-  const InputCustom({super.key, required this.labelInput, this.hintInput, this.errorMessageInput, this.onChanged, this.validator, this.obscureTextInput=false, this.iconInput,this.keyboardType=TextInputType.text, this.suffixIcon, this.controller});
+  final bool readOnly;
+  const InputCustom({super.key, required this.labelInput, this.hintInput, this.errorMessageInput, this.onChanged, this.validator, this.obscureTextInput=false, this.iconInput,this.keyboardType=TextInputType.text, this.suffixIcon, this.controller,this.readOnly=false});
 
 
   @override
@@ -25,6 +26,7 @@ class InputCustom extends StatelessWidget {
     return TextFormField(
       controller: controller,
       onChanged: onChanged,
+      readOnly: readOnly,
       // Validar el campo
       validator: validator,
       obscureText: obscureTextInput,

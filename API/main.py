@@ -188,7 +188,7 @@ def update_state_sample(sample_id: int):
         conn.close()
 
 # Ruta para editar una muestra
-@app.put("/sample/{sample_id}")
+@app.put("/sample/state/{sample_id}")
 def update_sample(sample_id: int):
     conn = get_db()
     cursor = conn.cursor()
@@ -205,6 +205,32 @@ def update_sample(sample_id: int):
         cursor.close()
         conn.close()
         
+#Ruta para editar  una muestra
+@app.put("/sample/update/{sample_id}")
+async def update_sample(
+    sampleName: str = Form(...),
+    idUser: int = Form(...),
+    typeSample: str = Form(...),
+    volumenSample: str = Form(...),
+    factorSample: str = Form(...),
+    medioSample: str = Form(...),
+    timeProcessingSample: str = Form(...),
+    countSample:str=Form(...),
+    dateSample: str = Form(...),
+    timeSample: str = Form(...),
+
+):
+    return RegistarMuestra.update_sample(
+        sampleName=sampleName,
+        idUser=idUser,
+        typeSample=typeSample,
+        volumenSample=volumenSample,
+        factorSample=factorSample,
+        medioSample=medioSample,
+    )
+
+
+
 @app.get("/ping")
 async def ping():
     return JSONResponse(content={"status": "ok"})

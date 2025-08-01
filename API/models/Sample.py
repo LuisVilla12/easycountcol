@@ -12,6 +12,7 @@ import time
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
 class RegistarMuestra(BaseModel):
     sampleName: str
     idUser: int
@@ -104,6 +105,58 @@ class RegistarMuestra(BaseModel):
                 "success": True,
                 "idSample": sample_id,
                 "message": "Muestra registrada correctamente."
+            }
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Error al registrar muestra: {e}")
+
+    def update_sample(cls,idSample:int, sampleName: str, idUser: int, typeSample: str,volumenSample: str,factorSample: str, medioSample: str, count:str,processingTime:str,date:str,creationTime:str):
+        try:
+            muestra = cls(
+                sampleName=sampleName,
+                idUser=idUser,
+                typeSample=typeSample,
+                volumenSample=volumenSample,
+                factorSample=factorSample,
+                count=count,
+                processingTime=processingTime,
+                creationDate=date,
+                creationTime=creationTime,
+                medioSample=medioSample,
+            )
+            conn = get_db()
+            cursor = conn.cursor()
+
+            sql = """
+                INSERT INTO samples (
+                    sampleName, idUser, typeSample, volumenSample,
+                    factorSample, sampleRoute, creationDate,processingTime,count,creationTime, medioSample
+                ) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s,%s,%s,%s,%s)
+            """
+            cursor.execute(sql, (
+                muestra.sampleName,
+                muestra.idUser,
+                muestra.typeSample,
+                muestra.volumenSample,
+                muestra.factorSample,
+                muestra.sampleRoute,
+                muestra.creationDate,
+                muestra.processingTime,
+                muestra.count,
+                muestra.creationTime,
+                muestra.medioSample
+            ))
+            sample_id = cursor.lastrowid
+
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            # Regresar el id de la muestra y mensaje
+            return {
+                "success": True,
+                "idSample": sample_id,
+                "message": "Muestra actualizada correctamente."
             }
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Error al registrar muestra: {e}")
