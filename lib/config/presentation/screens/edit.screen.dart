@@ -1,22 +1,47 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:easycoutcol/app/resultadoMuestra.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 
-class ResultsScreen extends StatefulWidget {
-  static const String name = 'results_screen';
-
+class EditSample extends StatefulWidget {
+  static const String name = 'edit_sample';
   final int idMuestra;
-
-  const ResultsScreen({Key? key, required this.idMuestra}) : super(key: key);
+  EditSample({super.key, required this.idMuestra});
 
   @override
-  State<ResultsScreen> createState() => _ResultsScreenState();
+  State<EditSample> createState() => _EditSampleState();
 }
 
-class _ResultsScreenState extends State<ResultsScreen> {
+class _EditSampleState extends State<EditSample> {
+  final GlobalKey<FormState> formKeySample = GlobalKey<FormState>();
+  final TextEditingController nameSampleController = TextEditingController();
+  final TextEditingController typeSampleController = TextEditingController();
+  final TextEditingController factorSampleController = TextEditingController();
+  final TextEditingController volumenSampleController = TextEditingController();
+  final TextEditingController mediumController = TextEditingController();
+  String? selectedMedium;
+  String? selectedClasification;
+  String imagePath = '';
+  int? idUser;
+
+  final List<String> mediumList = [
+    'Agar nutritivo',
+    'Agar MacConkey',
+    'Agar sangre',
+    'Agar Sabouraud',
+  ];
+
+  final List<String> clasificationList = [
+    'Clinica - Biológica', //Sangre, saliva, orina, hisopados
+    'Ambiental',//Aire, superficies, agua, suelo
+    'Alimentos',//Leches, frutas, verduras, carnes
+    'Material',//Guantes, ropa de laboratorio, utensilios
+    'Otras muestras',//Otros tipos de muestras
+  ];
   late Future<Map<String, dynamic>> data;
   @override
   void initState() {
@@ -24,7 +49,29 @@ class _ResultsScreenState extends State<ResultsScreen> {
     data = fetchData();
   }
 
-  Future<Map<String, dynamic>> fetchData() async {
+  @override
+  void dispose() {
+    nameSampleController.dispose();
+    typeSampleController.dispose();
+    factorSampleController.dispose();
+    volumenSampleController.dispose();
+    mediumController.dispose();
+    super.dispose();
+  }
+  void cleanControllers() {
+    nameSampleController.clear();
+    typeSampleController.clear();
+    factorSampleController.clear();
+    volumenSampleController.clear();
+    mediumController.clear();
+    imagePath = '';
+    setState(() {
+      selectedMedium = null;
+      selectedClasification = null;
+    });
+  }
+
+    Future<Map<String, dynamic>> fetchData() async {
     final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:8000';
     final originalUrl = '$apiUrl/imagen-original/${widget.idMuestra}';
     final processedUrl = '$apiUrl/imagen-procesada/${widget.idMuestra}';
@@ -49,6 +96,27 @@ class _ResultsScreenState extends State<ResultsScreen> {
       'sample': sample['sample'],
     };
   }
+  
+  Widget showImageView() {
+    if (imagePath == '') return const SizedBox.shrink();
+    final file = File(imagePath);
+    if (!file.existsSync()) {
+      return const Padding(
+        padding: EdgeInsets.only(top: 20),
+        child: Text("La imagen no existe o no se pudo cargar."),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: Image.file(
+        file,
+        width: 200,
+        height: 200,
+        fit: BoxFit.cover,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +125,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: true, // Desactiva el botón de retroceso
         foregroundColor: Colors.white,
-        title: const Text('Resultados', style: TextStyle(color: Colors.white)),
+        title: const Text('Editar Muestra', style: TextStyle(color: Colors.white)),
         backgroundColor: colors.primary,
       ),
       body: FutureBuilder<Map<String, dynamic>>(
@@ -191,6 +259,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
     );
   }
 }
+
 
 Widget _infoItem(IconData icon, String title, String value) {
   return Row(

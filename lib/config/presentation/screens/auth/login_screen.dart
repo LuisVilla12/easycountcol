@@ -45,7 +45,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     // Esperar al siguiente "frame" para asegurarse de que el contexto esté listo
-  Future.delayed(Duration.zero, _verificarLoginBiometrico);
+  // Future.delayed(Duration.zero, _verificarLoginBiometrico);
       // Inicializar el TabController con 2 pestañas
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
@@ -238,17 +238,17 @@ void mostrarError(BuildContext context, String mensaje) {
               child: const Text('¿Olvidaste tu contraseña?'),
             ),
           ),
-          CheckboxListTile(
-            value: _rememberMe,
-            contentPadding: EdgeInsets.zero,
-            onChanged: (value) {
-              setState(() {
-                _rememberMe = value!;
-              });
-            },
-            title: const Text('Recordar mi sesión'),
-            controlAffinity: ListTileControlAffinity.leading,
-          ),
+          // CheckboxListTile(
+          //   value: _rememberMe,
+          //   contentPadding: EdgeInsets.zero,
+          //   onChanged: (value) {
+          //     setState(() {
+          //       _rememberMe = value!;
+          //     });
+          //   },
+          //   title: const Text('Recordar mi sesión'),
+          //   controlAffinity: ListTileControlAffinity.leading,
+          // ),
           const SizedBox(height: 16),
           Center(
             child: Consumer(

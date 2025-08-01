@@ -138,7 +138,7 @@ def getSample(id_muestra: int):
 def getSamples():
     conn = get_db()
     cursor = conn.cursor()
-    sql = "SELECT * FROM samples"
+    sql = "SELECT * FROM samples WHERE state = 1"  # Solo muestras activas
     cursor.execute(sql)
     result = cursor.fetchall()
     cursor.close()
@@ -169,6 +169,42 @@ def getSamplesUser(idUser: int):
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Eror: {e}") 
 
+# Ruta para cambiar el estado de una muestra
+@app.put("/sample/{sample_id}")
+def update_state_sample(sample_id: int):
+    conn = get_db()
+    cursor = conn.cursor()
+    try:
+        sql = "UPDATE samples SET state = 0 WHERE id = %s"
+        cursor.execute(sql, (sample_id,))
+        conn.commit()
+        
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Muestra no encontrada")
+
+        return {"message": "Estado de la muestra actualizado a 0"}
+    finally:
+        cursor.close()
+        conn.close()
+
+# Ruta para editar una muestra
+@app.put("/sample/{sample_id}")
+def update_sample(sample_id: int):
+    conn = get_db()
+    cursor = conn.cursor()
+    try:
+        sql = "UPDATE samples SET state = 0 WHERE id = %s"
+        cursor.execute(sql, (sample_id,))
+        conn.commit()
+        
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Muestra no encontrada")
+
+        return {"message": "Estado de la muestra actualizado a 0"}
+    finally:
+        cursor.close()
+        conn.close()
+        
 @app.get("/ping")
 async def ping():
     return JSONResponse(content={"status": "ok"})

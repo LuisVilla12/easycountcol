@@ -1,6 +1,7 @@
 import 'package:easycoutcol/config/presentation/screens/auth/login_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/auth/logout_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/config_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/edit.screen.dart';
 import 'package:easycoutcol/config/presentation/screens/help_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/history_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/home_screen.dart';
@@ -14,7 +15,7 @@ import 'package:go_router/go_router.dart';
 // Definir rutas
 // Definir rutas
 final appRouter = GoRouter(
-  initialLocation: '/login',
+  initialLocation: '/home',
   routes: [
     GoRoute(
       path: '/splash',
@@ -63,6 +64,13 @@ final appRouter = GoRouter(
       name: LogoutScreen.name,
       builder: (context, state) => const LogoutScreen(),
     ),
+    GoRoute(
+        path: '/editSample:id',
+        name: EditSample.name,
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return EditSample(idMuestra: id);
+        }),
     GoRoute(
       path: '/overlay',
       name: OverlayScreen.name,
