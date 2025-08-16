@@ -14,6 +14,7 @@ args = vars(ap.parse_args())
 
 # Cargar imagen
 image = cv2.imread(args["image"])
+imageOriginal = cv2.imread(args["image"])
 shifted = cv2.pyrMeanShiftFiltering(image, 21, 51)
 
 # Escala de grises + umbral de Otsu
@@ -54,25 +55,9 @@ for label in np.unique(labels):
                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
 
 # Mostrar con Matplotlib
-plt.figure(figsize=(10,5))
-plt.subplot(1, 2, 1)
-plt.imshow(thresh, cmap="gray")
-plt.title("Umbral (Otsu)")
-plt.axis("off")
-
-plt.subplot(1, 2, 2)
-plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-plt.title("Colonias detectadas")
-plt.axis("off")
-
-plt.tight_layout()
-plt.show()
-
-
-
 plt.figure(figsize=(12, 6))
 plt.subplot(2, 3, 1)
-plt.imshow(image)
+plt.imshow(imageOriginal)
 plt.title("Imagen original")
 plt.axis("off")
 
