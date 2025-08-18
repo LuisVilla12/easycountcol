@@ -7,18 +7,18 @@ import imutils
 import cv2
 import matplotlib.pyplot as plt
 
-# Analizar los argumentos de línea de comandos
 ap = argparse.ArgumentParser()
-ap.add_argument("-i", "--image", required=True, help="path to input image")
+ap.add_argument("-i", "--image", required=True, help="Colocar la ruta de la imagen")
 args = vars(ap.parse_args())
 
-# Cargar imagen
+# Cargar la imagen tomando el arugmento de la línea de comandos
 image = cv2.imread(args["image"])
 imageOriginal = cv2.imread(args["image"])
 shifted = cv2.pyrMeanShiftFiltering(image, 21, 51)
 
-# Escala de grises + umbral de Otsu
+# Escala de grises
 gray = cv2.cvtColor(shifted, cv2.COLOR_BGR2GRAY)
+#Imbrusal 
 thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
 
 # Calcular distancia euclidiana
@@ -61,22 +61,22 @@ plt.imshow(imageOriginal)
 plt.title("Imagen original")
 plt.axis("off")
 
-plt.subplot(2, 3, 3)
+plt.subplot(2, 3, 2)
 plt.imshow(gray, cmap="gray")
 plt.title("Gris")
 plt.axis("off")
 
-plt.subplot(2, 3, 4)
+plt.subplot(2, 3, 3)
 plt.imshow(thresh, cmap="gray")
 plt.title("Umbral Otsu invertido")
 plt.axis("off")
 
-plt.subplot(2, 3, 5)
+plt.subplot(2, 3, 4)
 plt.imshow(D, cmap="jet")
 plt.title("Mapa de distancia")
 plt.axis("off")
 
-plt.subplot(2, 3, 6)
+plt.subplot(2, 3, 5)
 # plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 plt.imshow(image)
 plt.title("Colonias detectadas")
