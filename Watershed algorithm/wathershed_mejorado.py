@@ -33,12 +33,17 @@ mask_circular = np.zeros(gray.shape, dtype="uint8")
 if circles is not None:
     circles = np.round(circles[0, :]).astype("int")
     c = max(circles, key=lambda x: x[2])
-    cv2.circle(mask_circular, (c[0], c[1]), c[2] - 30, 255, -1)  # -10 para evitar más borde
+    margen = int(0.15 * c[2])  # 3% del radio detectado, ajustable
+    radio_mascara = c[2] - margen
+    cv2.circle(mask_circular, (c[0], c[1]), radio_mascara, 255, -1)
+    # cv2.circle(mask_circular, (c[0], c[1]), c[2] - 500, 255, -1)  # -10 para evitar más borde
+    print(f"Círculo detectado: centro=({c[0]}, {c[1]}), radio={c[2]}")
 else:
     # Si no se detecta círculo, usar el centro y radio por defecto
     center = (gray.shape[1] // 2, gray.shape[0] // 2)
     radius = min(center) - 10
     cv2.circle(mask_circular, center, radius, 255, -1)
+    print(f"No se detectó círculo, usando centro=({center[0]}, {center[1]}), radio={radius}")
 
 # Aplicar la máscara al umbral
 thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
