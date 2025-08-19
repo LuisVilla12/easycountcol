@@ -10,7 +10,7 @@ class ResultsScreen extends StatefulWidget {
 
   final int idMuestra;
 
-  const ResultsScreen({Key? key, required this.idMuestra}) : super(key: key);
+  const ResultsScreen({super.key, required this.idMuestra});
 
   @override
   State<ResultsScreen> createState() => _ResultsScreenState();

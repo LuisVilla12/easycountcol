@@ -14,7 +14,7 @@ import 'package:http/http.dart' as http;
 class EditSample extends StatefulWidget {
   static const String name = 'edit_sample';
   final int idMuestra;
-  EditSample({super.key, required this.idMuestra});
+  const EditSample({super.key, required this.idMuestra});
 
   @override
   State<EditSample> createState() => _EditSampleState();
@@ -192,10 +192,12 @@ class _EditSampleState extends State<EditSample> {
                                 color: colors.primary),
                             controller: nameSampleController,
                             validator: (value) {
-                              if (value == null || value.isEmpty)
+                              if (value == null || value.isEmpty) {
                                 return 'El campo es requerido.';
-                              if (value.length < 2)
+                              }
+                              if (value.length < 2) {
                                 return 'El campo debe  tener una longitud valida.';
+                              }
                               return null;
                             },
                           ),
@@ -242,8 +244,9 @@ class _EditSampleState extends State<EditSample> {
                             iconInput: Icon(Icons.water, color: colors.primary),
                             controller: volumenSampleController,
                             validator: (value) {
-                              if (value == null || value.isEmpty)
+                              if (value == null || value.isEmpty) {
                                 return 'El campo es requerido.';
+                              }
                               return null;
                             },
                             keyboardType: TextInputType.number,
@@ -257,8 +260,9 @@ class _EditSampleState extends State<EditSample> {
                                 Icon(Icons.local_drink, color: colors.primary),
                             controller: factorSampleController,
                             validator: (value) {
-                              if (value == null || value.isEmpty)
+                              if (value == null || value.isEmpty) {
                                 return 'El campo es requerido.';
+                              }
                               return null;
                             },
                             keyboardType: TextInputType.number,
@@ -307,8 +311,9 @@ class _EditSampleState extends State<EditSample> {
                                 Icon(Icons.timer_outlined, color: colors.primary),
                             controller: timeProcesingController,
                             validator: (value) {
-                              if (value == null || value.isEmpty)
+                              if (value == null || value.isEmpty) {
                                 return 'El campo es requerido.';
+                              }
                               return null;
                             },
                             keyboardType: TextInputType.number,
@@ -323,8 +328,9 @@ class _EditSampleState extends State<EditSample> {
                                 Icon(Icons.calculate_outlined, color: colors.primary),
                             controller: countController,
                             validator: (value) {
-                              if (value == null || value.isEmpty)
+                              if (value == null || value.isEmpty) {
                                 return 'El campo es requerido.';
+                              }
                               return null;
                             },
                             keyboardType: TextInputType.number,
@@ -339,8 +345,9 @@ class _EditSampleState extends State<EditSample> {
                                 Icon(Icons.date_range_outlined, color: colors.primary),
                             controller: dateController,
                             validator: (value) {
-                              if (value == null || value.isEmpty)
+                              if (value == null || value.isEmpty) {
                                 return 'El campo es requerido.';
+                              }
                               return null;
                             },
                             keyboardType: TextInputType.number,
@@ -355,8 +362,9 @@ class _EditSampleState extends State<EditSample> {
                                 Icon(Icons.date_range_outlined, color: colors.primary),
                             controller: timeController,
                             validator: (value) {
-                              if (value == null || value.isEmpty)
+                              if (value == null || value.isEmpty) {
                                 return 'El campo es requerido.';
+                              }
                               return null;
                             },
                             keyboardType: TextInputType.number,

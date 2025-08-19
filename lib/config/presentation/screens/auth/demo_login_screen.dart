@@ -56,15 +56,18 @@ class _FormLoginState extends State<FormLogin> {
                     formKey.currentState?.validate();
                   },
                   validator: (value) {
-                    if (value == null || value.isEmpty)
+                    if (value == null || value.isEmpty) {
                       return 'El campo es requerido.';
-                    if (value.length < 5)
+                    }
+                    if (value.length < 5) {
                       return 'El campo debe  tener una longitud valida.';
+                    }
                     final emailRegExp = RegExp(
                       r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
                     );
-                    if (!emailRegExp.hasMatch(value))
+                    if (!emailRegExp.hasMatch(value)) {
                       return 'El correo electronico no es valido.';
+                    }
                     return null;
                   },
                 ),
@@ -81,10 +84,12 @@ class _FormLoginState extends State<FormLogin> {
                     formKey.currentState?.validate();
                   },
                   validator: (value) {
-                    if (value == null || value.isEmpty)
+                    if (value == null || value.isEmpty) {
                       return 'El campo es requerido.';
-                    if (value.length < 5)
+                    }
+                    if (value.length < 5) {
                       return 'El campo debe  tener una longitud valida.';
+                    }
                     return null;
                   },
                 ),

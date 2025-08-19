@@ -5,7 +5,7 @@ import 'package:camera/camera.dart';
 class OverlayScreen extends StatefulWidget {
   static const String name = 'overlay_name';
 
-  const OverlayScreen({Key? key}) : super(key: key);
+  const OverlayScreen({super.key});
 
   @override
   State<OverlayScreen> createState() => _OverlayScreenState();

@@ -37,7 +37,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   String lastname = '';
   String username = '';
   String passwordConfirm = '';
-  bool _rememberMe = false;
+  final bool _rememberMe = false;
   bool _obscurePassword = true;
   bool _obscurePasswordConfirm = true;
 
@@ -190,15 +190,18 @@ void mostrarError(BuildContext context, String mensaje) {
               formKeyLogin.currentState?.validate();
             },
             validator: (value) {
-              if (value == null || value.isEmpty)
+              if (value == null || value.isEmpty) {
                 return 'El campo es requerido.';
-              if (value.length < 5)
+              }
+              if (value.length < 5) {
                 return 'El campo debe  tener una longitud valida.';
+              }
               final emailRegExp = RegExp(
                 r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
               );
-              if (!emailRegExp.hasMatch(value))
+              if (!emailRegExp.hasMatch(value)) {
                 return 'El correo electronico no es valido.';
+              }
               return null;
             },
             keyboardType: TextInputType.emailAddress,
@@ -224,10 +227,12 @@ void mostrarError(BuildContext context, String mensaje) {
               },
             ),
             validator: (value) {
-              if (value == null || value.isEmpty)
+              if (value == null || value.isEmpty) {
                 return 'El campo es requerido.';
-              if (value.length < 5)
+              }
+              if (value.length < 5) {
                 return 'El campo debe  tener una longitud valida.';
+              }
               return null;
             },
           ),
@@ -351,10 +356,12 @@ context.goNamed(HomeScreen.name);
               formKeySingin.currentState?.validate();
             },
             validator: (value) {
-              if (value == null || value.isEmpty)
+              if (value == null || value.isEmpty) {
                 return 'El campo es requerido.';
-              if (value.length < 2)
+              }
+              if (value.length < 2) {
                 return 'El campo debe  tener una longitud valida.';
+              }
               return null;
             },
           ),
@@ -370,10 +377,12 @@ context.goNamed(HomeScreen.name);
               formKeySingin.currentState?.validate();
             },
             validator: (value) {
-              if (value == null || value.isEmpty)
+              if (value == null || value.isEmpty) {
                 return 'El campo es requerido.';
-              if (value.length < 5)
+              }
+              if (value.length < 5) {
                 return 'El campo debe  tener una longitud valida.';
+              }
               return null;
             },
           ),
@@ -389,10 +398,12 @@ context.goNamed(HomeScreen.name);
               formKeySingin.currentState?.validate();
             },
             validator: (value) {
-              if (value == null || value.isEmpty)
+              if (value == null || value.isEmpty) {
                 return 'El campo es requerido.';
-              if (value.length < 5)
+              }
+              if (value.length < 5) {
                 return 'El campo debe  tener una longitud valida.';
+              }
               return null;
             },
           ),
@@ -409,13 +420,15 @@ context.goNamed(HomeScreen.name);
               keyboardType: TextInputType.emailAddress,
               iconInput: const Icon(Icons.email),
               validator: (value) {
-                if (value == null || value.isEmpty)
+                if (value == null || value.isEmpty) {
                   return 'El campo es requerido.';
+                }
                 final emailRegExp = RegExp(
                   r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
                 );
-                if (!emailRegExp.hasMatch(value))
+                if (!emailRegExp.hasMatch(value)) {
                   return 'El correo electronico no es valido.';
+                }
 
                 return null;
               }),
@@ -442,10 +455,12 @@ context.goNamed(HomeScreen.name);
               ),
               iconInput: const Icon(Icons.password),
               validator: (value) {
-                if (value == null || value.isEmpty)
+                if (value == null || value.isEmpty) {
                   return 'El campo es requerido.';
-                if (value.length < 10)
+                }
+                if (value.length < 10) {
                   return 'El campo debe  adf una longitud valida.';
+                }
                 return null;
               }),
           const SizedBox(
@@ -473,8 +488,9 @@ context.goNamed(HomeScreen.name);
               ),
               iconInput: const Icon(Icons.password),
               validator: (value) {
-                if (value == null || value.isEmpty)
+                if (value == null || value.isEmpty) {
                   return 'El campo es requerido.';
+                }
                 // Extrar el valor de la pantalla
                 if (value != password) {
                   return 'Las contraseñas no coinciden.';
