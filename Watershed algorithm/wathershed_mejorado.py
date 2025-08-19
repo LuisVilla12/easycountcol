@@ -33,7 +33,7 @@ mask_circular = np.zeros(gray.shape, dtype="uint8")
 if circles is not None:
     circles = np.round(circles[0, :]).astype("int")
     c = max(circles, key=lambda x: x[2])
-    margen = int(0.15 * c[2])  # 3% del radio detectado, ajustable
+    margen = int(0.08 * c[2])  # 3% del radio detectado, ajustable
     radio_mascara = c[2] - margen
     cv2.circle(mask_circular, (c[0], c[1]), radio_mascara, 255, -1)
     # cv2.circle(mask_circular, (c[0], c[1]), c[2] - 500, 255, -1)  # -10 para evitar más borde
