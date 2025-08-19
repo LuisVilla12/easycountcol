@@ -31,9 +31,8 @@ circles = cv2.HoughCircles(
 mask_circular = np.zeros(gray.shape, dtype="uint8")
 if circles is not None:
     circles = np.round(circles[0, :]).astype("int")
-    # Tomar el círculo más grande detectado (usualmente la caja Petri)
     c = max(circles, key=lambda x: x[2])
-    cv2.circle(mask_circular, (c[0], c[1]), c[2]-5, 255, -1)  # -5 para evitar el borde
+    cv2.circle(mask_circular, (c[0], c[1]), c[2] - 10, 255, -1)  # -10 para evitar más borde
 else:
     # Si no se detecta círculo, usar el centro y radio por defecto
     center = (gray.shape[1] // 2, gray.shape[0] // 2)
@@ -44,13 +43,23 @@ else:
 thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
 thresh = cv2.bitwise_and(thresh, thresh, mask=mask_circular)
 
-# Ahora usa thresh_masked en lugar de thresh
-D = ndimage.distance_transform_edt(thresh)
-coordinates = peak_local_max(D, min_distance=20, labels=thresh)
+# Calcula el valor máximo del mapa de distancia para cada marcador
+min_distancia = 20  # Ajusta según separación mínima esperada
+umbral_distancia = 25  # Ajusta según el valor mínimo aceptable en el mapa de distancia
 
-# Crear máscara booleana
+D = ndimage.distance_transform_edt(thresh)
+coordinates = peak_local_max(D, min_distance=min_distancia, labels=thresh)
+
+# Solo selecciona los máximos locales que superan el umbral
+coordinates_filtradas = []
+for coord in coordinates:
+    if D[coord[0], coord[1]] > umbral_distancia:
+        coordinates_filtradas.append(coord)
+coordinates_filtradas = np.array(coordinates_filtradas)
+
 localMax = np.zeros_like(D, dtype=bool)
-localMax[tuple(coordinates.T)] = True
+if len(coordinates_filtradas) > 0:
+    localMax[tuple(coordinates_filtradas.T)] = True
 
 # Etiquetar marcadores
 markers = ndimage.label(localMax, structure=np.ones((3, 3)))[0]
@@ -77,7 +86,7 @@ for label in np.unique(labels):
         c = max(cnts, key=cv2.contourArea)
         area = cv2.contourArea(c)
         # 🔹 Filtrar por tamaño mínimo
-        if  area>300:   # Ajusta los valores según tu imagen
+        if  1000<area>300:   # Ajusta los valores según tu imagen
             contador_colonias += 1
             ((x, y), r) = cv2.minEnclosingCircle(c)
             cv2.circle(image, (int(x), int(y)), int(r), (0, 255, 0), 2)
