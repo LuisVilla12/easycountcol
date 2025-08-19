@@ -21,8 +21,28 @@ imagen_suavizada=cv2.GaussianBlur(image,(5,5,),7)
 shifted = cv2.pyrMeanShiftFiltering(imagen_suavizada, 30,30)
 
 gray = cv2.cvtColor(shifted, cv2.COLOR_BGR2GRAY)
-# Escala de grises
+
+# Detectar automáticamente el círculo de la caja Petri
+circles = cv2.HoughCircles(
+    gray, cv2.HOUGH_GRADIENT, dp=1.2, minDist=gray.shape[0]//2,
+    param1=50, param2=30, minRadius=gray.shape[0]//4, maxRadius=gray.shape[0]//2
+)
+
+mask_circular = np.zeros(gray.shape, dtype="uint8")
+if circles is not None:
+    circles = np.round(circles[0, :]).astype("int")
+    # Tomar el círculo más grande detectado (usualmente la caja Petri)
+    c = max(circles, key=lambda x: x[2])
+    cv2.circle(mask_circular, (c[0], c[1]), c[2]-5, 255, -1)  # -5 para evitar el borde
+else:
+    # Si no se detecta círculo, usar el centro y radio por defecto
+    center = (gray.shape[1] // 2, gray.shape[0] // 2)
+    radius = min(center) - 10
+    cv2.circle(mask_circular, center, radius, 255, -1)
+
+# Aplicar la máscara al umbral
 thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+thresh = cv2.bitwise_and(thresh, thresh, mask=mask_circular)
 
 # Ahora usa thresh_masked en lugar de thresh
 D = ndimage.distance_transform_edt(thresh)
