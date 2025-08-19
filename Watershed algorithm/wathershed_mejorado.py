@@ -39,7 +39,9 @@ markers = ndimage.label(localMax, structure=np.ones((3, 3)))[0]
 labels = watershed(-D, markers, mask=thresh)
 
 # Mostrar cantidad detectada
-print(f"[INFO] {len(np.unique(labels)) - 1} colonias detectadas")
+print(f"[INFO] {len(np.unique(labels)) - 1} etiquetas dectectadas (sin contar fondo)")
+
+contador_colonias = 0  # Nuevo contador
 
 # Dibujar resultados
 for label in np.unique(labels):
@@ -47,13 +49,22 @@ for label in np.unique(labels):
         continue
     mask = np.zeros(gray.shape, dtype="uint8")
     mask[labels == label] = 255
+
     cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
-    c = max(cnts, key=cv2.contourArea)
-    ((x, y), r) = cv2.minEnclosingCircle(c)
-    cv2.circle(image, (int(x), int(y)), int(r), (0, 255, 0), 2)
-    cv2.putText(image, f"#{label}", (int(x) - 10, int(y)),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+
+    if len(cnts) > 0:
+        c = max(cnts, key=cv2.contourArea)
+        area = cv2.contourArea(c)
+        # 🔹 Filtrar por tamaño mínimo
+        if  area>300:   # Ajusta los valores según tu imagen
+            contador_colonias += 1
+            ((x, y), r) = cv2.minEnclosingCircle(c)
+            cv2.circle(image, (int(x), int(y)), int(r), (0, 255, 0), 2)
+            cv2.putText(image, f"#{label}", (int(x) - 10, int(y)),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+
+print(f"[INFO] {contador_colonias} colonias detectadas")
 
 # Mostrar con Matplotlib
 plt.figure(figsize=(12, 6))
