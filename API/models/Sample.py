@@ -9,6 +9,7 @@ import shutil
 import os
 import uuid
 import time
+import API.models.water as water
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -39,19 +40,13 @@ class RegistarMuestra(BaseModel):
             # Reiniciar lectura del archivo
             with open(file_location, "wb") as buffer:
                 shutil.copyfileobj(sample_file.file, buffer)
-            # Inicio de tiempo para procesamiento a escala de grises
-            start_time = time.time()  
+
             # Crear y guardar la imagen en escala de grises
             processed_location = f"processed/{filename}"
+            
             with Image.open(file_location) as image:
-                image = image.convert("L")  # Convertir a escala de grises
-                image.save(processed_location)
-            #Fin del tiempo para la escala de grises
-            end_time = time.time()  
-            # Resta del tiempo de fin y el inicio
-            processing_time = end_time - start_time 
-            # Conteo de UFC
-            count=5
+                resultados=water.tratamiento_imagen(image)          
+            
             # Determinar la hora
             ahoraActual = datetime.now()
             creation_time = ahoraActual.strftime("%H:%M:%S")
@@ -63,8 +58,8 @@ class RegistarMuestra(BaseModel):
                 volumenSample=volumenSample,
                 factorSample=factorSample,
                 sampleRoute=filename,
-                count=count,
-                processingTime=processing_time,
+                count=resultados['labels'],
+                processingTime=resultados['processing_time'],
                 creationDate=date.today(),
                 creationTime=creation_time,
                 medioSample=medioSample,

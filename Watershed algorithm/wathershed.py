@@ -7,6 +7,7 @@ import imutils
 import cv2
 import matplotlib.pyplot as plt
 
+
 ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--image", required=True, help="Colocar la ruta de la imagen")
 args = vars(ap.parse_args())
