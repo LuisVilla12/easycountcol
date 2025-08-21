@@ -67,4 +67,5 @@ def tratamiento_imagen(name_image):
 
 
 
-# resultados=tratamiento_imagen('example.jpg')
+resultados=tratamiento_imagen('example.jpg')
+print(resultados)

@@ -4,12 +4,12 @@ from datetime import datetime
 from passlib.context import CryptContext
 from db import get_db
 from fastapi import HTTPException, UploadFile
-from PIL import Image  # <-- ¡IMPORTANTE! necesitas importar PILLOW
+from PIL import Image 
 import shutil
 import os
 import uuid
 import time
-import API.models.water as water
+from algoritmo_water import tratamiento_imagen
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -45,11 +45,12 @@ class RegistarMuestra(BaseModel):
             processed_location = f"processed/{filename}"
             
             with Image.open(file_location) as image:
-                resultados=water.tratamiento_imagen(image)          
+                resultados=tratamiento_imagen(image)          
             
             # Determinar la hora
             ahoraActual = datetime.now()
             creation_time = ahoraActual.strftime("%H:%M:%S")
+            
             # Crear la instancia de RegistarMuestra
             muestra = cls(
                 sampleName=sampleName,
