@@ -9,7 +9,7 @@ import shutil
 import os
 import uuid
 # import time
-# import cv2
+import cv2
 # import numpy as np
 from ia.algoritmo_water import tratamiento_imagen
 
@@ -50,12 +50,19 @@ class RegistarMuestra(BaseModel):
 
             # Crear la ruta para guardar la imagen procesada
             processed_location = f"processed/{filename}"
+            
+            
             resultado = tratamiento_imagen(file_location)
+            image_resultado = resultado["image_resultado"]
+            labels = resultado["labels"]
+            processing_time = resultado["processing_time"]
+        
             # Guardar la imagen procesada
-            with Image.open(file_location) as image:
-                image.save(processed_location)
+            # with Image.open(file_location) as image:
+            #     image.save(processed_location)
             
-            
+            cv2.imwrite(file_location, image_resultado)
+
             # Determinar la hora
             ahoraActual = datetime.now()
             creation_time = ahoraActual.strftime("%H:%M:%S")
