@@ -59,7 +59,6 @@ def tratamiento_imagen(name_image):
     
     
     return {
-        "image": image,
         "image_resultado": image_resultado,
         "labels": len(np.unique(labels)) - 1,
         "processing_time": processing_time
@@ -67,5 +66,5 @@ def tratamiento_imagen(name_image):
 
 
 
-resultados=tratamiento_imagen('example.jpg')
-print(resultados)
+# resultados=tratamiento_imagen('example.jpg')
+# print(resultados)

@@ -4,12 +4,15 @@ from datetime import datetime
 from passlib.context import CryptContext
 from db import get_db
 from fastapi import HTTPException, UploadFile
-from PIL import Image 
+from PIL import Image  # <-- ¡IMPORTANTE! necesitas importar PILLOW
 import shutil
 import os
 import uuid
-import time
-from algoritmo_water import tratamiento_imagen
+# import time
+# import cv2
+# import numpy as np
+from ia.algoritmo_water import tratamiento_imagen
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -33,19 +36,25 @@ class RegistarMuestra(BaseModel):
             #Verificar existencia de las carpetas donde esta almacenada las imagenes
             os.makedirs("uploads", exist_ok=True)
             os.makedirs("processed", exist_ok=True)
+            
             # Asignar un nombre unico
             filename = f"{uuid.uuid4().hex}_{sample_file.filename}"
             file_location = f"uploads/{filename}"
+            # Reinicia el puntero del archivo al primer
             sample_file.file.seek(0) 
+            
             # Reiniciar lectura del archivo
             with open(file_location, "wb") as buffer:
+                # Guarda el archivo subidoa la carpeta uploads
                 shutil.copyfileobj(sample_file.file, buffer)
 
-            # Crear y guardar la imagen en escala de grises
+            # Crear la ruta para guardar la imagen procesada
             processed_location = f"processed/{filename}"
-            
+            resultado = tratamiento_imagen(file_location)
+            # Guardar la imagen procesada
             with Image.open(file_location) as image:
-                resultados=tratamiento_imagen(image)          
+                image.save(processed_location)
+            
             
             # Determinar la hora
             ahoraActual = datetime.now()
@@ -59,13 +68,13 @@ class RegistarMuestra(BaseModel):
                 volumenSample=volumenSample,
                 factorSample=factorSample,
                 sampleRoute=filename,
-                count=resultados['labels'],
-                processingTime=resultados['processing_time'],
+                count=0,
+                processingTime=0,
                 creationDate=date.today(),
                 creationTime=creation_time,
                 medioSample=medioSample,
             )
-            # print(f"Registro de muestra: {muestra}")
+
             # 4. Guardar en la base de datos
             conn = get_db()
             cursor = conn.cursor()

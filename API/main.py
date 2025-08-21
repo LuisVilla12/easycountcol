@@ -59,6 +59,7 @@ async def registrar_muestra_file(
         medioSample=medioSample,
         sample_file=sample_file
     )
+
 #Ruta para mostar la imagen procesada
 @app.get("/imagen-procesada/{id_muestra}")
 def get_processed_image(id_muestra: int):
@@ -186,6 +187,7 @@ def update_state_sample(sample_id: int):
     finally:
         cursor.close()
         conn.close()
+
 
 # Ruta para editar una muestra
 @app.put("/sample/state/{sample_id}")
