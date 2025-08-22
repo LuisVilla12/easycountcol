@@ -54,14 +54,18 @@ class RegistarMuestra(BaseModel):
             
             resultado = tratamiento_imagen(file_location)
             image_resultado = resultado["image_resultado"]
+            
             labels = resultado["labels"]
-            processing_time = resultado["processing_time"]
-        
+            # processing_time = resultado["processing_time_str"]
+            
+            # Guardar imagen procesada
+            cv2.imwrite(processed_location, image_resultado)
+
+
             # Guardar la imagen procesada
             # with Image.open(file_location) as image:
             #     image.save(processed_location)
             
-            cv2.imwrite(file_location, image_resultado)
 
             # Determinar la hora
             ahoraActual = datetime.now()
@@ -75,7 +79,7 @@ class RegistarMuestra(BaseModel):
                 volumenSample=volumenSample,
                 factorSample=factorSample,
                 sampleRoute=filename,
-                count=0,
+                count=labels,
                 processingTime=0,
                 creationDate=date.today(),
                 creationTime=creation_time,

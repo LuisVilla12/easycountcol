@@ -115,33 +115,33 @@ class _ResultsScreenState extends State<ResultsScreen> {
                         const SizedBox(height: 12),
 
                         // Imagen Original
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Imagen original:',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.memory(
-                                  resultado.originalImage,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 10),
+                        // Padding(
+                        //   padding: const EdgeInsets.symmetric(horizontal: 10),
+                        //   child: Column(
+                        //     crossAxisAlignment: CrossAxisAlignment.start,
+                        //     children: [
+                        //       const Text(
+                        //         'Imagen original:',
+                        //         style: TextStyle(
+                        //           fontSize: 20,
+                        //           fontWeight: FontWeight.bold,
+                        //           color: Colors.white,
+                        //         ),
+                        //       ),
+                        //       const SizedBox(height: 10),
+                        //       ClipRRect(
+                        //         borderRadius: BorderRadius.circular(12),
+                        //         child: Image.memory(
+                        //           resultado.originalImage,
+                        //           fit: BoxFit.cover,
+                        //         ),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
+                        // const SizedBox(height: 10),
 
-                        // Imagen Original
+                        // Imagen procesada
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 5),
                           child: Column(

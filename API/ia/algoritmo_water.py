@@ -56,15 +56,20 @@ def tratamiento_imagen(name_image):
     
     end_time = time.time()   
     processing_time = end_time - start_time 
-    
+    processing_time_str = str(processing_time)
+
+    # O bien, con formato (ej. 2 decimales)
+    processing_time_str = f"{processing_time:.2f} segundos"
     
     return {
         "image_resultado": image_resultado,
         "labels": len(np.unique(labels)) - 1,
-        "processing_time": processing_time
+        "processing_time": processing_time_str
     }
 
 
 
 # resultados=tratamiento_imagen('example.jpg')
-# print(resultados)
+# print(type(resultados["image_resultado"]))
+# print(type(resultados["labels"]))
+# print(type(resultados["processing_time"]))
