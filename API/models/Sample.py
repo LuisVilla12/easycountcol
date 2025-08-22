@@ -8,7 +8,7 @@ from PIL import Image  # <-- ¡IMPORTANTE! necesitas importar PILLOW
 import shutil
 import os
 import uuid
-# import time
+import time
 import cv2
 # import numpy as np
 from ia.algoritmo_water import tratamiento_imagen
@@ -42,31 +42,27 @@ class RegistarMuestra(BaseModel):
             file_location = f"uploads/{filename}"
             # Reinicia el puntero del archivo al primer
             sample_file.file.seek(0) 
-            
+        
             # Reiniciar lectura del archivo
             with open(file_location, "wb") as buffer:
                 # Guarda el archivo subidoa la carpeta uploads
                 shutil.copyfileobj(sample_file.file, buffer)
-
+                
             # Crear la ruta para guardar la imagen procesada
             processed_location = f"processed/{filename}"
-            
-            
+            start_time = time.time()  
+            # Extreaer los resultados del procesamiento de la imagen
             resultado = tratamiento_imagen(file_location)
+            end_time = time.time()   
+            processing_time = end_time - start_time 
+            
+            # Asignar variables del resultado
             image_resultado = resultado["image_resultado"]
-            
             labels = resultado["labels"]
-            # processing_time = resultado["processing_time_str"]
-            
+
             # Guardar imagen procesada
             cv2.imwrite(processed_location, image_resultado)
-
-
-            # Guardar la imagen procesada
-            # with Image.open(file_location) as image:
-            #     image.save(processed_location)
             
-
             # Determinar la hora
             ahoraActual = datetime.now()
             creation_time = ahoraActual.strftime("%H:%M:%S")
@@ -80,7 +76,7 @@ class RegistarMuestra(BaseModel):
                 factorSample=factorSample,
                 sampleRoute=filename,
                 count=labels,
-                processingTime=0,
+                processingTime=processing_time,
                 creationDate=date.today(),
                 creationTime=creation_time,
                 medioSample=medioSample,

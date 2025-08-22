@@ -1,4 +1,3 @@
-import time
 from skimage.feature import peak_local_max
 from skimage.segmentation import watershed
 from scipy import ndimage
@@ -9,7 +8,6 @@ import matplotlib.pyplot as plt
 
 
 def tratamiento_imagen(name_image):
-    start_time = time.time()  
     # Cargar la imagen tomando el arugmento de la línea de comandos
     image = cv2.imread(name_image)
     image_resultado = image.copy()  # Trabaja sobre una copia
@@ -54,19 +52,10 @@ def tratamiento_imagen(name_image):
         cv2.putText(image_resultado, f"#{label}", (int(x) - 10, int(y)),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
     
-    end_time = time.time()   
-    processing_time = end_time - start_time 
-    processing_time_str = str(processing_time)
-
-    # O bien, con formato (ej. 2 decimales)
-    processing_time_str = f"{processing_time:.2f} segundos"
-    
     return {
         "image_resultado": image_resultado,
-        "labels": len(np.unique(labels)) - 1,
-        "processing_time": processing_time_str
-    }
-
+        "labels": len(np.unique(labels)) - 1
+        }
 
 
 # resultados=tratamiento_imagen('example.jpg')
