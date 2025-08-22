@@ -128,8 +128,8 @@ class _ViewCameraState extends State<_ViewCamera>
     mediumController.clear();
     imagePath = '';
     setState(() {
-      selectedMedium = null;
       selectedClasification = null;
+      selectedMedium = null;
     });
   }
 
@@ -179,6 +179,7 @@ class _ViewCameraState extends State<_ViewCamera>
               },
             ),
               DropdownButtonFormField<String>(
+              initialValue: selectedClasification,
               decoration: InputDecoration(
                 labelText: 'Tipo de muestra',
                 prefixIcon: Icon(Icons.science, color: colors.primary),
@@ -370,6 +371,8 @@ class _ViewCameraState extends State<_ViewCamera>
                         }
                         if (!context.mounted) return;
                         try {
+                          // llamar a la función de carga
+                          showLoadingDialog(context);
                           final result = await uploadSampleWithFile(
                             sampleName: nameSampleController.text,
                             idUser: idUser,
@@ -379,6 +382,9 @@ class _ViewCameraState extends State<_ViewCamera>
                             medioSample: mediumController.text,
                             sampleFile: imagePath,
                           );
+                          // cerrar la carga
+                          Navigator.of(context).pop();
+                          
                           if (result['success']) {
                             final int idSample = result['idSample'];
                             await showDialog(
@@ -424,6 +430,11 @@ class _ViewCameraState extends State<_ViewCamera>
                           }
                         } catch (e) {
                           // print(e);
+                          // Ocultar spinner si ocurre un error
+                        Navigator.of(context).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Error al subir la muestra: $e")),
+                        );
                         }
                       }
                       },
@@ -616,4 +627,31 @@ class _ViewCameraState extends State<_ViewCamera>
       ),
     );
   }
+}
+
+// Función para mostrar el diálogo de carga
+void showLoadingDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierDismissible: false, // No se puede cerrar al tocar fuera
+    builder: (context) {
+      return const Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 10),
+              Text(
+                "Procesando...",
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }

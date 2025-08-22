@@ -22,9 +22,10 @@ class _SideMenuState extends ConsumerState<SideMenu> {
     final titleStyle = Theme.of(context).textTheme.titleLarge?.copyWith(
           fontWeight: FontWeight.bold,
         );
+
     // Saber el usuario con riverpod
     final name = ref.watch(nameProvider);
-    final lastName = ref.watch(lastnameProvider); // final idUser = ref.watch(idUserProvider);
+    final lastName = ref.watch(lastnameProvider); 
 
     return NavigationDrawer(
       selectedIndex: navDrawerIndex,
@@ -109,7 +110,15 @@ class _SideMenuState extends ConsumerState<SideMenu> {
           padding: const EdgeInsets.fromLTRB(20, 10, 16, 10),
           child: const Text('CUENTA', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
         ),
-        ...appMenuItems.asMap().entries.where((entry)=> entry.key>3 && entry.key<6).map((entry) {
+        ...appMenuItems.asMap().entries.where(
+          (entry){
+            final item = entry.value;
+
+            if (entry.key <= 3 || entry.key >= 6) return false;
+            if (nameProvider == '' && item.link == '/logut') return false;
+            if (nameProvider != '' && item.link == '/login') return false;
+            return true;
+          }).map((entry) {
           final index = entry.key;
           final item = entry.value;
           return NavigationDrawerDestination(
@@ -131,7 +140,8 @@ class _SideMenuState extends ConsumerState<SideMenu> {
             color: colors.primary.withOpacity(0.5),
           ),
         ),
-         ...appMenuItems.asMap().entries.where((entry)=> entry.key>5).map((entry) {
+        ...appMenuItems.asMap().entries.where(
+          (entry)=>entry.key>5).map((entry) {
           final index = entry.key;
           final item = entry.value;
           return NavigationDrawerDestination(

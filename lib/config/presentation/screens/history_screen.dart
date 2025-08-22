@@ -111,12 +111,17 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             itemCount: samplesFilter.length,
             itemBuilder: (context, index) {
               final sample = samplesFilter[index];
+              // print(sample.creationDate);
               final timeSample = sample.creationTime;
+
               // Convertir el dato que viene de la base de datos a datatime
               final DateTime now = DateTime.now();
-              final DateTime creationTime =
-                  DateTime(now.year, now.month, now.day)
-                      .add(Duration(seconds: timeSample.toInt()));
+              final DateTime creationTime = DateTime(now.year, now.month, now.day).add(Duration(seconds: timeSample.toInt()));
+              // Convertir de string a DateTime
+              final DateTime creationDate = DateTime.parse(sample.creationDate);
+              // Dar formato a la fecha de creación
+              String creacionDateFormat = DateFormat('dd-MM-yyyy').format(creationDate);
+
               // Convertir el datatime a time formateado
               final String formattedTime =
                   DateFormat('HH:mm:ss').format(creationTime);
@@ -221,8 +226,8 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                   context,
                   sample,
                   classification[sample.typeSample]?['color'] ?? colors.primary,
-                  DateFormat('dd/MM/yyyy').format(creationTime),
-                  formattedTime,
+                  creacionDateFormat,
+                  formattedTime
                 ),
               );
               // return sampleTile(

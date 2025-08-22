@@ -10,8 +10,8 @@ import os
 import uuid
 import time
 import cv2
-# import numpy as np
-from ia.algoritmo_water import tratamiento_imagen
+# from ia.algoritmo_water import tratamiento_imagen
+from ia.wather_houg import tratamiento_imagen
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
