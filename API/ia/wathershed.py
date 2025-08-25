@@ -17,6 +17,7 @@ image = cv2.imread(args["image"])
 imageOriginal = cv2.imread(args["image"])
 shifted = cv2.pyrMeanShiftFiltering(image, 21, 51)
 
+
 # Escala de grises
 gray = cv2.cvtColor(shifted, cv2.COLOR_BGR2GRAY)
 #Imbrusal 
@@ -26,7 +27,7 @@ thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
 D = ndimage.distance_transform_edt(thresh)
 
 # Buscar máximos locales
-coordinates = peak_local_max(D, min_distance=20, labels=thresh)
+coordinates = peak_local_max(D, min_distance=50, labels=thresh)
 
 # Crear máscara booleana
 localMax = np.zeros_like(D, dtype=bool)
@@ -63,23 +64,28 @@ plt.title("Imagen original")
 plt.axis("off")
 
 plt.subplot(2, 3, 2)
+plt.imshow(shifted)
+plt.title("Imagen suavizada ")
+plt.axis("off")
+
+
+plt.subplot(2, 3, 3)
 plt.imshow(gray, cmap="gray")
 plt.title("Gris")
 plt.axis("off")
 
-plt.subplot(2, 3, 3)
+plt.subplot(2, 3, 4)
 plt.imshow(thresh, cmap="gray")
 plt.title("Umbral Otsu invertido")
 plt.axis("off")
 
-plt.subplot(2, 3, 4)
+plt.subplot(2, 3, 5)
 plt.imshow(D, cmap="jet")
 plt.title("Mapa de distancia")
 plt.axis("off")
 
-plt.subplot(2, 3, 5)
-# plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-plt.imshow(image)
+plt.subplot(2, 3, 6)
+plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 plt.title("Colonias detectadas")
 plt.axis("off")
 

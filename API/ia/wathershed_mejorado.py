@@ -125,11 +125,11 @@ for label in np.unique(labels):
         c = max(cnts, key=cv2.contourArea)
         area = cv2.contourArea(c)
         # 🔹 Filtrar por tamaño mínimo
-        if  600<area>300:   # Ajusta los valores según tu imagen
-            contador_colonias += 1
-            ((x, y), r) = cv2.minEnclosingCircle(c)
-            cv2.circle(image_resultado, (int(x), int(y)), int(r), (255, 255, 255), 6)
-            cv2.putText(image_resultado, f"#{label}", (int(x) - 10, int(y)),
+        # if 300 < area < 600:# Ajusta los valores según tu imagen
+        contador_colonias += 1
+        ((x, y), r) = cv2.minEnclosingCircle(c)
+        cv2.circle(image_resultado, (int(x), int(y)), int(r), (255, 255, 255), 6)
+        cv2.putText(image_resultado, f"#{label}", (int(x) - 10, int(y)),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 10)
 
 print(f"[INFO] {contador_colonias} colonias detectadas")
@@ -151,14 +151,16 @@ plt.imshow(gray, cmap="gray")
 plt.title("Gris")
 plt.axis("off")
 
-plt.subplot(2, 4, 4)
-plt.imshow(mask_circular, cmap="gray")
-plt.title("Mascara circular")
-plt.axis("off")
 
-plt.subplot(2, 4, 5)
+
+plt.subplot(2, 4, 4)
 plt.imshow(thresh, cmap="gray")
 plt.title("Umbral Otsu invertido")
+plt.axis("off")
+
+plt.subplot(2, 4,5)
+plt.imshow(mask_circular, cmap="gray")
+plt.title("Mascara circular")
 plt.axis("off")
 
 plt.subplot(2, 4, 6)
