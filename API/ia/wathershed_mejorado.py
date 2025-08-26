@@ -236,12 +236,28 @@ for label in np.unique(labels):
         reflect_overlap_px = np.count_nonzero(np.logical_and(reflection_mask > 0, mask > 0))
         reflect_overlap_ratio = reflect_overlap_px / area_contour_px
 
-        # Reglas para descartar reflexiones (más permisivas)
-        if reflect_overlap_ratio > 0.60:
-            _reject(label, "reflect_overlap_ratio alto", reflect_overlap_ratio=round(reflect_overlap_ratio, 2))
+        # Reglas para descartar reflexiones: exigir coincidencia de máscara de reflexión + brillo alto.
+        # Usar el umbral specular_thresh calculado anteriormente (más robusto frente a variaciones globales)
+        spec_thresh_local = int(specular_thresh) if 'specular_thresh' in globals() else int(mean_v_plate + max(30, 2.0 * std_v_plate))
+
+        # Rechaza si una fracción importante del contorno cae en reflection_mask y el brillo local supera el umbral de reflejo
+        if reflect_overlap_ratio > 0.50 and mean_v_contour >= spec_thresh_local:
+            _reject(label, "reflect_overlap_ratio + brillo (reflexión)", reflect_overlap_ratio=round(reflect_overlap_ratio, 2),
+                    mean_v_contour=round(mean_v_contour, 1), spec_thresh_local=spec_thresh_local)
             continue
-        if mean_v_contour >= (mean_v_plate + max(10, 3.0 * std_v_plate)):
-            _reject(label, "brillo muy alto (posible reflejo)", mean_v_contour=round(mean_v_contour,1), mean_v_plate=round(mean_v_plate,1))
+
+        # Permitir objetos brillantes si están claramente dentro de la máscara erosionada (no en la franja)
+        # esto evita descartar colonias brillantes ubicadas dentro de la placa
+        area_inside_eroded = np.count_nonzero(np.logical_and(mask_circular_eroded > 0, mask > 0))
+        frac_inside_eroded = area_inside_eroded / area_contour_px
+        if mean_v_contour >= spec_thresh_local and frac_inside_eroded > 0.70:
+            # Considerar válido: brillo alto pero dentro de la placa (no reject)
+            pass
+
+        # Criterio alternativo más estricto (si aún se desea): brillo muy superior a la media y cierto overlap
+        if mean_v_contour >= (mean_v_plate + max(45, 4.0 * std_v_plate)) and reflect_overlap_ratio > 0.35:
+            _reject(label, "brillo muy alto y reflect_overlap", mean_v_contour=round(mean_v_contour,1),
+                    mean_v_plate=round(mean_v_plate,1), reflect_overlap_ratio=round(reflect_overlap_ratio,2))
             continue
 
         area_inside_original = np.count_nonzero(np.logical_and(mask_circular > 0, mask > 0))
