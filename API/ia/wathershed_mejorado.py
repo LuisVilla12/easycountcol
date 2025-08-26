@@ -95,23 +95,73 @@ else:
 # Después de generar mask_circular_eroded (tanto en if como en else) construye la franja
 mask_edge = cv2.bitwise_xor(mask_circular, mask_circular_eroded)
 thresh = cv2.bitwise_and(thresh, thresh, mask=mask_circular_eroded)
+# Cerrar pequeños huecos para recuperar microcolonias pegadas al borde
+kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel_close, iterations=1)
+
+# --- NUEVO: máscara de reflejo basada en brillo (canal V) ---
+# usa imagen suavizada para reducir ruido en la detección de reflejos
+hsv = cv2.cvtColor(shifted, cv2.COLOR_BGR2HSV)
+v = hsv[:, :, 2].astype(np.uint8)
+lab = cv2.cvtColor(shifted, cv2.COLOR_BGR2LAB)
+Lchan = lab[:, :, 0]
+
+# Referencia de brillo dentro de la placa (si mask_circular válida)
+mask_plate = (mask_circular > 0)
+if np.count_nonzero(mask_plate) > 0:
+    mean_v_plate = np.mean(v[mask_plate])
+    std_v_plate = np.std(v[mask_plate])
+else:
+    mean_v_plate = np.mean(v)
+    std_v_plate = np.std(v)
+
+# detectar píxeles especulares en la franja: muy brillantes respecto a la placa
+v_blur = cv2.GaussianBlur(v, (7, 7), 0)
+# umbral adaptativo simple: media + k*std o un corte absoluto alto
+specular_thresh = int(min(255, mean_v_plate + max(18, 1.6 * std_v_plate)))
+reflection_mask = np.zeros_like(v_blur, dtype=np.uint8)
+reflection_mask[(v_blur >= specular_thresh) & (mask_edge > 0)] = 255
+
+# opcional: dilatar la máscara de reflejo para cubrir halo
+kernel_spec = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+reflection_mask = cv2.dilate(reflection_mask, kernel_spec, iterations=1)
+
+# Combina la máscara de reflejo con la máscara circular erosionada
+mask_final = cv2.bitwise_or(mask_circular_eroded, reflection_mask)
 
 # Calcula el valor máximo del mapa de distancia para cada marcador
 min_distancia = 10  # Ajusta según separación mínima esperada
-umbral_distancia = 20  # Ajusta según el valor mínimo aceptable en el mapa de distancia
 
+# --- REEMPLAZADO: umbral adaptativo más robusto ---
 D = ndimage.distance_transform_edt(thresh)
+
+# Valores dentro de la placa (no fondo)
+nonzero_D = D[thresh > 0]
+if nonzero_D.size > 0:
+    # usa un factor más pequeño y limitar por un percentil del mapa D
+    factor_radio = 0.06            # antes 0.12, reducir para no filtrar demasiado
+    umbral_por_radio = int(factor_radio * radio_mascara)
+    umbral_por_percentil = int(np.percentile(nonzero_D, 75))  # 75º percentil
+    umbral_distancia = max(6, min(umbral_por_radio, umbral_por_percentil))
+else:
+    umbral_distancia = 6
+
 coordinates = peak_local_max(D, min_distance=min_distancia, labels=thresh)
+
+# DEBUG: imprimir información útil
+print(f"[DEBUG] nonzero_thresh_px={nonzero_D.size}, D_max={D.max():.1f}, umbral_distancia={umbral_distancia}")
+print(f"[DEBUG] total_maxima_encontradas={len(coordinates)}")
+if len(coordinates) > 0:
+    sample = coordinates[:10]
+    print(f"[DEBUG] primeras coordenadas: {sample}")
 
 # Solo selecciona los máximos locales que superan el umbral
 coordinates_filtradas = []
-valores_umbral =[]
+valores_umbral = []
 for coord in coordinates:
-    # Guarda los valores del umbral
     valor = D[coord[0], coord[1]]
-    if D[coord[0], coord[1]] > umbral_distancia:
+    if valor > umbral_distancia:
         coordinates_filtradas.append(coord)
-        # Agrega el valor a la lista
         valores_umbral.append(valor)
 coordinates_filtradas = np.array(coordinates_filtradas)
 
@@ -135,6 +185,12 @@ labels = watershed(-D, markers, mask=thresh)
 # print(f"[INFO] {len(np.unique(labels)) - 1} etiquetas dectectadas (sin contar fondo)")
 
 contador_colonias = 0  # Nuevo contador
+debug = True  # Poner False para silencio
+
+def _reject(label, reason, **kw):
+    if debug:
+        info = " ".join(f"{k}={v}" for k, v in kw.items())
+        print(f"[RECHAZADO] label={label} reason={reason} {info}")
 
 for label in np.unique(labels):
     if label == 0:
@@ -157,7 +213,7 @@ for label in np.unique(labels):
         distancia_al_centro = np.sqrt((x - centro[0])**2 + (y - centro[1])**2)
 
         # filtros por área mínima y circularidad
-        min_area = max(40, int(np.pi * (2.5**2)))
+        min_area = max(20, int(np.pi * (2.0**2)))  # reducido para permitir microcolonias
         perim = cv2.arcLength(c, True)
         circularity = 0
         if perim > 0:
@@ -165,67 +221,79 @@ for label in np.unique(labels):
 
         borde_tol = max(5, int(0.02 * radio_mascara))
 
-        # 1) Reemplazo: calcular solapamiento con la franja en lugar de excluir por cualquier toque
+        # Solapamiento con la franja
         area_contour_px = np.count_nonzero(mask > 0)
         if area_contour_px == 0:
+            _reject(label, "area_contour_px==0")
             continue
         area_overlap_px = np.count_nonzero(np.logical_and(mask_edge > 0, mask > 0))
         overlap_ratio = (area_overlap_px / area_contour_px)
 
-        # Área dentro de la máscara original y dentro de la máscara erosionada
+        # brillo medio del contorno en V y en L
+        mean_v_contour = float(np.mean(v[mask > 0])) if np.count_nonzero(mask) > 0 else 0.0
+        mean_L_contour = float(np.mean(Lchan[mask > 0])) if np.count_nonzero(mask) > 0 else 0.0
+
+        reflect_overlap_px = np.count_nonzero(np.logical_and(reflection_mask > 0, mask > 0))
+        reflect_overlap_ratio = reflect_overlap_px / area_contour_px
+
+        # Reglas para descartar reflexiones (más permisivas)
+        if reflect_overlap_ratio > 0.60:
+            _reject(label, "reflect_overlap_ratio alto", reflect_overlap_ratio=round(reflect_overlap_ratio, 2))
+            continue
+        if mean_v_contour >= (mean_v_plate + max(10, 3.0 * std_v_plate)):
+            _reject(label, "brillo muy alto (posible reflejo)", mean_v_contour=round(mean_v_contour,1), mean_v_plate=round(mean_v_plate,1))
+            continue
+
         area_inside_original = np.count_nonzero(np.logical_and(mask_circular > 0, mask > 0))
         area_inside_eroded = np.count_nonzero(np.logical_and(mask_circular_eroded > 0, mask > 0))
         frac_inside_original = area_inside_original / area_contour_px
         frac_inside_eroded = area_inside_eroded / area_contour_px
 
-        # Si el contorno está completamente fuera de la máscara circular original, descartar
         if area_inside_original == 0:
+            _reject(label, "fuera de máscara circular original", area_inside_original=area_inside_original)
             continue
 
-        # Umbrales ajustables: permitir mayor solapamiento si suficiente parte queda dentro
-        overlap_threshold = 0.55     # si overlap_ratio > threshold normalmente descartamos
-        min_frac_inside_original = 0.20  # si >= 65% del contorno está dentro de la máscara original, permitimos
-        min_frac_inside_eroded = 0.55    # si >= 35% queda dentro de la máscara erosionada lo aceptamos
+        # Umbrales ajustables: relajar aceptación si solapa con franja
+        overlap_threshold = 0.80     # antes 0.55
+        min_frac_inside_original = 0.15
+        min_frac_inside_eroded = 0.45
 
-        # Si solapa mucho pero está mayormente dentro de la máscara original, aceptarlo
         if overlap_ratio > overlap_threshold and not (frac_inside_original >= min_frac_inside_original or frac_inside_eroded >= min_frac_inside_eroded):
+            _reject(label, "overlap_ratio alto y no dentro suficiente", overlap_ratio=round(overlap_ratio,2), frac_inside_eroded=round(frac_inside_eroded,2))
             continue
 
-        # 2) Geometría: permitir si parte significativa del contorno queda dentro del radio efectivo
-        #    Comprobar que al menos una fracción (p.ej. 40%) del contorno está dentro de la máscara erosionada
         if frac_inside_eroded < min_frac_inside_eroded:
-            # como excepción, si el centro geométrico del objeto está bien dentro, permitir
             M = cv2.moments(c)
             if M["m00"] != 0:
                 cx = int(M["m10"] / M["m00"])
                 cy = int(M["m01"] / M["m00"])
                 if mask_circular_eroded[cy, cx] == 0:
+                    _reject(label, "centro fuera de máscara erosionada", cx=cx, cy=cy)
                     continue
             else:
+                _reject(label, "moments m00==0")
                 continue
 
-        # 3) Comprobaciones adicionales de área y circularidad estaba en .1
-        if area < max(20, min_area) or circularity < 0.05:
+        if area < min_area or circularity < 0.03:
+            _reject(label, "area o circularidad bajo", area=area, circularity=round(circularity,3))
             continue
 
         # Si pasa todos los filtros, contar
         contador_colonias += 1
-        # Ajustar radio de dibujo para no pintar sobre el aro externo
         orig_r = max(1, int(round(r)))
-        # reducción base (evita solapado visual con el borde)
         draw_r = max(1, orig_r - 3)
-        # si hay solapamiento con la franja, reducir proporcionalmente más
         if overlap_ratio > 0.05:
             extra_reduc = int(min(orig_r * 0.6, max(2, overlap_ratio * orig_r * 2)))
             draw_r = max(1, orig_r - extra_reduc)
 
-        # Dibujar con radio reducido y grosor menor para evitar "tocar" el borde
-        cv2.circle(image_resultado, (int(x), int(y)), draw_r, (255, 255, 255), 4)
-        # Posicionar la etiqueta ligeramente hacia el centro para que no salga fuera
+        cv2.circle(image_resultado, (int(x), int(y)), draw_r, (0, 255, 0), 2)
+        txt = f"#{contador_colonias}"
         txt_x = int(x) - min(10, draw_r)
-        txt_y = int(y)
-        cv2.putText(image_resultado, f"#{label}", (txt_x, txt_y),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 8)
+        txt_y = int(y) + int(draw_r / 2)
+        cv2.putText(image_resultado, txt, (txt_x, txt_y),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 4, cv2.LINE_AA)
+        cv2.putText(image_resultado, txt, (txt_x, txt_y),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1, cv2.LINE_AA)
 
 print(f"[INFO] {contador_colonias} colonias detectadas")
 
