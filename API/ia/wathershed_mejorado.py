@@ -32,30 +32,52 @@ kernel = np.ones((7, 7), np.uint8)  # (3x3 menos agresivo,5x5, 7x7 más agresivo
 # Aplica apertura para eliminar ruido pequeño
 thresh = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel)
 
-# Detectar automáticamente el círculo de la caja Petri
+# Transformada de Hough para detectar el borde circular de una caja de Petri
 circles = cv2.HoughCircles(
-    gray, cv2.HOUGH_GRADIENT, dp=1.2, minDist=gray.shape[0]//2,
-    param1=50, param2=30, minRadius=gray.shape[0]//4, maxRadius=gray.shape[0]//2
+    # Imagen en escala de grises
+    gray, 
+    # Método de detección (Gradiente de Hough)
+    cv2.HOUGH_GRADIENT, 
+    # Método de detección (Gradiente de Hough)
+    dp=1.2, 
+    # Distancia mínima entre centros de círculos
+    minDist=gray.shape[0]//2,
+    # Umbral superior para Canny
+    param1=50, 
+    # Umbral para el acumulador de centros
+    param2=30, 
+    # Radio mínimo esperado
+    minRadius=gray.shape[0]//4, 
+    # Radio máximo esperado
+    maxRadius=gray.shape[0]//2
 )
-
+# # Define una mascara  una máscara binaria vacía  mismo tamaño que la imagen en escala de grises gray.
 mask_circular = np.zeros(gray.shape, dtype="uint8")
+
+# Si se detecta un círculo, usarlo para crear una máscara circular
 if circles is not None:
+    # Detecta el círculo más grande (asumiendo que es la caja de Petri)
     circles = np.round(circles[0, :]).astype("int")
     c = max(circles, key=lambda x: x[2])
+    # Almacena el radio y centro dectado
     radio_detectado = c[2]
     centro = (c[0], c[1])
 
-    # Prueba márgenes crecientes hasta que la franja del borde tenga pocos píxeles blancos
+    # Ajuste dinámico del margen para la máscara circular
     umbral_borde = 0.05  # Porcentaje máximo de píxeles blancos permitidos en la franja
     ancho_franja = 5    # Ancho de la franja en píxeles
     margen = 0
-    while margen < int(0.1 * radio_detectado):  # No restar más del 20% del radio
+    
+    # Crea una franja anular alrededor del borde, qué porcentaje de píxeles blancos hay en esa zona. Si hay mucho ruido, reduce progresivamente el área  (incrementando el margen) hasta que el borde esté limpio.
+    
+    while margen < int(0.12 * radio_detectado):  # No restar más del 12% del radio
         radio_interno = int(radio_detectado - margen - ancho_franja)
         radio_externo = int(radio_detectado - margen)
         # Crear máscara para la franja circular
         mascara_franja = np.zeros(gray.shape, dtype="uint8")
         cv2.circle(mascara_franja, centro, radio_externo, 255, -1)
         cv2.circle(mascara_franja, centro, radio_interno, 0, -1)
+        
         # Aplica la franja a la imagen umbralizada
         pixeles_borde = cv2.bitwise_and(thresh, thresh, mask=mascara_franja)
         porcentaje_blancos = np.sum(pixeles_borde > 0) / np.sum(mascara_franja > 0)
@@ -63,21 +85,24 @@ if circles is not None:
             break
         margen += 2  # Aumenta el margen de a 2 píxeles
 
+    # Genera la máscara binaria para el  interior de la caja Petri.
     radio_mascara = int(radio_detectado - margen)
     mask_circular = np.zeros(gray.shape, dtype="uint8")
     cv2.circle(mask_circular, centro, radio_mascara, 255, -1)
     print(f"Margen automático aplicado: {margen} píxeles (radio final: {radio_mascara})")
 
-    # Erosiona la máscara circular para eliminar artefactos cercanos al borde (ajusta el factor si hace falta)
-    # Usar erosión más suave para no eliminar colonias reales junto al borde
+    # Erosiona suavemente para eliminar artefactos pegados al borde sin perder colonias reales cercanas.
     erosion_px = max(1, int(0.003 * radio_mascara))
     kernel_ellipse = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (erosion_px*2+1, erosion_px*2+1))
     mask_circular_eroded = cv2.erode(mask_circular, kernel_ellipse, iterations=1)
 
     # Usa la máscara erosionada para el umbral final (evita falsos positivos en el borde)
     thresh = cv2.bitwise_and(thresh, thresh, mask=mask_circular_eroded)
+    
     # Cerrar pequeños huecos para recuperar microcolonias pegadas al borde
-    kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+    kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
+    
+    # Limitar el umbral al área interior de la caja Petri
     thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel_close, iterations=1)
 else:
     # Si no se detecta círculo, usar el centro y radio por defecto
@@ -93,14 +118,14 @@ else:
     kernel_ellipse = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (erosion_px*2+1, erosion_px*2+1))
     mask_circular_eroded = cv2.erode(mask_circular, kernel_ellipse, iterations=1)
 
-# Después de generar mask_circular_eroded (tanto en if como en else) construye la franja
+# Crear máscara de la franja del borde para análisis posterior
 mask_edge = cv2.bitwise_xor(mask_circular, mask_circular_eroded)
 thresh = cv2.bitwise_and(thresh, thresh, mask=mask_circular_eroded)
+
 # Cerrar pequeños huecos para recuperar microcolonias pegadas al borde
-kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
 thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel_close, iterations=1)
 
-# --- NUEVO: máscara de reflejo basada en brillo (canal V) ---
 # usa imagen suavizada para reducir ruido en la detección de reflejos
 hsv = cv2.cvtColor(shifted, cv2.COLOR_BGR2HSV)
 v = hsv[:, :, 2].astype(np.uint8)
@@ -124,14 +149,14 @@ reflection_mask = np.zeros_like(v_blur, dtype=np.uint8)
 reflection_mask[(v_blur >= specular_thresh) & (mask_edge > 0)] = 255
 
 # opcional: dilatar la máscara de reflejo para cubrir halo
-kernel_spec = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+kernel_spec = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
 reflection_mask = cv2.dilate(reflection_mask, kernel_spec, iterations=1)
 
 # Combina la máscara de reflejo con la máscara circular erosionada
 mask_final = cv2.bitwise_or(mask_circular_eroded, reflection_mask)
 
 # Calcula el valor máximo del mapa de distancia para cada marcador
-min_distancia = 10  # Ajusta según separación mínima esperada
+min_distancia = 9  # Ajusta según separación mínima esperada
 
 # --- REEMPLAZADO: umbral adaptativo más robusto ---
 D = ndimage.distance_transform_edt(thresh)
@@ -144,18 +169,18 @@ if nonzero_D.size > 0:
     # umbral_por_radio = int(factor_radio * radio_mascara)
     # umbral_por_percentil = int(np.percentile(nonzero_D, 75))  # 75º percentil
     # umbral_distancia = max(6, min(umbral_por_radio, umbral_por_percentil))
-    umbral_distancia = 8
+    umbral_distancia = 9
 else:
-    umbral_distancia = 8
+    umbral_distancia = 9
 
 coordinates = peak_local_max(D, min_distance=min_distancia, labels=thresh)
 
-# DEBUG: imprimir información útil
-print(f"[DEBUG] nonzero_thresh_px={nonzero_D.size}, D_max={D.max():.1f}, umbral_distancia={umbral_distancia}")
-print(f"[DEBUG] total_maxima_encontradas={len(coordinates)}")
-if len(coordinates) > 0:
-    sample = coordinates[:10]
-    print(f"[DEBUG] primeras coordenadas: {sample}")
+# # DEBUG: imprimir información útil
+# print(f"[DEBUG] nonzero_thresh_px={nonzero_D.size}, D_max={D.max():.1f}, umbral_distancia={umbral_distancia}")
+# print(f"[DEBUG] total_maxima_encontradas={len(coordinates)}")
+# if len(coordinates) > 0:
+#     sample = coordinates[:10]
+#     print(f"[DEBUG] primeras coordenadas: {sample}")
 
 # Solo selecciona los máximos locales que superan el umbral
 coordinates_filtradas = []
@@ -242,7 +267,7 @@ for label in np.unique(labels):
         if reflect_overlap_ratio > 0.60:
             _reject(label, "reflect_overlap_ratio alto", reflect_overlap_ratio=round(reflect_overlap_ratio, 2))
             continue
-        if mean_v_contour >= (mean_v_plate + max(30, 5.0 * std_v_plate)):
+        if mean_v_contour >= (mean_v_plate + max(30, 4.0 * std_v_plate)):
             print("[DEBUG] mean_v_contour demasiado alto comparado con placa:")
             print(mean_v_plate, std_v_plate)
             _reject(label, "brillo muy alto (posible reflejo)", mean_v_contour=round(mean_v_contour,1), mean_v_plate=round(mean_v_plate,1))
