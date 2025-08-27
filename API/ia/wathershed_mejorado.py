@@ -27,8 +27,9 @@ gray = cv2.cvtColor(shifted, cv2.COLOR_BGR2GRAY)
 # Aplicar la máscara al umbral
 thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
 
-# --- NUEVO: Operación morfológica para limpiar el borde ---
-kernel = np.ones((5, 5), np.uint8)  # Puedes probar con (3,3) o (7,7) según el resultado
+# Crea una matriz kernel que define el área con la que se realizarán las operaciones morfológicas.
+kernel = np.ones((7, 7), np.uint8)  # (3x3 menos agresivo,5x5, 7x7 más agresivo)
+# Aplica apertura para eliminar ruido pequeño
 thresh = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel)
 
 # Detectar automáticamente el círculo de la caja Petri
@@ -46,7 +47,7 @@ if circles is not None:
 
     # Prueba márgenes crecientes hasta que la franja del borde tenga pocos píxeles blancos
     umbral_borde = 0.05  # Porcentaje máximo de píxeles blancos permitidos en la franja
-    ancho_franja = 10    # Ancho de la franja en píxeles
+    ancho_franja = 5    # Ancho de la franja en píxeles
     margen = 0
     while margen < int(0.1 * radio_detectado):  # No restar más del 20% del radio
         radio_interno = int(radio_detectado - margen - ancho_franja)
@@ -139,12 +140,13 @@ D = ndimage.distance_transform_edt(thresh)
 nonzero_D = D[thresh > 0]
 if nonzero_D.size > 0:
     # usa un factor más pequeño y limitar por un percentil del mapa D
-    factor_radio = 0.06            # antes 0.12, reducir para no filtrar demasiado
-    umbral_por_radio = int(factor_radio * radio_mascara)
-    umbral_por_percentil = int(np.percentile(nonzero_D, 75))  # 75º percentil
-    umbral_distancia = max(6, min(umbral_por_radio, umbral_por_percentil))
+    # factor_radio = 0.06            # antes 0.12, reducir para no filtrar demasiado
+    # umbral_por_radio = int(factor_radio * radio_mascara)
+    # umbral_por_percentil = int(np.percentile(nonzero_D, 75))  # 75º percentil
+    # umbral_distancia = max(6, min(umbral_por_radio, umbral_por_percentil))
+    umbral_distancia = 8
 else:
-    umbral_distancia = 6
+    umbral_distancia = 8
 
 coordinates = peak_local_max(D, min_distance=min_distancia, labels=thresh)
 
@@ -236,28 +238,14 @@ for label in np.unique(labels):
         reflect_overlap_px = np.count_nonzero(np.logical_and(reflection_mask > 0, mask > 0))
         reflect_overlap_ratio = reflect_overlap_px / area_contour_px
 
-        # Reglas para descartar reflexiones: exigir coincidencia de máscara de reflexión + brillo alto.
-        # Usar el umbral specular_thresh calculado anteriormente (más robusto frente a variaciones globales)
-        spec_thresh_local = int(specular_thresh) if 'specular_thresh' in globals() else int(mean_v_plate + max(30, 2.0 * std_v_plate))
-
-        # Rechaza si una fracción importante del contorno cae en reflection_mask y el brillo local supera el umbral de reflejo
-        if reflect_overlap_ratio > 0.50 and mean_v_contour >= spec_thresh_local:
-            _reject(label, "reflect_overlap_ratio + brillo (reflexión)", reflect_overlap_ratio=round(reflect_overlap_ratio, 2),
-                    mean_v_contour=round(mean_v_contour, 1), spec_thresh_local=spec_thresh_local)
+        # Reglas para descartar reflexiones (más permisivas)
+        if reflect_overlap_ratio > 0.60:
+            _reject(label, "reflect_overlap_ratio alto", reflect_overlap_ratio=round(reflect_overlap_ratio, 2))
             continue
-
-        # Permitir objetos brillantes si están claramente dentro de la máscara erosionada (no en la franja)
-        # esto evita descartar colonias brillantes ubicadas dentro de la placa
-        area_inside_eroded = np.count_nonzero(np.logical_and(mask_circular_eroded > 0, mask > 0))
-        frac_inside_eroded = area_inside_eroded / area_contour_px
-        if mean_v_contour >= spec_thresh_local and frac_inside_eroded > 0.70:
-            # Considerar válido: brillo alto pero dentro de la placa (no reject)
-            pass
-
-        # Criterio alternativo más estricto (si aún se desea): brillo muy superior a la media y cierto overlap
-        if mean_v_contour >= (mean_v_plate + max(45, 4.0 * std_v_plate)) and reflect_overlap_ratio > 0.35:
-            _reject(label, "brillo muy alto y reflect_overlap", mean_v_contour=round(mean_v_contour,1),
-                    mean_v_plate=round(mean_v_plate,1), reflect_overlap_ratio=round(reflect_overlap_ratio,2))
+        if mean_v_contour >= (mean_v_plate + max(30, 5.0 * std_v_plate)):
+            print("[DEBUG] mean_v_contour demasiado alto comparado con placa:")
+            print(mean_v_plate, std_v_plate)
+            _reject(label, "brillo muy alto (posible reflejo)", mean_v_contour=round(mean_v_contour,1), mean_v_plate=round(mean_v_plate,1))
             continue
 
         area_inside_original = np.count_nonzero(np.logical_and(mask_circular > 0, mask > 0))
@@ -314,11 +302,11 @@ for label in np.unique(labels):
 print(f"[INFO] {contador_colonias} colonias detectadas")
 
 # Mostrar con Matplotlib
-plt.figure(figsize=(14, 7))
-plt.subplot(2, 4, 1)
-plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-plt.title("Imagen original")
-plt.axis("off")
+# plt.figure(figsize=(14, 7))
+# plt.subplot(2, 4, 1)
+# plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+# plt.title("Imagen original")
+# plt.axis("off")
 
 # plt.subplot(2, 4, 2)
 # plt.imshow(cv2.cvtColor(imagen_suavizada, cv2.COLOR_BGR2RGB))
@@ -329,8 +317,6 @@ plt.axis("off")
 # plt.imshow(gray, cmap="gray")
 # plt.title("Gris")
 # plt.axis("off")
-
-
 
 # plt.subplot(2, 4, 4)
 # plt.imshow(thresh, cmap="gray")
@@ -347,11 +333,86 @@ plt.axis("off")
 # plt.title("Mapa de distancia")
 # plt.axis("off")
 
-plt.subplot(2, 4, 2)
-# plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+
+# plt.subplot(2, 4, 7)
+# plt.imshow(cv2.cvtColor(image_resultado, cv2.COLOR_BGR2RGB))
+# plt.title("Colonias detectadas")
+# plt.axis("off")
+
+# plt.tight_layout()
+# plt.show()
+
+# ...existing code...
+# Sustituir la sección de plots por esta versión ampliada con visualizaciones útiles
+plt.figure(figsize=(16, 10))
+
+plt.subplot(3, 4, 1)
+plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+plt.title("Imagen original")
+plt.axis("off")
+
+plt.subplot(3, 4, 2)
+plt.imshow(cv2.cvtColor(imagen_suavizada, cv2.COLOR_BGR2RGB))
+plt.title("imagen_suavizada")
+plt.axis("off")
+
+plt.subplot(3, 4, 3)
+plt.imshow(gray, cmap="gray")
+plt.title("Gris")
+plt.axis("off")
+
+plt.subplot(3, 4, 4)
+plt.imshow(thresh, cmap="gray")
+plt.title("Umbral (thresh)")
+plt.axis("off")
+
+plt.subplot(3, 4, 5)
+plt.imshow(mask_circular, cmap="gray")
+plt.title("mask_circular")
+plt.axis("off")
+
+plt.subplot(3, 4, 6)
+plt.imshow(mask_circular_eroded, cmap="gray")
+plt.title("mask_circular_eroded")
+plt.axis("off")
+
+plt.subplot(3, 4, 7)
+plt.imshow(reflection_mask, cmap="gray")
+plt.title("reflection_mask (reflejos)")
+plt.axis("off")
+
+plt.subplot(3, 4, 8)
+plt.imshow(D, cmap="jet")
+plt.title("Mapa de distancia D")
+plt.axis("off")
+
+# Mostrar máximos locales sobre el mapa D
+plt.subplot(3, 4, 9)
+plt.imshow(D, cmap="jet")
+if 'coordinates' in globals() and len(coordinates) > 0:
+    ys = [c[0] for c in coordinates]
+    xs = [c[1] for c in coordinates]
+    plt.scatter(xs, ys, c='white', s=20, edgecolors='k')
+plt.title("D + máximos locales (coordinates)")
+plt.axis("off")
+
+# Overlay de labels/watershed sobre la imagen original (bordes)
+plt.subplot(3, 4, 11)
+img_labels_overlay = image.copy()
+if 'labels' in globals():
+    # obtener contorno de la segmentación para visualizar límites
+    seg_mask = (labels > 0).astype("uint8") * 255
+    edges = cv2.morphologyEx(seg_mask, cv2.MORPH_GRADIENT, np.ones((3,3), np.uint8))
+    img_labels_overlay[edges > 0] = [255, 0, 0]  # bordes en rojo
+plt.imshow(cv2.cvtColor(img_labels_overlay, cv2.COLOR_BGR2RGB))
+plt.title("Watershed boundaries")
+plt.axis("off")
+
+plt.subplot(3, 4, 12)
 plt.imshow(cv2.cvtColor(image_resultado, cv2.COLOR_BGR2RGB))
-plt.title("Colonias detectadas")
+plt.title("Resultado final")
 plt.axis("off")
 
 plt.tight_layout()
 plt.show()
+
