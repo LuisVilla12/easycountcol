@@ -111,7 +111,6 @@ else:
     cv2.circle(mask_circular, center, radius, 255, -1)
     print(f"No se detectó círculo, usando centro=({center[0]}, {center[1]}), radio={radius}")
 
-    # Asegurar variables necesarias más adelante
     centro = center
     radio_mascara = radius
     erosion_px = max(3, int(0.03 * radio_mascara))
@@ -126,6 +125,7 @@ thresh = cv2.bitwise_and(thresh, thresh, mask=mask_circular_eroded)
 kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
 thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel_close, iterations=1)
 
+# Conversión a otros espacios de color
 # usa imagen suavizada para reducir ruido en la detección de reflejos
 hsv = cv2.cvtColor(shifted, cv2.COLOR_BGR2HSV)
 v = hsv[:, :, 2].astype(np.uint8)
@@ -158,63 +158,50 @@ mask_final = cv2.bitwise_or(mask_circular_eroded, reflection_mask)
 # Calcula el valor máximo del mapa de distancia para cada marcador
 min_distancia = 9  # Ajusta según separación mínima esperada
 
-# --- REEMPLAZADO: suavizado de D y limpieza de máximos para evitar marcadores ruidosos ---
+# umbral adaptativo más robusto
 D = ndimage.distance_transform_edt(thresh)
 
-# Suavizar el mapa de distancia para eliminar picos locales de poca importancia
-D_blur = cv2.GaussianBlur(D.astype(np.float32), (9, 9), 2.0)
 
-# Detectar máximos locales sobre la versión suavizada
-coordinates = peak_local_max(D_blur, min_distance=min_distancia, labels=thresh)
-
-# Debug rápido
-print(f"[DEBUG] total_maxima_encontradas={len(coordinates)} D_max={D.max():.1f}")
-
-# Construir máscara de máximos y eliminar marcadores muy pequeños (ruido)
-localMax = np.zeros_like(D, dtype=np.uint8)
-if len(coordinates) > 0:
-    localMax[tuple(coordinates.T)] = 1
-
-# Opcional: expandir ligeramente los máximos para formar regiones de marcador robustas
-kernel_m = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
-localMax = cv2.dilate(localMax, kernel_m, iterations=1)
-
-# Etiquetar marcadores y eliminar componentes muy pequeñas
-markers_lab, n_labels = ndimage.label(localMax)
-min_marker_area = 8  # ajustar si colonias muy pequeñas; reducir a 4 si necesitas más sensibilidad
-if n_labels > 0:
-    sizes = np.bincount(markers_lab.ravel())
-    remove_mask = np.zeros_like(markers_lab, dtype=bool)
-    for lab_id, sz in enumerate(sizes):
-        if lab_id == 0:
-            continue
-        if sz < min_marker_area:
-            remove_mask[markers_lab == lab_id] = True
-    markers_lab[remove_mask] = 0
-    # compactar etiquetas
-    new_markers = np.zeros_like(markers_lab)
-    lab_map = {}
-    new_id = 1
-    for lab_id in np.unique(markers_lab):
-        if lab_id == 0:
-            continue
-        new_markers[markers_lab == lab_id] = new_id
-        new_id += 1
-    markers_lab = new_markers
+# Valores dentro de la placa (no fondo)
+nonzero_D = D[thresh > 0]
+if nonzero_D.size > 0:
+    # usa un factor más pequeño y limitar por un percentil del mapa D
+    # factor_radio = 0.06            # antes 0.12, reducir para no filtrar demasiado
+    # umbral_por_radio = int(factor_radio * radio_mascara)
+    # umbral_por_percentil = int(np.percentile(nonzero_D, 75))  # 75º percentil
+    # umbral_distancia = max(6, min(umbral_por_radio, umbral_por_percentil))
+    umbral_distancia = 9
 else:
-    markers_lab = np.zeros_like(D, dtype=int)
+    umbral_distancia = 9
 
-# Si no hay marcadores válidos, fallback: usar componentes conectados de thresh como marcadores
-if markers_lab.max() == 0:
-    print("[WARN] No se detectaron máximos robustos, usando componentes de 'thresh' como marcadores fallback")
-    cc = cv2.connectedComponents((thresh > 0).astype(np.uint8))[1]
-    # remover fondo (0) y componentes muy grandes/pequeñas según convenga
-    markers_lab = cc
-    # opcional: reducir número de marcadores si hay demasiados (no obligatorio)
+# umbral_distancia = 9
+coordinates = peak_local_max(D, min_distance=min_distancia, labels=thresh)
 
-# Aplicar watershed sobre la versión suavizada del mapa de distancia
-markers = markers_lab.copy()
-labels = watershed(-D_blur, markers, mask=thresh)
+# Solo selecciona los máximos locales que superan el umbral
+coordinates_filtradas = []
+valores_umbral = []
+for coord in coordinates:
+    valor = D[coord[0], coord[1]]
+    if valor > umbral_distancia:
+        coordinates_filtradas.append(coord)
+        valores_umbral.append(valor)
+coordinates_filtradas = np.array(coordinates_filtradas)
+
+# Imprime los valores
+print("Valores del mapa de distancia en cada máximo local filtrado:")
+for i, valor in enumerate(valores_umbral):
+    print(f"Punto {i+1}: {valor}")
+    
+    
+localMax = np.zeros_like(D, dtype=bool)
+if len(coordinates_filtradas) > 0:
+    localMax[tuple(coordinates_filtradas.T)] = True
+
+# Etiquetar marcadores
+markers = ndimage.label(localMax, structure=np.ones((3, 3)))[0]
+
+# Aplicar Watershed
+labels = watershed(-D, markers, mask=thresh)
 
 # Mostrar cantidad detectada
 # print(f"[INFO] {len(np.unique(labels)) - 1} etiquetas dectectadas (sin contar fondo)")
@@ -334,7 +321,51 @@ for label in np.unique(labels):
 
 print(f"[INFO] {contador_colonias} colonias detectadas")
 
+# Mostrar con Matplotlib
+# plt.figure(figsize=(14, 7))
+# plt.subplot(2, 4, 1)
+# plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+# plt.title("Imagen original")
+# plt.axis("off")
+
+# plt.subplot(2, 4, 2)
+# plt.imshow(cv2.cvtColor(imagen_suavizada, cv2.COLOR_BGR2RGB))
+# plt.title("imagen suavizada")
+# plt.axis("off")
+
+# plt.subplot(2, 4, 3)
+# plt.imshow(gray, cmap="gray")
+# plt.title("Gris")
+# plt.axis("off")
+
+# plt.subplot(2, 4, 4)
+# plt.imshow(thresh, cmap="gray")
+# plt.title("Umbral Otsu invertido")
+# plt.axis("off")
+
+# plt.subplot(2, 4,5)
+# plt.imshow(mask_circular, cmap="gray")
+# plt.title("Mascara circular")
+# plt.axis("off")
+
+# plt.subplot(2, 4, 6)
+# plt.imshow(D, cmap="jet")
+# plt.title("Mapa de distancia")
+# plt.axis("off")
+
+
+# plt.subplot(2, 4, 7)
+# plt.imshow(cv2.cvtColor(image_resultado, cv2.COLOR_BGR2RGB))
+# plt.title("Colonias detectadas")
+# plt.axis("off")
+
+# plt.tight_layout()
+# plt.show()
+
+# ...existing code...
+# Sustituir la sección de plots por esta versión ampliada con visualizaciones útiles
 plt.figure(figsize=(16, 10))
+
 plt.subplot(3, 4, 1)
 plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 plt.title("Imagen original")
