@@ -27,5 +27,4 @@ class CameraServicesImplementation extends CameraService{
       if(photo==null) return null;
       return photo.path;
   }
-
 }

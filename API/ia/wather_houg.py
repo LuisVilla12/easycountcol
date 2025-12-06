@@ -65,7 +65,7 @@ def tratamiento_imagen(name_image):
 
     # Calcula el valor máximo del mapa de distancia para cada marcador
     min_distancia = 10  # Ajusta según separación mínima esperada
-    umbral_distancia = 15  # Ajusta según el valor mínimo aceptable en el mapa de distancia
+    umbral_distancia = 10  # Ajusta según el valor mínimo aceptable en el mapa de distancia
 
     D = ndimage.distance_transform_edt(thresh)
     coordinates = peak_local_max(D, min_distance=min_distancia, labels=thresh)

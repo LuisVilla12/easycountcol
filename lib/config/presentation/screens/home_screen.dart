@@ -540,7 +540,7 @@ class _ViewCameraState extends State<_ViewCamera>
               icon: const Icon(Icons.upload_outlined),
               label: imagePath == ''
                   ? const Text('Seleccionar una imagen')
-                  : const Text('Seleccionar otra una imagen'),
+                  : const Text('Seleccionar otra  imagen'),
             ),
           ],
         ),
