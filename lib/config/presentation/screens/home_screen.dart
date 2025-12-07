@@ -3,13 +3,13 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:easycoutcol/app/registerSample.dart';
 import 'package:easycoutcol/config/menu/side_menu.dart';
 import 'package:easycoutcol/config/presentation/providers/login_provider.dart';
-import 'package:easycoutcol/config/presentation/providers/theme_provider.dart';
 import 'package:easycoutcol/config/presentation/screens/overlay_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
 import 'package:easycoutcol/config/presentation/wigets/input_custom.dart';
 import 'package:easycoutcol/config/services/camera_services_implementation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 
 class HomeScreen extends StatelessWidget {
   static const String name = 'home_screen';
@@ -102,7 +102,7 @@ class _ViewCameraState extends State<_ViewCamera>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+       _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
       // cambiar el state del tab
       setState(() {});
