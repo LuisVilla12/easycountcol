@@ -9,7 +9,7 @@ class CameraServicesImplementation extends CameraService{
     final XFile? photo = await picker.pickImage(
       source: ImageSource.gallery, 
       // Calidad de la imagen
-      imageQuality: 10,
+      imageQuality: 100,
       // Que camara prefiere
       preferredCameraDevice: CameraDevice.rear);
       if(photo==null) return null;

@@ -18,7 +18,7 @@ void main() async {
   FlutterNativeSplash.remove();
 
   // Habilita riverpodsen toda la aplicaición
-  WidgetsFlutterBinding.ensureInitialized();
+  // WidgetsFlutterBinding.ensureInitialized();
   // Listado de camaras
   await dotenv.load(fileName: ".env");
   cameras = await availableCameras();
