@@ -206,7 +206,7 @@ class _EditSampleState extends State<EditSample> {
                           ),
                           // Tipo de muestra
                           DropdownButtonFormField<String>(
-                            initialValue: selectedClasification,
+                           // initialValue: selectedClasification,
                             decoration: InputDecoration(
                               labelText: 'Tipo de muestra',
                               prefixIcon:
@@ -271,7 +271,7 @@ class _EditSampleState extends State<EditSample> {
                             height: 8,
                           ),
                           DropdownButtonFormField<String>(
-                            initialValue: selectedMedium,
+                            //initialValue: selectedMedium,
                             decoration: InputDecoration(
                               labelText: 'Medio de cultivo',
                               prefixIcon:
