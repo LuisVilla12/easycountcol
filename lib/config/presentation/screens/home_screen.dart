@@ -179,7 +179,7 @@ class _ViewCameraState extends State<_ViewCamera>
               },
             ),
               DropdownButtonFormField<String>(
-              initialValue: selectedClasification,
+              //initialValue: selectedClasification,
               decoration: InputDecoration(
                 labelText: 'Tipo de muestra',
                 prefixIcon: Icon(Icons.science, color: colors.primary),
@@ -240,7 +240,7 @@ class _ViewCameraState extends State<_ViewCamera>
               height: 8,
             ),
             DropdownButtonFormField<String>(
-              initialValue: selectedMedium,
+              //initialValue: selectedMedium,
               decoration: InputDecoration(
                 labelText: 'Medio de cultivo',
                 prefixIcon: Icon(Icons.trending_up, color: colors.primary),
