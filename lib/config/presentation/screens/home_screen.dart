@@ -371,7 +371,6 @@ class _ViewCameraState extends State<_ViewCamera>
                         }
                         if (!context.mounted) return;
                         try {
-                          // llamar a la función de carga
                           showLoadingDialog(context);
                           final result = await uploadSampleWithFile(
                             sampleName: nameSampleController.text,
@@ -382,7 +381,6 @@ class _ViewCameraState extends State<_ViewCamera>
                             medioSample: mediumController.text,
                             sampleFile: imagePath,
                           );
-                          // cerrar la carga
                           Navigator.of(context).pop();
                           
                           if (result['success']) {
@@ -598,7 +596,7 @@ class _ViewCameraState extends State<_ViewCamera>
                   child: Padding(
                     padding: EdgeInsets.all(5),
                     child: Text(
-                      '💡 Consejo profesional: Para obtener resultados óptimos, utiliza un fondo blanco o negro uniforme detrás de la placa.',
+                      'Consejo profesional: Para obtener resultados óptimos, utiliza un fondo blanco o negro uniforme detrás de la placa.',
                       style: TextStyle(fontStyle: FontStyle.italic),
                     ),
                   ),

@@ -13,7 +13,6 @@ import 'package:easycoutcol/config/presentation/screens/tutorial_screen.dart';
 import 'package:go_router/go_router.dart';
 
 // Definir rutas
-// Definir rutas
 final appRouter = GoRouter(
   initialLocation: '/home',
   routes: [
