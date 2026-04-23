@@ -15,7 +15,7 @@ import 'package:go_router/go_router.dart';
 // Definir rutas
 // Definir rutas
 final appRouter = GoRouter(
-  initialLocation: '/home',
+  initialLocation: '/tutorial',
   routes: [
     GoRoute(
       path: '/splash',

@@ -22,6 +22,7 @@ class EditSample extends StatefulWidget {
 
 class _EditSampleState extends State<EditSample> {
   final GlobalKey<FormState> formKeySample = GlobalKey<FormState>();
+  final TextEditingController idSampleController = TextEditingController();
   final TextEditingController nameSampleController = TextEditingController();
   final TextEditingController typeSampleController = TextEditingController();
   final TextEditingController factorSampleController = TextEditingController();
@@ -38,18 +39,19 @@ class _EditSampleState extends State<EditSample> {
   int? idUser;
 
   final List<String> mediumList = [
+   'Agar Nutritivo',
     'Agar MacConkey',
-    'Agar nutritivo',
     'Agar sangre',
     'Agar Sabouraud',
+    'Otro'
   ];
 
   final List<String> clasificationList = [
     'Clinica - Biológica', //Sangre, saliva, orina, hisopados
-    'Ambiental', //Aire, superficies, agua, suelo
-    'Alimentos', //Leches, frutas, verduras, carnes
-    'Material', //Guantes, ropa de laboratorio, utensilios
-    'Otras muestras', //Otros tipos de muestras
+    'Ambiental',//Aire, superficies, agua, suelo
+    'Alimentos',//Leches, frutas, verduras, carnes
+    'Material',//Guantes, ropa de laboratorio, utensilios
+    'Otro',//Otros tipos de muestras
   ];
   late Future<Map<String, dynamic>> data;
   @override
@@ -60,6 +62,7 @@ class _EditSampleState extends State<EditSample> {
 
   @override
   void dispose() {
+    idSampleController.dispose();
     nameSampleController.dispose();
     typeSampleController.dispose();
     factorSampleController.dispose();
@@ -73,6 +76,7 @@ class _EditSampleState extends State<EditSample> {
   }
 
   void cleanControllers() {
+    idSampleController.clear();
     nameSampleController.clear();
     typeSampleController.clear();
     factorSampleController.clear();
@@ -158,6 +162,7 @@ class _EditSampleState extends State<EditSample> {
             // Usamos el modelo para parsear los datos
             final resultado = ResultadoMuestra.fromMap(snapshot.data!);
             // Asignar el valor por defecto si aún no se ha seleccionado
+            idSampleController.text = resultado.id.toString();
             nameSampleController.text = resultado.name;
             volumenSampleController.text = resultado.volumenSample;
             timeProcesingController.text = resultado.processingTime.toString();
@@ -206,7 +211,7 @@ class _EditSampleState extends State<EditSample> {
                           ),
                           // Tipo de muestra
                           DropdownButtonFormField<String>(
-                           // initialValue: selectedClasification,
+                           value: selectedClasification,
                             decoration: InputDecoration(
                               labelText: 'Tipo de muestra',
                               prefixIcon:
@@ -271,7 +276,7 @@ class _EditSampleState extends State<EditSample> {
                             height: 8,
                           ),
                           DropdownButtonFormField<String>(
-                            //initialValue: selectedMedium,
+                            value: selectedMedium,
                             decoration: InputDecoration(
                               labelText: 'Medio de cultivo',
                               prefixIcon:
@@ -402,7 +407,7 @@ class _EditSampleState extends State<EditSample> {
                           builder: (context) => AlertDialog(
                             title: const Text('Confirmar'),
                             content: const Text(
-                                '¿Deseas registrar la muestra?'),
+                                '¿Deseas actualizar la muestra?'),
                             actions: [
                               TextButton(
                                 onPressed: () =>
@@ -443,9 +448,8 @@ class _EditSampleState extends State<EditSample> {
                           if (!context.mounted) return;
                           try {
                             final result = await updateSample(
-                              // idSample=
+                              sampleID: int.parse(idSampleController.text),
                               sampleName: nameSampleController.text,
-                              idUser: idUser,
                               typeSample: typeSampleController.text,
                               volumenSample: volumenSampleController.text,
                               factorSample: factorSampleController.text,
@@ -458,7 +462,7 @@ class _EditSampleState extends State<EditSample> {
                                 builder: (context) => AlertDialog(
                                   title: const Text("Éxito"),
                                   content: const Text(
-                                      "Muestra almacenada correctamente, continúa su análisis."),
+                                      "Muestra actualizada correctamente"),
                                   actions: [
                                     TextButton(
                                       onPressed: () {
@@ -471,20 +475,20 @@ class _EditSampleState extends State<EditSample> {
                                 ),
                               );
                               cleanControllers();
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      ResultsScreen(idMuestra: idSample),
-                                ),
-                              );
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) =>
+                              //         ResultsScreen(idMuestra: idSample),
+                              //   ),
+                              // );
                             } else {
                               showDialog(
                                 context: context,
                                 builder: (context) => AlertDialog(
                                   title: const Text("Error"),
                                   content: const Text(
-                                      'Ocurrió un error al registrarse'),
+                                      'Ocurrió un error al actualizar la muestra. Por favor intenta nuevamente.'),
                                   actions: [
                                     TextButton(
                                       onPressed: () => Navigator.pop(context),
@@ -500,7 +504,7 @@ class _EditSampleState extends State<EditSample> {
                         }
                         },
                         icon: const Icon(Icons.save),
-                        label: const Text('Registrar muestra'),
+                        label: const Text('Actualizar muestra'),
                         style: FilledButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 15, vertical: 15),

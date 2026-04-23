@@ -41,12 +41,7 @@ const appMenuItems=<MenuItem>[
     link: '/theme',
     icon:Icons.color_lens_outlined,
   ),
-  MenuItem(
-    title:'Iniciar sesión' ,
-    subtitle: 'Iniciar sesión',
-    link: '/login',
-    icon:Icons.login_outlined ,
-  ),   
+  
     MenuItem(
     title:'Cerrar sesión' ,
     subtitle: 'Cerrar sesión',
@@ -59,4 +54,10 @@ const appMenuItems=<MenuItem>[
     link: '/help',
     icon:Icons.question_answer_outlined ,
   ),  
+  // MenuItem(
+  //   title:'Iniciar sesión' ,
+  //   subtitle: 'Iniciar sesión',
+  //   link: '/login',
+  //   icon:Icons.login_outlined ,
+  // ),   
 ];

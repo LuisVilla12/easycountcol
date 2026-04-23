@@ -32,8 +32,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   Future<List<Sample>> fetchSamples() async {
     // Utilizar dotenv para manejar la URL de la API
     final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:8000';
-    // final response = await http.get(Uri.parse('$apiUrl/samples/$idUser'));
-    final response = await http.get(Uri.parse('$apiUrl/samples'));
+    final response = await http.get(Uri.parse('$apiUrl/samples/$idUser'));
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonData = jsonDecode(response.body);
       final List<dynamic> samplesList = jsonData['samples'];
@@ -75,7 +74,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
       'color': Colors.blue.shade700,
       'icon': Icons.build_outlined,
     },
-    'Otras muestras': {
+    'Otro': {
       'color': Colors.grey.shade700,
       'icon': Icons.category_outlined,
     },

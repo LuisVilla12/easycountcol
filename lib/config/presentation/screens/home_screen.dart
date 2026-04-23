@@ -85,10 +85,11 @@ class _ViewCameraState extends State<_ViewCamera>
   String? nameUser;
 
   final List<String> mediumList = [
-    'Agar nutritivo',
+    'Agar Nutritivo',
     'Agar MacConkey',
     'Agar sangre',
     'Agar Sabouraud',
+    'Otro',
   ];
   
   final List<String> clasificationList = [
@@ -96,7 +97,7 @@ class _ViewCameraState extends State<_ViewCamera>
     'Ambiental',//Aire, superficies, agua, suelo
     'Alimentos',//Leches, frutas, verduras, carnes
     'Material',//Guantes, ropa de laboratorio, utensilios
-    'Otras muestras',//Otros tipos de muestras
+    'Otro',//Otros tipos de muestras
   ];
 
   @override

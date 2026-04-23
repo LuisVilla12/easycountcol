@@ -3,8 +3,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 Future<Map<String, dynamic>> updateSample({
+  required int sampleID,
   required String sampleName,
-  required int idUser,
   required String typeSample,
   required String volumenSample,
   required String factorSample,
@@ -13,12 +13,11 @@ Future<Map<String, dynamic>> updateSample({
 }) async {
   // Utilizar dotenv para manejar la URL de la API
   final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:8000';
-  final url = Uri.parse('$apiUrl/update/'); // Asegúrate de que coincida con tu ruta
+  final url = Uri.parse('$apiUrl/sample/update/$sampleID'); // Endpoint para actualizar muestra
 
   // Prepara la solicitud con multipart/form-dat  .
-  final request = http.MultipartRequest('POST', url)
+  final request = http.MultipartRequest('PUT', url)
     ..fields['sampleName'] = sampleName
-    ..fields['idUser'] = idUser.toString()
     ..fields['typeSample'] = typeSample
     ..fields['volumenSample'] = volumenSample
     ..fields['factorSample'] = factorSample
