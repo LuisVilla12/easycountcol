@@ -28,6 +28,12 @@ const appMenuItems=<MenuItem>[
     subtitle: 'Registro de todas las muestras ',
     link: '/history',
     icon:Icons.history_outlined ,
+  ),
+  MenuItem(
+    title:'Seguimientos' ,
+    subtitle: 'Registro de todos los seguimientos ',
+    link: '/seguimientos',
+    icon:Icons.track_changes_outlined ,
   ), 
   MenuItem(
     title:'Configuración' ,

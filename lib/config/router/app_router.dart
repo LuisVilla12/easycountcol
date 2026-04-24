@@ -10,6 +10,7 @@ import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/splash_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/theme_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/tutorial_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/follow_screen.dart';
 import 'package:go_router/go_router.dart';
 
 // Definir rutas
@@ -44,6 +45,11 @@ final appRouter = GoRouter(
           final id = int.parse(state.pathParameters['id']!);
           return ResultsScreen(idMuestra: id);
         }),
+    GoRoute(
+      path: '/seguimientos',
+      name: FollowScreen.name,
+      builder: (context, state) => const FollowScreen(),
+    ),
     GoRoute(
       path: '/config',
       name: ConfigScreen.name,
