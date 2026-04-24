@@ -5,20 +5,17 @@ import 'package:easycoutcol/app/resultadoFollow.dart';
 import 'package:easycoutcol/app/updatesFollow.dart';
 import 'package:easycoutcol/config/presentation/wigets/input_custom.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
 
-class EditFollowScreen extends StatefulWidget {
-  static const String name = 'edit_follow_screen';
-  final int idFollow;
-  const EditFollowScreen({super.key, required this.idFollow});
+class AddFollowScreen extends StatefulWidget {
+  static const String name = 'add_follow_screen';
+  const AddFollowScreen({super.key});
 
   @override
-  State<EditFollowScreen> createState() => _EditFollowScreenState();
+  State<AddFollowScreen> createState() => _AddFollowScreenState();
 }
 
-class _EditFollowScreenState extends State<EditFollowScreen> {
+class _AddFollowScreenState extends State<AddFollowScreen> {
   final GlobalKey<FormState> formKeyFollow = GlobalKey<FormState>();
   final TextEditingController idFollowController = TextEditingController();
   final TextEditingController nameFollowController = TextEditingController();
@@ -30,7 +27,6 @@ class _EditFollowScreenState extends State<EditFollowScreen> {
   @override
   void initState() {
     super.initState();
-    data = fetchData();
   }
 
   @override
@@ -51,22 +47,6 @@ class _EditFollowScreenState extends State<EditFollowScreen> {
     timeController.clear();
   }
 
-  Future<Map<String, dynamic>> fetchData() async {
-    final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:8000';
-    final infoUrl = '$apiUrl/follows/info/${widget.idFollow}';
-
-    final responses = await Future.wait([
-      http.get(Uri.parse(infoUrl)),
-    ]);
-
-    if (responses.any((res) => res.statusCode != 200)) {
-      throw Exception('Error al cargar datos');
-    }
-    final follow = jsonDecode(responses[0].body);
-    return {
-      'follow': follow['follow'],
-    };
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +56,7 @@ class _EditFollowScreenState extends State<EditFollowScreen> {
         automaticallyImplyLeading: true, // Desactiva el botón de retroceso
         foregroundColor: Colors.white,
         title:
-            const Text('Editar Seguimiento', style: TextStyle(color: Colors.white)),
+            const Text('Agregar  Seguimiento', style: TextStyle(color: Colors.white)),
         backgroundColor: colors.primary,
       ),
       body: FutureBuilder<Map<String, dynamic>>(

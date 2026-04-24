@@ -2,6 +2,7 @@ import 'package:easycoutcol/config/presentation/screens/auth/login_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/auth/logout_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/config_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/edit_follow_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/add_follow_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/edit.screen.dart';
 import 'package:easycoutcol/config/presentation/screens/help_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/history_screen.dart';
@@ -51,13 +52,18 @@ final appRouter = GoRouter(
       name: FollowsScreen.name,
       builder: (context, state) => const FollowsScreen(),
     ),
-    // GoRoute(
-    //     path: '/editFollow:id',
-    //     name: EditFollowScreen.name,
-    //     builder: (context, state) {
-    //       final id = int.parse(state.pathParameters['id']!);
-    //       return EditFollowScreen(idFollow: id);
-    //     }),
+    GoRoute(
+        path: '/editFollow:id',
+        name: EditFollowScreen.name,
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return EditFollowScreen(idFollow: id);
+        }),
+    GoRoute(
+        path: '/addFollow',
+        name: AddFollowScreen.name,
+        builder: (context, state) => const AddFollowScreen(),
+        ),
     GoRoute(
       path: '/config',
       name: ConfigScreen.name,

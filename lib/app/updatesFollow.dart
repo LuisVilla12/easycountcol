@@ -14,7 +14,7 @@ Future<Map<String, dynamic>> updatesFollow({
   // Prepara la solicitud con multipart/form-dat  .
   final request = http.MultipartRequest('PUT', url)
     ..fields['followName'] = followName
-    ..fields['description'] = followDescription;
+    ..fields['followDescription'] = followDescription;
 
   final response = await request.send();
 

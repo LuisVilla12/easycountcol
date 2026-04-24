@@ -1,8 +1,7 @@
 import 'package:easycoutcol/app/Follows.dart';
-import 'package:easycoutcol/app/Samples.dart';
 import 'package:easycoutcol/config/presentation/providers/login_provider.dart';
 import 'package:easycoutcol/config/presentation/providers/theme_provider.dart';
-import 'package:easycoutcol/config/presentation/screens/edit.screen.dart';
+import 'package:easycoutcol/config/presentation/screens/edit_follow_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -189,7 +188,7 @@ class _FollowsScreenState extends ConsumerState<FollowsScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    EditSample(idMuestra: follow.id),
+                                    EditFollowScreen(idFollow: follow.id),
                               ),
                             )
                               },
@@ -223,13 +222,6 @@ class _FollowsScreenState extends ConsumerState<FollowsScreen> {
                   formattedTime
                 ),
               );
-              // return sampleTile(
-              //   context,
-              //   sample,
-              //   classification[sample.typeSample]?['color'] ?? colors.primary,
-              //   DateFormat('dd/MM/yyyy').format(creationTime),
-              //   formattedTime,
-              // );
             },
           );
         }
@@ -247,61 +239,8 @@ class _FollowsScreenState extends ConsumerState<FollowsScreen> {
             Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.filter_alt_outlined),
+                  icon: const Icon(Icons.add),
                   onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      backgroundColor: isDarkmode
-                          ? Colors.black
-                          : Colors.white, // Cambia el color de fondo
-                      shape: const RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(20)),
-                      ),
-                      isScrollControlled: true, // permite ajustar el tamaño
-                      builder: (context) {
-                        return Padding(
-                          padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
-                          // Ocupa solo el tamaño necesario
-                          child: Wrap(
-                            children: [
-                              ...classification.entries.map((entry) {
-                                final category = entry.key;
-                                final color = entry.value['color'];
-                                final icon = entry.value['icon'];
-                                return Center(
-                                  child: ListTile(
-                                    selectedTileColor:
-                                        color, // si deseas que al tocar se quede así
-                                    leading: CircleAvatar(
-                                      backgroundColor: color,
-                                      child: Icon(icon, color: Colors.white),
-                                    ),
-                                    title: Text(category),
-                                    onTap: () {
-                                      setState(() {
-                                        _selectedFilter = category;
-                                      });
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                );
-                              }),
-                              ListTile(
-                                leading: const Icon(Icons.clear),
-                                title: const Text('Quitar filtro'),
-                                onTap: () {
-                                  setState(() {
-                                    _selectedFilter = null;
-                                  });
-                                  Navigator.pop(context);
-                                },
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
                   },
                 ),
                 IconButton(
