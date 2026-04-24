@@ -1,6 +1,7 @@
 import 'package:easycoutcol/config/presentation/screens/auth/login_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/auth/logout_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/config_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/edit_follow_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/edit.screen.dart';
 import 'package:easycoutcol/config/presentation/screens/help_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/history_screen.dart';
@@ -10,7 +11,7 @@ import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/splash_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/theme_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/tutorial_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/follow_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/follows_screen.dart';
 import 'package:go_router/go_router.dart';
 
 // Definir rutas
@@ -47,9 +48,16 @@ final appRouter = GoRouter(
         }),
     GoRoute(
       path: '/seguimientos',
-      name: FollowScreen.name,
-      builder: (context, state) => const FollowScreen(),
+      name: FollowsScreen.name,
+      builder: (context, state) => const FollowsScreen(),
     ),
+    // GoRoute(
+    //     path: '/editFollow:id',
+    //     name: EditFollowScreen.name,
+    //     builder: (context, state) {
+    //       final id = int.parse(state.pathParameters['id']!);
+    //       return EditFollowScreen(idFollow: id);
+    //     }),
     GoRoute(
       path: '/config',
       name: ConfigScreen.name,
