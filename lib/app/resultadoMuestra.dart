@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:intl/intl.dart';
 
 class ResultadoMuestra {
+  final int id;
   final Uint8List originalImage;
   final Uint8List processedImage;
   final String name;
@@ -16,6 +17,7 @@ class ResultadoMuestra {
   final String formattedTime;
 
   ResultadoMuestra({
+    required this.id,
     required this.originalImage,
     required this.processedImage,
     required this.name,
@@ -39,6 +41,7 @@ class ResultadoMuestra {
         DateFormat('HH:mm:ss').format(creationTime);
 
     return ResultadoMuestra(
+      id: sample[0],
       originalImage: data['originalImage'] as Uint8List,
       processedImage: data['processedImage']as Uint8List,
       name: sample[1],

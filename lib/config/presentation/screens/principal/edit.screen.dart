@@ -3,13 +3,12 @@ import 'dart:io';
 
 import 'package:easycoutcol/app/resultadoMuestra.dart';
 import 'package:easycoutcol/app/updateSample.dart';
-import 'package:easycoutcol/config/presentation/providers/login_provider.dart';
-import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
 import 'package:easycoutcol/config/presentation/wigets/input_custom.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:easycoutcol/config/functions/dialog_helper.dart';
 
 class EditSample extends StatefulWidget {
   static const String name = 'edit_sample';
@@ -22,6 +21,7 @@ class EditSample extends StatefulWidget {
 
 class _EditSampleState extends State<EditSample> {
   final GlobalKey<FormState> formKeySample = GlobalKey<FormState>();
+  final TextEditingController idSampleController = TextEditingController();
   final TextEditingController nameSampleController = TextEditingController();
   final TextEditingController typeSampleController = TextEditingController();
   final TextEditingController factorSampleController = TextEditingController();
@@ -38,10 +38,11 @@ class _EditSampleState extends State<EditSample> {
   int? idUser;
 
   final List<String> mediumList = [
+    'Agar Nutritivo',
     'Agar MacConkey',
-    'Agar nutritivo',
     'Agar sangre',
     'Agar Sabouraud',
+    'Otro'
   ];
 
   final List<String> clasificationList = [
@@ -49,7 +50,7 @@ class _EditSampleState extends State<EditSample> {
     'Ambiental', //Aire, superficies, agua, suelo
     'Alimentos', //Leches, frutas, verduras, carnes
     'Material', //Guantes, ropa de laboratorio, utensilios
-    'Otras muestras', //Otros tipos de muestras
+    'Otro', //Otros tipos de muestras
   ];
   late Future<Map<String, dynamic>> data;
   @override
@@ -60,6 +61,7 @@ class _EditSampleState extends State<EditSample> {
 
   @override
   void dispose() {
+    idSampleController.dispose();
     nameSampleController.dispose();
     typeSampleController.dispose();
     factorSampleController.dispose();
@@ -73,6 +75,7 @@ class _EditSampleState extends State<EditSample> {
   }
 
   void cleanControllers() {
+    idSampleController.clear();
     nameSampleController.clear();
     typeSampleController.clear();
     factorSampleController.clear();
@@ -158,13 +161,14 @@ class _EditSampleState extends State<EditSample> {
             // Usamos el modelo para parsear los datos
             final resultado = ResultadoMuestra.fromMap(snapshot.data!);
             // Asignar el valor por defecto si aún no se ha seleccionado
+            idSampleController.text = resultado.id.toString();
             nameSampleController.text = resultado.name;
             volumenSampleController.text = resultado.volumenSample;
             timeProcesingController.text = resultado.processingTime.toString();
             countController.text = resultado.count.toString();
             factorSampleController.text = resultado.factorSample;
-            timeController.text=resultado.formattedTime;
-            dateController.text=resultado.dateSample;
+            timeController.text = resultado.formattedTime;
+            dateController.text = resultado.dateSample;
             selectedMedium ??= resultado.medioSample;
             mediumController.text = selectedMedium!;
 
@@ -206,7 +210,7 @@ class _EditSampleState extends State<EditSample> {
                           ),
                           // Tipo de muestra
                           DropdownButtonFormField<String>(
-                           // initialValue: selectedClasification,
+                            value: selectedClasification,
                             decoration: InputDecoration(
                               labelText: 'Tipo de muestra',
                               prefixIcon:
@@ -271,11 +275,11 @@ class _EditSampleState extends State<EditSample> {
                             height: 8,
                           ),
                           DropdownButtonFormField<String>(
-                            //initialValue: selectedMedium,
+                            value: selectedMedium,
                             decoration: InputDecoration(
                               labelText: 'Medio de cultivo',
-                              prefixIcon:
-                                  Icon(Icons.trending_up, color: colors.primary),
+                              prefixIcon: Icon(Icons.trending_up,
+                                  color: colors.primary),
                               enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
                                     color: colors.primary,
@@ -307,8 +311,8 @@ class _EditSampleState extends State<EditSample> {
                           InputCustom(
                             labelInput: 'Tiempo de procesamiento',
                             readOnly: true,
-                            iconInput:
-                                Icon(Icons.timer_outlined, color: colors.primary),
+                            iconInput: Icon(Icons.timer_outlined,
+                                color: colors.primary),
                             controller: timeProcesingController,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -324,8 +328,8 @@ class _EditSampleState extends State<EditSample> {
                           InputCustom(
                             labelInput: 'Conteo de UFC',
                             readOnly: true,
-                            iconInput:
-                                Icon(Icons.calculate_outlined, color: colors.primary),
+                            iconInput: Icon(Icons.calculate_outlined,
+                                color: colors.primary),
                             controller: countController,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -341,8 +345,8 @@ class _EditSampleState extends State<EditSample> {
                           InputCustom(
                             labelInput: 'Fecha de realización',
                             readOnly: true,
-                            iconInput:
-                                Icon(Icons.date_range_outlined, color: colors.primary),
+                            iconInput: Icon(Icons.date_range_outlined,
+                                color: colors.primary),
                             controller: dateController,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -358,8 +362,8 @@ class _EditSampleState extends State<EditSample> {
                           InputCustom(
                             labelInput: 'Hora de realización',
                             readOnly: true,
-                            iconInput:
-                                Icon(Icons.date_range_outlined, color: colors.primary),
+                            iconInput: Icon(Icons.date_range_outlined,
+                                color: colors.primary),
                             controller: timeController,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -369,7 +373,9 @@ class _EditSampleState extends State<EditSample> {
                             },
                             keyboardType: TextInputType.number,
                           ),
-                          SizedBox(height: 20,),
+                          SizedBox(
+                            height: 20,
+                          ),
                           // Imagen Original
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -388,130 +394,116 @@ class _EditSampleState extends State<EditSample> {
                             ),
                           ),
                           const SizedBox(height: 30),
-                    SizedBox(
-                  width: double.infinity,
-                  child: Consumer(
-                    builder: (context, ref, child) {
-                      final idUser =
-                          ref.watch(idUserProvider); // Obtener el ID de Riverpod
-                      return FilledButton.icon(
-                        onPressed: () async {
-                          // Solicita al usuario la confirmación antes de registrar la muestra
-                          final confirmSendSample = await showDialog<bool>(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('Confirmar'),
-                            content: const Text(
-                                '¿Deseas registrar la muestra?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.of(context).pop(
-                                        false),
-                                child: const Text('Cancelar'),
-                              ),
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.of(context).pop(
-                                        true),
-                                child: const Text('Aceptar'),
-                              ),
-                            ],
-                          ),                        
-                          );
-                          if (confirmSendSample == true) {
-                          final isValid = formKeySample.currentState!.validate();
-                          if (!isValid) return;
-                          if (selectedMedium == null ||
-                              selectedMedium == 'Sin seleccionar') {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Medio de cultivo requerido'),
-                                content: const Text(
-                                    'Por favor selecciona un medio de cultivo antes de continuar.'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.of(context).pop(),
-                                    child: const Text('Aceptar'),
-                                  ),
-                                ],
-                              ),
-                            );
-                            return;
-                          }
-                          if (!context.mounted) return;
-                          try {
-                            final result = await updateSample(
-                              // idSample=
-                              sampleName: nameSampleController.text,
-                              idUser: idUser,
-                              typeSample: typeSampleController.text,
-                              volumenSample: volumenSampleController.text,
-                              factorSample: factorSampleController.text,
-                              medioSample: mediumController.text,
-                            );
-                            if (result['success']) {
-                              final int idSample = result['idSample'];
-                              await showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text("Éxito"),
-                                  content: const Text(
-                                      "Muestra almacenada correctamente, continúa su análisis."),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop(
-                                            true); // Devuelve un valor al cerrar el diálogo
-                                      },
-                                      child: const Text("OK"),
+                          SizedBox(
+                              width: double.infinity,
+                              child: Consumer(
+                                builder: (context, ref, child) {
+                                  return FilledButton.icon(
+                                    onPressed: () async {
+                                      // Solicita al usuario la confirmación antes de registrar la muestra
+                                      final confirmSendSample =
+                                          await showDialog<bool>(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: const Text('Confirmar'),
+                                          content: const Text(
+                                              '¿Deseas actualizar la muestra?'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.of(context)
+                                                      .pop(false),
+                                              child: const Text('Cancelar'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.of(context)
+                                                      .pop(true),
+                                              child: const Text('Aceptar'),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                      if (confirmSendSample == true) {
+                                        final isValid = formKeySample
+                                            .currentState!
+                                            .validate();
+                                        if (!isValid) return;
+                                        if (selectedMedium == null ||
+                                            selectedMedium ==
+                                                'Sin seleccionar') {
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) => AlertDialog(
+                                              title: const Text(
+                                                  'Medio de cultivo requerido'),
+                                              content: const Text(
+                                                  'Por favor selecciona un medio de cultivo antes de continuar.'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.of(context)
+                                                          .pop(),
+                                                  child: const Text('Aceptar'),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                          return;
+                                        }
+                                        if (!context.mounted) return;
+                                        try {
+                                          final result = await updateSample(
+                                            sampleID: int.parse(
+                                                idSampleController.text),
+                                            sampleName:
+                                                nameSampleController.text,
+                                            typeSample:
+                                                typeSampleController.text,
+                                            volumenSample:
+                                                volumenSampleController.text,
+                                            factorSample:
+                                                factorSampleController.text,
+                                            medioSample: mediumController.text,
+                                          );
+                                          if (result['success']) {
+                                            final res = await mostrarDialogo(
+                                              context: context,
+                                              titulo: "Éxito",
+                                              mensaje:
+                                                  "Seguimiento actualizado correctamente",
+                                            );
+
+                                            if (res == true) {
+                                              Navigator.of(context).pop(
+                                                  true); // ← regresa a pantalla anterior
+                                            }
+                                          } else {
+                                            await mostrarDialogo(
+                                              context: context,
+                                              titulo: "Error",
+                                              mensaje:
+                                                  "Ocurrió un error. Intenta nuevamente.",
+                                            );
+                                          }
+                                        } catch (e) {
+                                          // print(e);
+                                        }
+                                      }
+                                    },
+                                    icon: const Icon(Icons.save),
+                                    label: const Text('Actualizar muestra'),
+                                    style: FilledButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15, vertical: 15),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
                                     ),
-                                  ],
-                                ),
-                              );
-                              cleanControllers();
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      ResultsScreen(idMuestra: idSample),
-                                ),
-                              );
-                            } else {
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text("Error"),
-                                  content: const Text(
-                                      'Ocurrió un error al registrarse'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: const Text("OK"),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }
-                          } catch (e) {
-                            // print(e);
-                          }
-                        }
-                        },
-                        icon: const Icon(Icons.save),
-                        label: const Text('Registrar muestra'),
-                        style: FilledButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 15, vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      );
-                    },
-                  )),
-                  const SizedBox(height: 50),
+                                  );
+                                },
+                              )),
+                          const SizedBox(height: 50),
                         ],
                       ),
                     ),
@@ -535,87 +527,4 @@ class _EditSampleState extends State<EditSample> {
       ),
     );
   }
-}
-
-Widget _infoItem(IconData icon, String title, String value) {
-  return Row(
-    children: [
-      Icon(icon, color: Colors.white, size: 24),
-      const SizedBox(width: 10),
-      Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.white,
-              ),
-            ),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
-      ),
-    ],
-  );
-}
-
-Widget _processingTimeItem(double time) {
-  return Row(
-    children: [
-      const Icon(Icons.av_timer, color: Colors.white, size: 24),
-      const SizedBox(width: 10),
-      Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Tiempo de procesamiento',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.white,
-              ),
-            ),
-            Row(
-              children: [
-                Text(
-                  '${time.toStringAsFixed(6)} segundos',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Text(
-                    'Rápido',
-                    style: TextStyle(
-                      color: Colors.green,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    ],
-  );
 }

@@ -1,5 +1,5 @@
 import 'package:easycoutcol/app/login.dart';
-import 'package:easycoutcol/config/presentation/screens/home_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/home_screen.dart';
 import 'package:easycoutcol/config/presentation/wigets/input_custom.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';

@@ -3,8 +3,8 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:easycoutcol/app/registerSample.dart';
 import 'package:easycoutcol/config/menu/side_menu.dart';
 import 'package:easycoutcol/config/presentation/providers/login_provider.dart';
-import 'package:easycoutcol/config/presentation/screens/overlay_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/overlay_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/results_screen.dart';
 import 'package:easycoutcol/config/presentation/wigets/input_custom.dart';
 import 'package:easycoutcol/config/services/camera_services_implementation.dart';
 import 'package:flutter/material.dart';
@@ -85,10 +85,11 @@ class _ViewCameraState extends State<_ViewCamera>
   String? nameUser;
 
   final List<String> mediumList = [
-    'Agar nutritivo',
+    'Agar Nutritivo',
     'Agar MacConkey',
     'Agar sangre',
     'Agar Sabouraud',
+    'Otro',
   ];
   
   final List<String> clasificationList = [
@@ -96,7 +97,7 @@ class _ViewCameraState extends State<_ViewCamera>
     'Ambiental',//Aire, superficies, agua, suelo
     'Alimentos',//Leches, frutas, verduras, carnes
     'Material',//Guantes, ropa de laboratorio, utensilios
-    'Otras muestras',//Otros tipos de muestras
+    'Otro',//Otros tipos de muestras
   ];
 
   @override

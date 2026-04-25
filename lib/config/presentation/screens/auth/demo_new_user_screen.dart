@@ -1,5 +1,5 @@
 import 'package:easycoutcol/config/presentation/bloc/cubit-user/user_register_cubit.dart';
-import 'package:easycoutcol/config/presentation/screens/home_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/home_screen.dart';
 import 'package:easycoutcol/config/presentation/wigets/input_custom.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

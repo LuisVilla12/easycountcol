@@ -1,20 +1,23 @@
 import 'package:easycoutcol/config/presentation/screens/auth/login_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/auth/logout_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/config_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/edit.screen.dart';
-import 'package:easycoutcol/config/presentation/screens/help_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/history_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/home_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/overlay_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/splash_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/theme_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/tutorial_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/config_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/follows/edit_follow_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/follows/add_follow_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/edit.screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/help_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/history_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/home_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/overlay_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/results_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/splash_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/theme_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/tutorial_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/follows/follows_screen.dart';
 import 'package:go_router/go_router.dart';
 
 // Definir rutas
 final appRouter = GoRouter(
-  initialLocation: '/home',
+  initialLocation: '/tutorial',
   routes: [
     GoRoute(
       path: '/splash',
@@ -43,6 +46,23 @@ final appRouter = GoRouter(
           final id = int.parse(state.pathParameters['id']!);
           return ResultsScreen(idMuestra: id);
         }),
+    GoRoute(
+      path: '/seguimientos',
+      name: FollowsScreen.name,
+      builder: (context, state) => const FollowsScreen(),
+    ),
+    GoRoute(
+        path: '/editFollow:id',
+        name: EditFollowScreen.name,
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return EditFollowScreen(idFollow: id);
+        }),
+    GoRoute(
+        path: '/addFollow',
+        name: AddFollowScreen.name,
+        builder: (context, state) => const AddFollowScreen(),
+        ),
     GoRoute(
       path: '/config',
       name: ConfigScreen.name,

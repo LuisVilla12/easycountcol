@@ -58,7 +58,7 @@ class _SideMenuState extends ConsumerState<SideMenu> {
           child: const Text('NAVEGACIÓN', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
         ),
         // Muestra las primeras tres opciones del menú
-        ...appMenuItems.asMap().entries.where((entry)=> entry.key<=2).map((entry) {
+        ...appMenuItems.asMap().entries.where((entry)=> entry.key<=3).map((entry) {
           final index = entry.key;
           final item = entry.value;
           return NavigationDrawerDestination(
@@ -85,7 +85,7 @@ class _SideMenuState extends ConsumerState<SideMenu> {
           child: const Text('PREFERENCIAS', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
         ),
         // Muestra las siguientes opciones del menú 
-        ...appMenuItems.asMap().entries.where((entry)=> entry.key>2 && entry.key<4).map((entry) {
+        ...appMenuItems.asMap().entries.where((entry)=> entry.key>3 && entry.key<5).map((entry) {
           final index = entry.key;
           final item = entry.value;
           return NavigationDrawerDestination(
@@ -115,7 +115,7 @@ class _SideMenuState extends ConsumerState<SideMenu> {
           (entry){
             final item = entry.value;
 
-            if (entry.key <= 3 || entry.key >= 6) return false;
+            if (entry.key <= 4 || entry.key >= 6) return false;
             if (nameProvider == '' && item.link == '/logut') return false;
             if (nameProvider != '' && item.link == '/login') return false;
             return true;
