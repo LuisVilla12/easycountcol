@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:easycoutcol/config/functions/dialog_helper.dart';
+
 
 class EditFollowScreen extends StatefulWidget {
   static const String name = 'edit_follow_screen';
@@ -22,7 +24,8 @@ class _EditFollowScreenState extends State<EditFollowScreen> {
   final GlobalKey<FormState> formKeyFollow = GlobalKey<FormState>();
   final TextEditingController idFollowController = TextEditingController();
   final TextEditingController nameFollowController = TextEditingController();
-  final TextEditingController descripcionFollowController = TextEditingController();
+  final TextEditingController descripcionFollowController =
+      TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final TextEditingController timeController = TextEditingController();
 
@@ -75,8 +78,8 @@ class _EditFollowScreenState extends State<EditFollowScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: true, // Desactiva el botón de retroceso
         foregroundColor: Colors.white,
-        title:
-            const Text('Editar Seguimiento', style: TextStyle(color: Colors.white)),
+        title: const Text('Editar Seguimiento',
+            style: TextStyle(color: Colors.white)),
         backgroundColor: colors.primary,
       ),
       body: FutureBuilder<Map<String, dynamic>>(
@@ -93,8 +96,8 @@ class _EditFollowScreenState extends State<EditFollowScreen> {
             idFollowController.text = resultado.id.toString();
             nameFollowController.text = resultado.name;
             descripcionFollowController.text = resultado.description;
-            timeController.text=resultado.formattedTime;
-            dateController.text=resultado.dateFollow;
+            timeController.text = resultado.formattedTime;
+            dateController.text = resultado.dateFollow;
 
             return SingleChildScrollView(
               padding: const EdgeInsets.all(4),
@@ -147,12 +150,12 @@ class _EditFollowScreenState extends State<EditFollowScreen> {
                           SizedBox(
                             height: 10,
                           ),
-                          
+
                           InputCustom(
                             labelInput: 'Fecha de realización',
                             readOnly: true,
-                            iconInput:
-                                Icon(Icons.date_range_outlined, color: colors.primary),
+                            iconInput: Icon(Icons.date_range_outlined,
+                                color: colors.primary),
                             controller: dateController,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -168,8 +171,8 @@ class _EditFollowScreenState extends State<EditFollowScreen> {
                           InputCustom(
                             labelInput: 'Hora de realización',
                             readOnly: true,
-                            iconInput:
-                                Icon(Icons.date_range_outlined, color: colors.primary),
+                            iconInput: Icon(Icons.date_range_outlined,
+                                color: colors.primary),
                             controller: timeController,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -179,101 +182,95 @@ class _EditFollowScreenState extends State<EditFollowScreen> {
                             },
                             keyboardType: TextInputType.number,
                           ),
-                          SizedBox(height: 20,),
-                          // Imagen Original
-                          
-                          const SizedBox(height: 30),
-                    SizedBox(
-                  width: double.infinity,
-                  child: Consumer(
-                    builder: (context, ref, child) {
-                      return FilledButton.icon(
-                        onPressed: () async {
-                          // Solicita al usuario la confirmación antes de registrar la muestra
-                          final confirmSendFollow = await showDialog<bool>(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('Confirmar'),
-                            content: const Text(
-                                '¿Deseas actualizar el seguimiento?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.of(context).pop(
-                                        false),
-                                child: const Text('Cancelar'),
-                              ),
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.of(context).pop(
-                                        true),
-                                child: const Text('Aceptar'),
-                              ),
-                            ],
-                          ),                        
-                          );
-                          if (confirmSendFollow == true) {
-                          final isValid = formKeyFollow.currentState!.validate();
-                          if (!isValid) return;
-                          try {
-                            final result = await updatesFollow(
-                              followID: int.parse(idFollowController.text),
-                              followName: nameFollowController.text,
-                              followDescription: descripcionFollowController.text,
-                              );
-                            if (result['success']) {
-                              // final int idSample = result['idSample'];
-                              await showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text("Éxito"),
-                                  content: const Text(
-                                      "Seguimiento actualizado correctamente"),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop(
-                                            true); 
-                                      },
-                                      child: const Text("OK"),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            } else {
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text("Error"),
-                                  content: const Text(
-                                      'Ocurrió un error al actualizar el seguimiento. Por favor intenta nuevamente.'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: const Text("OK"),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }
-                          } catch (e) {
-                            // print(e);
-                          }
-                        }
-                        },
-                        icon: const Icon(Icons.save),
-                        label: const Text('Actualizar seguimiento'),
-                        style: FilledButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 15, vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                          SizedBox(
+                            height: 20,
                           ),
-                        ),
-                      );
-                    },
-                  )),
-                  const SizedBox(height: 50),
+                          // Imagen Original
+
+                          const SizedBox(height: 30),
+                          SizedBox(
+                              width: double.infinity,
+                              child: Consumer(
+                                builder: (context, ref, child) {
+                                  return FilledButton.icon(
+                                    onPressed: () async {
+                                      // Solicita al usuario la confirmación antes de registrar la muestra
+                                      final confirmSendFollow =
+                                          await showDialog<bool>(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: const Text('Confirmar'),
+                                          content: const Text(
+                                              '¿Deseas actualizar el seguimiento?'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.of(context)
+                                                      .pop(false),
+                                              child: const Text('Cancelar'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.of(context)
+                                                      .pop(true),
+                                              child: const Text('Aceptar'),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                      if (confirmSendFollow == true) {
+                                        final isValid = formKeyFollow
+                                            .currentState!
+                                            .validate();
+                                        if (!isValid) return;
+                                        try {
+                                          final result = await updatesFollow(
+                                            followID: int.parse(
+                                                idFollowController.text),
+                                            followName:
+                                                nameFollowController.text,
+                                            followDescription:
+                                                descripcionFollowController
+                                                    .text,
+                                          );
+                                          if (result['success']) {
+                                            final res = await mostrarDialogo(
+                                              context: context,
+                                              titulo: "Éxito",
+                                              mensaje:
+                                                  "Seguimiento actualizado correctamente",
+                                            );
+
+                                            if (res == true) {
+                                              Navigator.of(context).pop(true); 
+                                              
+                                            }
+                                          } else {
+                                            await mostrarDialogo(
+                                              context: context,
+                                              titulo: "Error",
+                                              mensaje:
+                                                  "Ocurrió un error. Intenta nuevamente.",
+                                            );
+                                          }
+                                        } catch (e) {
+                                          // print(e);
+                                        }
+                                      }
+                                    },
+                                    icon: const Icon(Icons.save),
+                                    label: const Text('Actualizar seguimiento'),
+                                    style: FilledButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15, vertical: 15),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              )),
+                          const SizedBox(height: 50),
                         ],
                       ),
                     ),

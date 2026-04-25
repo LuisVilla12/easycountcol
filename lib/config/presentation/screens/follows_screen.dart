@@ -2,6 +2,7 @@ import 'package:easycoutcol/app/Follows.dart';
 import 'package:easycoutcol/config/presentation/providers/login_provider.dart';
 import 'package:easycoutcol/config/presentation/providers/theme_provider.dart';
 import 'package:easycoutcol/config/presentation/screens/edit_follow_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/add_follow_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -20,6 +21,7 @@ class FollowsScreen extends ConsumerStatefulWidget {
 
 class _FollowsScreenState extends ConsumerState<FollowsScreen> {
   int? idUser;
+  
   @override
   void initState() {
     super.initState();
@@ -82,7 +84,6 @@ class _FollowsScreenState extends ConsumerState<FollowsScreen> {
       'icon': Icons.category_outlined,
     },
   };
-  String? _selectedFilter; // null significa "sin filtro"
 
   // Construir listado de muestras
   Widget buildSampleList() {
@@ -241,6 +242,12 @@ class _FollowsScreenState extends ConsumerState<FollowsScreen> {
                 IconButton(
                   icon: const Icon(Icons.add),
                   onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AddFollowScreen(),
+                      ),
+                    );
                   },
                 ),
                 IconButton(
