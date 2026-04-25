@@ -1,7 +1,7 @@
 import 'package:easycoutcol/app/login.dart';
 import 'package:easycoutcol/app/RegisterUser.dart';
 import 'package:easycoutcol/config/presentation/providers/login_provider.dart';
-import 'package:easycoutcol/config/presentation/screens/home_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/home_screen.dart';
 import 'package:easycoutcol/config/presentation/wigets/input_custom.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

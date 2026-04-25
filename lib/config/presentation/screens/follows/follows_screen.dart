@@ -1,26 +1,27 @@
-import 'package:easycoutcol/app/Samples.dart';
+import 'package:easycoutcol/app/Follows.dart';
 import 'package:easycoutcol/config/presentation/providers/login_provider.dart';
 import 'package:easycoutcol/config/presentation/providers/theme_provider.dart';
-import 'package:easycoutcol/config/presentation/screens/edit.screen.dart';
-import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/follows/edit_follow_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/follows/add_follow_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/results_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import 'package:intl/intl.dart';
 
-class HistoryScreen extends ConsumerStatefulWidget {
-  static const String name = 'history_screen';
-  const HistoryScreen({super.key});
+class FollowsScreen extends ConsumerStatefulWidget {
+  static const String name = 'follow_screen';
+  const FollowsScreen({super.key});
 
   @override
-  ConsumerState<HistoryScreen> createState() => _HistoryScreenState();
+  ConsumerState<FollowsScreen> createState() => _FollowsScreenState();
 }
 
-class _HistoryScreenState extends ConsumerState<HistoryScreen> {
+class _FollowsScreenState extends ConsumerState<FollowsScreen> {
   int? idUser;
+  
   @override
   void initState() {
     super.initState();
@@ -29,31 +30,34 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   }
 
   // Obtener las muestras de la API
-  Future<List<Sample>> fetchSamples() async {
+  Future<List<Follows>> fetchFollows() async {
+
     // Utilizar dotenv para manejar la URL de la API
     final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:8000';
-    final response = await http.get(Uri.parse('$apiUrl/samples/$idUser'));
-    
+    final response = await http.get(Uri.parse('$apiUrl/follows/$idUser'));
+
+    // print(response.body);
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonData = jsonDecode(response.body);
-      final List<dynamic> samplesList = jsonData['samples'];
-      // Mapea cada sublista a un objeto Sample
-      return samplesList.map((item) => Sample.fromJsonList(item)).toList();
+      final List<dynamic> followsList = jsonData['follows'] ?? [];
+      // print(followsList);
+      // Mapea cada sublista a un objeto Follows
+      return followsList.map((item) => Follows.fromJsonList(item)).toList();
     } else {
-      throw Exception('Error al cargar las muestras');
+      throw Exception('Error los siguimientos');
     }
   }
 
   //Actualizar el estado de la muestra
-  Future<void> updateStateSample(Sample sample) async {
+  Future<void> updateStateFollow(Follows follow) async {
     final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:8000';
     final response = await http.put(
-      Uri.parse('$apiUrl/sample/state/${sample.id}'),
+      Uri.parse('$apiUrl/follow/state/${follow.id}'),
       headers: {'Content-Type': 'application/json'},
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Error al actualizar la muestra');
+      throw Exception('Error al actualizar el seguimiento: ${response.statusCode}');
     }
   }
 
@@ -80,45 +84,34 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
       'icon': Icons.category_outlined,
     },
   };
-  String? _selectedFilter; // null significa "sin filtro"
 
   // Construir listado de muestras
   Widget buildSampleList() {
     final colors = Theme.of(context).colorScheme;
-    return FutureBuilder<List<Sample>>(
-      future: fetchSamples(),
+    return FutureBuilder<List<Follows>>(
+      future: fetchFollows(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('No hay muestras disponibles'));
+          return const Center(child: Text('No hay siguimientos disponibles'));
         } else {
           // Obtener todas las muestras
-          final allSamples = snapshot.data!;
-          // Filtra las muestras según el fPiltro seleccionado
-          final samplesFilter = (_selectedFilter == null)
-              ? allSamples
-              : allSamples
-                  .where((s) => s.typeSample == _selectedFilter)
-                  .toList();
-          if (samplesFilter.isEmpty) {
-            return const Center(
-                child: Text('No hay muestras para esta categoría'));
-          }
+          final allFollows = snapshot.data!;       
           return ListView.builder(
-            itemCount: samplesFilter.length,
+            itemCount: allFollows.length,
             itemBuilder: (context, index) {
-              final sample = samplesFilter[index];
+              final follow = allFollows[index];
               // print(sample.creationDate);
-              final timeSample = sample.creationTime;
-
+              final timeFollow = follow.creationTime;
               // Convertir el dato que viene de la base de datos a datatime
               final DateTime now = DateTime.now();
-              final DateTime creationTime = DateTime(now.year, now.month, now.day).add(Duration(seconds: timeSample.toInt()));
               // Convertir de string a DateTime
-              final DateTime creationDate = DateTime.parse(sample.creationDate);
+              final DateTime creationTime = DateTime(now.year, now.month, now.day).add(Duration(seconds: timeFollow.toInt()));
+
+              final DateTime creationDate = DateTime.parse(follow.creationDate);
               // Dar formato a la fecha de creación
               String creacionDateFormat = DateFormat('dd-MM-yyyy').format(creationDate);
 
@@ -127,7 +120,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                   DateFormat('HH:mm:ss').format(creationTime);
               return Dismissible(
                 key: Key(
-                    sample.id.toString()), // Asegúrate que sample.id sea único
+                    follow.id.toString()), // Asegúrate que follow.id sea único
 
                 // Permitir swipe en ambos lados:
                 direction: DismissDirection.horizontal,
@@ -154,7 +147,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                       context: context,
                       builder: (context) => AlertDialog(
                         title: const Text('Confirmar'),
-                        content: const Text('¿Quieres eliminar esta muestra?'),
+                        content: const Text('¿Quieres eliminar este seguimiento?'),
                         actions: [
                           TextButton(
                               onPressed: () => Navigator.pop(context, false),
@@ -163,12 +156,12 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                             onPressed: () async {
                              // Cierra el diálogo primero
                               try {
-                                await updateStateSample(sample); // Espera la actualización
+                                await updateStateFollow(follow); // Espera la actualización
                                 Navigator.pop(context, true); 
                               } catch (e) {
                                 // Manejo de error, por ejemplo:
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Error al actualizar la muestra')),);
+                                  SnackBar(content: Text('Error al actualizar el seguimiento')),);
                               }
                             },
                             child: const Text('Sí'),
@@ -183,7 +176,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                       context: context,
                       builder: (context) => AlertDialog(
                         title: const Text('Confirmar'),
-                        content: const Text('¿Quieres editar esta muestra?'),
+                        content: const Text('¿Quieres editar este seguimiento?'),
                         actions: [
                           TextButton(
                               onPressed: () => Navigator.pop(context, false),
@@ -196,7 +189,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    EditSample(idMuestra: sample.id),
+                                    EditFollowScreen(idFollow: follow.id),
                               ),
                             )
                               },
@@ -213,30 +206,23 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                   if (direction == DismissDirection.endToStart) {
                     // Solo borrar cuando swipe sea de derecha a izquierda
                     setState(() {
-                      samplesFilter.removeAt(index);
+                      allFollows.removeAt(index);
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Muestra eliminada')),
+                      const SnackBar(content: Text('Seguimiento eliminado')),
                     );
                     // Aquí podrías llamar a tu API para borrar permanentemente
                   }
                 },
 
-                child: sampleTile(
+                child: followTile(
                   context,
-                  sample,
-                  classification[sample.typeSample]?['color'] ?? colors.primary,
+                  follow,
+                  classification[follow.nameFollow]?['color'] ?? colors.primary,
                   creacionDateFormat,
                   formattedTime
                 ),
               );
-              // return sampleTile(
-              //   context,
-              //   sample,
-              //   classification[sample.typeSample]?['color'] ?? colors.primary,
-              //   DateFormat('dd/MM/yyyy').format(creationTime),
-              //   formattedTime,
-              // );
             },
           );
         }
@@ -249,65 +235,18 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     final isDarkmode = ref.watch(isDarkModeProvider);
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Historial'),
+          title: const Text('Seguimientos'),
           actions: [
             Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.filter_alt_outlined),
+                  icon: const Icon(Icons.add),
                   onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      backgroundColor: isDarkmode
-                          ? Colors.black
-                          : Colors.white, // Cambia el color de fondo
-                      shape: const RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(20)),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AddFollowScreen(),
                       ),
-                      isScrollControlled: true, // permite ajustar el tamaño
-                      builder: (context) {
-                        return Padding(
-                          padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
-                          // Ocupa solo el tamaño necesario
-                          child: Wrap(
-                            children: [
-                              ...classification.entries.map((entry) {
-                                final category = entry.key;
-                                final color = entry.value['color'];
-                                final icon = entry.value['icon'];
-                                return Center(
-                                  child: ListTile(
-                                    selectedTileColor:
-                                        color, // si deseas que al tocar se quede así
-                                    leading: CircleAvatar(
-                                      backgroundColor: color,
-                                      child: Icon(icon, color: Colors.white),
-                                    ),
-                                    title: Text(category),
-                                    onTap: () {
-                                      setState(() {
-                                        _selectedFilter = category;
-                                      });
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                );
-                              }),
-                              ListTile(
-                                leading: const Icon(Icons.clear),
-                                title: const Text('Quitar filtro'),
-                                onTap: () {
-                                  setState(() {
-                                    _selectedFilter = null;
-                                  });
-                                  Navigator.pop(context);
-                                },
-                              ),
-                            ],
-                          ),
-                        );
-                      },
                     );
                   },
                 ),
@@ -326,7 +265,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   }
 }
 
-Widget sampleTile(BuildContext context, Sample sample, Color tagColor,
+Widget followTile(BuildContext context, Follows follow, Color tagColor,
     String formattedDate, String formattedTime) {
   final colors = Theme.of(context).colorScheme;
   return Card(
@@ -343,7 +282,7 @@ Widget sampleTile(BuildContext context, Sample sample, Color tagColor,
             backgroundColor: colors.primary,
             radius: 24,
             child: Text(
-              sample.sampleName.substring(0, 1).toUpperCase(),
+              follow.nameFollow.substring(0, 1).toUpperCase(),
               style: const TextStyle(
                   color: Colors.white, fontWeight: FontWeight.w900),
             ),
@@ -367,23 +306,8 @@ Widget sampleTile(BuildContext context, Sample sample, Color tagColor,
         children: [
           Expanded(
             child: Text(
-              sample.sampleName,
+              follow.nameFollow,
               style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: tagColor.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              sample.typeSample,
-              style: TextStyle(
-                color: tagColor,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
             ),
           ),
         ],
@@ -404,13 +328,14 @@ Widget sampleTile(BuildContext context, Sample sample, Color tagColor,
       ),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: () {
-        Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ResultsScreen(idMuestra: sample.id),
-          ),
-        );
+        // Navigator.pop(context);
+        // Navegar a la pantalla de resultados del seguimiento
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => ResultsScreen(idMuestra: follow.id),
+        //   ),
+        // );
       },
     ),
   );

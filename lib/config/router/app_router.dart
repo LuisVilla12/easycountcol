@@ -1,18 +1,18 @@
 import 'package:easycoutcol/config/presentation/screens/auth/login_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/auth/logout_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/config_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/edit_follow_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/add_follow_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/edit.screen.dart';
-import 'package:easycoutcol/config/presentation/screens/help_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/history_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/home_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/overlay_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/results_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/splash_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/theme_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/tutorial_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/follows_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/config_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/follows/edit_follow_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/follows/add_follow_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/edit.screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/help_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/history_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/home_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/overlay_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/results_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/splash_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/theme_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/principal/tutorial_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/follows/follows_screen.dart';
 import 'package:go_router/go_router.dart';
 
 // Definir rutas
