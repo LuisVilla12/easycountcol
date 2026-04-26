@@ -104,7 +104,7 @@ class _ViewCameraState extends State<_ViewCamera>
   void initState() {
     super.initState();
        _tabController = TabController(length: 2, vsync: this);
-    _tabController.addListener(() {
+      _tabController.addListener(() {
       // cambiar el state del tab
       setState(() {});
     });
