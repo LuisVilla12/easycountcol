@@ -22,6 +22,7 @@ Future<Map<String, dynamic>> setRecordRegister({
   if (response.statusCode == 200) {
     final respStr = await response.stream.bytesToString();
     final jsonData = jsonDecode(respStr);
+    // print('Respuesta del servidor: $jsonData'); // Log de la respuesta completa
     return jsonData; // Regresa  todo el mapa: success, id_sample, message
   } else {
     throw Exception('Error al subir muestra: ${response.statusCode}');

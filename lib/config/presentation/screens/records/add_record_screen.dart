@@ -4,12 +4,11 @@ import 'package:easycoutcol/app/registerRecord.dart';
 import 'package:easycoutcol/config/menu/side_menu.dart';
 import 'package:easycoutcol/config/presentation/providers/login_provider.dart';
 import 'package:easycoutcol/config/presentation/screens/principal/overlay_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/principal/results_screen.dart';
 import 'package:easycoutcol/config/presentation/wigets/input_custom.dart';
 import 'package:easycoutcol/config/services/camera_services_implementation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:easycoutcol/config/presentation/screens/records/show_record_screen.dart';
 
 class AddRecordScreen extends StatefulWidget {
   static const String name = 'add_record_screen';
@@ -247,7 +246,28 @@ class _ViewCameraState extends State<_ViewCamera>
                             followID: widget.followID,
                             sampleRoute: imagePath,
                           );
-
+                          if (result['success']) {
+                            print('Muestra registrada con ID: ${result['idSample']}');
+                            // Ocultar spinner
+                            Navigator.of(context).pop();
+                            // Mostrar mensaje de éxito
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Muestra registrada exitosamente")),
+                            );
+                            // Navegar a la pantalla de resultados
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ShowRecordScreen(idMuestra: result['idSample']),
+                              ),
+                            );
+                          } else {
+                            // Ocultar spinner si la respuesta no es exitosa
+                             Navigator.of(context).pop();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Error al registrar la muestra: ${result['message']}")),
+                            );
+                          }
                           // cerrar la carga
                           Navigator.of(context).pop();
                           
