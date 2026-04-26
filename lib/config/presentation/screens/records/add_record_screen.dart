@@ -140,9 +140,6 @@ class _ViewCameraState extends State<_ViewCamera>
                 if (value == null || value.isEmpty) {
                   return 'El campo es requerido.';
                 }
-                if (value.length < 2) {
-                  return 'El campo debe  tener una longitud valida.';
-                }
                 return null;
               },
             ),
@@ -238,15 +235,15 @@ class _ViewCameraState extends State<_ViewCamera>
                           showLoadingDialog(context);
                           final result = await setRecordRegister(
                             dayNumber: nameSampleController.text,
-                            followID: idUser,
-                            sampleFile: imagePath,
+                            followID: 8,
+                            sampleRoute: imagePath,
                           );
 
                           // cerrar la carga
                           Navigator.of(context).pop();
                           
                         } catch (e) {
-                          // print(e);
+                          print(e);
                           // Ocultar spinner si ocurre un error
                         Navigator.of(context).pop();
                         ScaffoldMessenger.of(context).showSnackBar(

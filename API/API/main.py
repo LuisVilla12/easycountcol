@@ -159,7 +159,7 @@ def getSamplesUser(idUser: int):
         conn = get_db()
         cursor = conn.cursor()
 
-        sql = "SELECT * FROM samples WHERE idUser = %s and state = 1"
+        sql = "SELECT * FROM samples WHERE idUser = %s"
         cursor.execute(sql, (idUser,))
         result = cursor.fetchall()
         cursor.close()

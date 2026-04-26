@@ -1,15 +1,14 @@
 import 'package:easycoutcol/app/Follows.dart';
 import 'package:easycoutcol/config/presentation/providers/login_provider.dart';
-import 'package:easycoutcol/config/presentation/providers/theme_provider.dart';
 import 'package:easycoutcol/config/presentation/screens/follows/edit_follow_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/follows/add_follow_screen.dart';
-import 'package:easycoutcol/config/presentation/screens/principal/results_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import '../records/records_screen.dart';
 
 class FollowsScreen extends ConsumerStatefulWidget {
   static const String name = 'follow_screen';
@@ -232,7 +231,6 @@ class _FollowsScreenState extends ConsumerState<FollowsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkmode = ref.watch(isDarkModeProvider);
     return Scaffold(
         appBar: AppBar(
           title: const Text('Seguimientos'),
@@ -328,14 +326,14 @@ Widget followTile(BuildContext context, Follows follow, Color tagColor,
       ),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: () {
-        // Navigator.pop(context);
-        // Navegar a la pantalla de resultados del seguimiento
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => ResultsScreen(idMuestra: follow.id),
-        //   ),
-        // );
+        Navigator.pop(context);
+        // Navegar a la pantalla de records del seguimiento
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RecordsScreen(followID: follow.id),
+          ),
+        );
       },
     ),
   );

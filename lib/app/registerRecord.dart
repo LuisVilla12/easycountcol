@@ -3,20 +3,19 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 Future<Map<String, dynamic>> setRecordRegister({
-  required String dayNumber,
   required int followID,
-  required String sampleFile,
+  required String dayNumber,
+  required String sampleRoute,
 }) async {
   // Utilizar dotenv para manejar la URL de la API
   final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:8000';
-  final url = Uri.parse(
-      '$apiUrl/registrar-muestra-file'); // Asegúrate de que coincida con tu ruta
+  final url = Uri.parse('$apiUrl/registrar-record-file'); // Asegúrate de que coincida con tu ruta
 
   // Prepara la solicitud con multipart/form-dat  .
   final request = http.MultipartRequest('POST', url)
-    ..fields['dayNumber'] = dayNumber
     ..fields['followID'] = followID.toString()
-    ..files.add(await http.MultipartFile.fromPath('sample_file', sampleFile));
+    ..fields['dayNumber'] = dayNumber
+    ..files.add(await http.MultipartFile.fromPath('sampleRoute', sampleRoute));
 
   final response = await request.send();
 

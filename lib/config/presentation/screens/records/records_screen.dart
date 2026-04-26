@@ -1,6 +1,6 @@
 import 'package:easycoutcol/app/Records.dart';
-import 'package:easycoutcol/config/presentation/providers/login_provider.dart';
 import 'package:easycoutcol/config/presentation/providers/theme_provider.dart';
+import 'package:easycoutcol/config/presentation/screens/records/add_record_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,10 +8,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
 
+
+// ignore: must_be_immutable
 class RecordsScreen extends ConsumerStatefulWidget {
   static const String name = 'records_screen';
-  // int idFollow;
-  const RecordsScreen({super.key});
+  int followID;
+  RecordsScreen({super.key, required this.followID});
 
   @override
   ConsumerState<RecordsScreen> createState() => _RecordsScreenState();
@@ -24,7 +26,7 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
   void initState() {
     super.initState();
     // Saber el calor actual del id_usuario que inicio sesión directamente desde riverpod
-    idUser = ref.read(idUserProvider);
+    // idUser = ref.read(idUserProvider);
   }
 
   // Obtener las muestras de la API
@@ -32,7 +34,7 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
 
     // Utilizar dotenv para manejar la URL de la API
     final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:8000';
-    final response = await http.get(Uri.parse('$apiUrl/records/$idUser'));
+    final response = await http.get(Uri.parse('$apiUrl/records/${widget.followID}'));
 
     // print(response.body);
     if (response.statusCode == 200) {
@@ -209,19 +211,19 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
     final isDarkmode = ref.watch(isDarkModeProvider);
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Seguimientos'),
+          title: const Text('Listado de registros'),
           actions: [
             Row(
               children: [
                 IconButton(
                   icon: const Icon(Icons.add),
                   onPressed: () {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => const AddFollowScreen(),
-                    //   ),
-                    // );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AddRecordScreen(),
+                      ),
+                    );
                   },
                 ),
                 IconButton(

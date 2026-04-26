@@ -62,19 +62,19 @@ final appRouter = GoRouter(
           final id = int.parse(state.pathParameters['id']!);
           return EditFollowScreen(idFollow: id);
         }),
-    //Ver
-
+        //Ver los records que tiene un follow
+    GoRoute(
+        path: '/follows/records:id',
+        name: RecordsScreen.name,
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return RecordsScreen(followID: id);
+        }),
     //Crear un nuevo seguimiento
     GoRoute(
         path: '/add-Follow',
         name: AddFollowScreen.name,
         builder: (context, state) => const AddFollowScreen(),
-        ),
-    //Ver los records que tiene un follow
-    GoRoute(
-        path: '/follows/records',
-        name: RecordsScreen.name,
-        builder: (context, state) => RecordsScreen(),
         ),
     //Registrar records al follows
     GoRoute(
