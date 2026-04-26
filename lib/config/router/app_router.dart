@@ -13,12 +13,14 @@ import 'package:easycoutcol/config/presentation/screens/principal/splash_screen.
 import 'package:easycoutcol/config/presentation/screens/principal/theme_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/principal/tutorial_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/follows/follows_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/records/add_record_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/records/records_screen.dart';
+
 import 'package:go_router/go_router.dart';
 
 // Definir rutas
-// Definir rutas
 final appRouter = GoRouter(
-  initialLocation: '/tutorial',
+  initialLocation: '/login',
   routes: [
     GoRoute(
       path: '/splash',
@@ -52,6 +54,7 @@ final appRouter = GoRouter(
       name: FollowsScreen.name,
       builder: (context, state) => const FollowsScreen(),
     ),
+    // Editar un seguimiento
     GoRoute(
         path: '/editFollow:id',
         name: EditFollowScreen.name,
@@ -59,10 +62,25 @@ final appRouter = GoRouter(
           final id = int.parse(state.pathParameters['id']!);
           return EditFollowScreen(idFollow: id);
         }),
+    //Ver
+
+    //Crear un nuevo seguimiento
     GoRoute(
-        path: '/addFollow',
+        path: '/add-Follow',
         name: AddFollowScreen.name,
         builder: (context, state) => const AddFollowScreen(),
+        ),
+    //Ver los records que tiene un follow
+    GoRoute(
+        path: '/follows/records',
+        name: RecordsScreen.name,
+        builder: (context, state) => RecordsScreen(),
+        ),
+    //Registrar records al follows
+    GoRoute(
+        path: '/add_record',
+        name: AddRecordScreen.name,
+        builder: (context, state) => const AddRecordScreen(),
         ),
     GoRoute(
       path: '/config',

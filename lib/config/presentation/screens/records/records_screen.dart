@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 
 class RecordsScreen extends ConsumerStatefulWidget {
   static const String name = 'records_screen';
+  // int idFollow;
   const RecordsScreen({super.key});
 
   @override
@@ -58,32 +59,8 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
     }
   }
 
-  // Colores de la clasificacion
-  final Map<String, Map<String, dynamic>> classification = {
-    'Clinica - Biológica': {
-      'color': Colors.red.shade700,
-      'icon': Icons.medical_services_outlined,
-    },
-    'Ambiental': {
-      'color': Colors.green.shade700,
-      'icon': Icons.public_outlined,
-    },
-    'Alimentos': {
-      'color': Colors.purple.shade700,
-      'icon': Icons.restaurant_outlined,
-    },
-    'Material': {
-      'color': Colors.blue.shade700,
-      'icon': Icons.build_outlined,
-    },
-    'Otro': {
-      'color': Colors.grey.shade700,
-      'icon': Icons.category_outlined,
-    },
-  };
-
   // Construir listado de muestras
-  Widget buildSampleList() {
+  Widget buildRecordsList() {
     final colors = Theme.of(context).colorScheme;
     return FutureBuilder<List<Records>>(
       future: fetchRecords(),
@@ -102,11 +79,11 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
             itemBuilder: (context, index) {
               final record = allRecords[index];
               // print(sample.creationDate);
-              final timeFollow = record.creationTime;
+              final timeRecord = record.creationTime;
               // Convertir el dato que viene de la base de datos a datatime
               final DateTime now = DateTime.now();
               // Convertir de string a DateTime
-              final DateTime creationTime = DateTime(now.year, now.month, now.day).add(Duration(seconds: timeFollow.toInt()));
+              final DateTime creationTime = DateTime(now.year, now.month, now.day).add(Duration(seconds: timeRecord.toInt()));
 
               final DateTime creationDate = DateTime.parse(record.creationDate);
               // Dar formato a la fecha de creación
@@ -144,7 +121,7 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
                       context: context,
                       builder: (context) => AlertDialog(
                         title: const Text('Confirmar'),
-                        content: const Text('¿Quieres eliminar este seguimiento?'),
+                        content: const Text('¿Quieres eliminar este record?'),
                         actions: [
                           TextButton(
                               onPressed: () => Navigator.pop(context, false),
@@ -173,7 +150,7 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
                       context: context,
                       builder: (context) => AlertDialog(
                         title: const Text('Confirmar'),
-                        content: const Text('¿Quieres editar este seguimiento?'),
+                        content: const Text('¿Quieres editar este record?'),
                         actions: [
                           TextButton(
                               onPressed: () => Navigator.pop(context, false),
@@ -206,7 +183,7 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
                       allRecords.removeAt(index);
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Seguimiento eliminado')),
+                      const SnackBar(content: Text('Record eliminado')),
                     );
                     // Aquí podrías llamar a tu API para borrar permanentemente
                   }
@@ -258,7 +235,7 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
             )
           ],
         ),
-        body: buildSampleList());
+        body: buildRecordsList());
   }
 }
 
