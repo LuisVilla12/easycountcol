@@ -35,7 +35,7 @@ class RegistarMuestra(BaseModel):
         try:
             #Verificar existencia de las carpetas donde esta almacenada las imagenes
             os.makedirs("ia/resultados/img", exist_ok=True)
-            os.makedirs("ia/resultados/clustering_img", exist_ok=True)
+            os.makedirs("ia/resultados/clustering", exist_ok=True)
             
             # Asignar un nombre unico
             filename = f"{uuid.uuid4().hex}_{sample_file.filename}"

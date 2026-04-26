@@ -80,7 +80,7 @@ def get_processed_image(id_muestra: int):
             raise HTTPException(status_code=404, detail="Muestra no encontrada")
 
         filename = result[0]
-        processed_path = f"ia/resultados/clustering_img/{filename}"
+        processed_path = f"ia/resultados/clustering/{filename}"
 
         if not os.path.exists(processed_path):
             raise HTTPException(status_code=404, detail="Imagen procesada no encontrada")

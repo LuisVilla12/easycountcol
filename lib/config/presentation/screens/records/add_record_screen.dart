@@ -11,10 +11,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 
-class AddRecordScreen extends StatelessWidget {
+class AddRecordScreen extends StatefulWidget {
   static const String name = 'add_record_screen';
-  const AddRecordScreen({super.key});
+  final int followID;
+  // ignore: prefer_const_constructors_in_immutables
+  AddRecordScreen({super.key, required this.followID});
 
+  @override
+  State<AddRecordScreen> createState() => _AddRecordScreenState();
+}
+
+class _AddRecordScreenState extends State<AddRecordScreen> {
   @override
   Widget build(BuildContext context) {
     // Saber la referencia actual
@@ -56,26 +63,28 @@ class AddRecordScreen extends StatelessWidget {
         ],
       ),
       drawer: SideMenu(scaffoldKey: scaffoldKey),
-      body: _ViewCamera(key: cameraKey),
+      body: _ViewCamera(key: cameraKey, followID: widget.followID),
     );
   }
 }
 
 class _ViewCamera extends StatefulWidget {
-  const _ViewCamera({super.key});
+    final int followID;
+  const _ViewCamera({super.key, required this.followID});
 
   @override
   State<_ViewCamera> createState() => _ViewCameraState();
 }
 
 class _ViewCameraState extends State<_ViewCamera>
-    with TickerProviderStateMixin {
+  with TickerProviderStateMixin {
   late final TabController _tabController;
   final GlobalKey<FormState> formKeySample = GlobalKey<FormState>();
   final TextEditingController nameSampleController = TextEditingController();
+
   
-  String imagePath = '';
-  int? idUser;
+  String imagePath = ''; 
+  int? followID ;
 
   @override
   void initState() {
@@ -235,7 +244,7 @@ class _ViewCameraState extends State<_ViewCamera>
                           showLoadingDialog(context);
                           final result = await setRecordRegister(
                             dayNumber: nameSampleController.text,
-                            followID: 8,
+                            followID: widget.followID,
                             sampleRoute: imagePath,
                           );
 

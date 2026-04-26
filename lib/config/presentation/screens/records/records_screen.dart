@@ -1,6 +1,7 @@
 import 'package:easycoutcol/app/Records.dart';
 import 'package:easycoutcol/config/presentation/providers/theme_provider.dart';
 import 'package:easycoutcol/config/presentation/screens/records/add_record_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/records/show_record_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,8 +26,6 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
   @override
   void initState() {
     super.initState();
-    // Saber el calor actual del id_usuario que inicio sesión directamente desde riverpod
-    // idUser = ref.read(idUserProvider);
   }
 
   // Obtener las muestras de la API
@@ -52,7 +51,7 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
   Future<void> updateStateRecord(Records record) async {
     final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:8000';
     final response = await http.put(
-      Uri.parse('$apiUrl/record/state/${record.id}'),
+      Uri.parse('$apiUrl/records/state/${record.id}'),
       headers: {'Content-Type': 'application/json'},
     );
 
@@ -130,15 +129,15 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
                               child: const Text('No')),
                           TextButton(
                             onPressed: () async {
-                             // Cierra el diálogo primero
-                              // try {
-                              //   await updateStateFollow(record); // Espera la actualización
-                              //   Navigator.pop(context, true); 
-                              // } catch (e) {
-                              //   // Manejo de error, por ejemplo:
-                              //   ScaffoldMessenger.of(context).showSnackBar(
-                              //     SnackBar(content: Text('Error al actualizar el seguimiento')),);
-                              // }
+                            //  Cierra el diálogo primero
+                             try {
+                               await updateStateRecord(record); // Espera la actualización
+                               Navigator.pop(context, true); 
+                             } catch (e) {
+                               // Manejo de error, por ejemplo:
+                               ScaffoldMessenger.of(context).showSnackBar(
+                                 SnackBar(content: Text('Error al actualizar el seguimiento')),);
+                             }
                             },
                             child: const Text('Sí'),
                           ),
@@ -221,7 +220,7 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const AddRecordScreen(),
+                        builder: (context) => AddRecordScreen(followID: widget.followID),
                       ),
                     );
                   },
@@ -258,7 +257,7 @@ Widget recordTile(BuildContext context, Records record, Color tagColor,
             backgroundColor: colors.primary,
             radius: 24,
             child: Text(
-              record.dayNumber.toString(),
+              record.colonyCount.toString(),
               style: const TextStyle(
                   color: Colors.white, fontWeight: FontWeight.w900),
             ),
@@ -304,14 +303,14 @@ Widget recordTile(BuildContext context, Records record, Color tagColor,
       ),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: () {
-        // Navigator.pop(context);
-        // Navegar a la pantalla de resultados del seguimiento
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => ResultsScreen(idMuestra: record.id),
-        //   ),
-        // );
+        Navigator.pop(context);
+        // Navegar a la pantalla de resultados
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ShowRecordScreen(idMuestra: record.id),
+          ),
+        );
       },
     ),
   );
