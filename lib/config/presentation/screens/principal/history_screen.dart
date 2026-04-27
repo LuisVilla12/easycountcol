@@ -33,7 +33,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     // Utilizar dotenv para manejar la URL de la API
     final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:8000';
     final response = await http.get(Uri.parse('$apiUrl/samples/$idUser'));
-    
+
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonData = jsonDecode(response.body);
       final List<dynamic> samplesList = jsonData['samples'];
@@ -116,11 +116,14 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
 
               // Convertir el dato que viene de la base de datos a datatime
               final DateTime now = DateTime.now();
-              final DateTime creationTime = DateTime(now.year, now.month, now.day).add(Duration(seconds: timeSample.toInt()));
+              final DateTime creationTime =
+                  DateTime(now.year, now.month, now.day)
+                      .add(Duration(seconds: timeSample.toInt()));
               // Convertir de string a DateTime
               final DateTime creationDate = DateTime.parse(sample.creationDate);
               // Dar formato a la fecha de creación
-              String creacionDateFormat = DateFormat('dd-MM-yyyy').format(creationDate);
+              String creacionDateFormat =
+                  DateFormat('dd-MM-yyyy').format(creationDate);
 
               // Convertir el datatime a time formateado
               final String formattedTime =
@@ -161,14 +164,18 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                               child: const Text('No')),
                           TextButton(
                             onPressed: () async {
-                             // Cierra el diálogo primero
+                              // Cierra el diálogo primero
                               try {
-                                await updateStateSample(sample); // Espera la actualización
-                                Navigator.pop(context, true); 
+                                await updateStateSample(
+                                    sample); // Espera la actualización
+                                Navigator.pop(context, true);
                               } catch (e) {
                                 // Manejo de error, por ejemplo:
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Error al actualizar la muestra')),);
+                                  SnackBar(
+                                      content: Text(
+                                          'Error al actualizar la muestra')),
+                                );
                               }
                             },
                             child: const Text('Sí'),
@@ -190,16 +197,15 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                               child: const Text('No')),
                           TextButton(
                               onPressed: () => {
-                                
-                                Navigator.pop(context, true),
-                                Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    EditSample(idMuestra: sample.id),
-                              ),
-                            )
-                              },
+                                    Navigator.pop(context, true),
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            EditSample(idMuestra: sample.id),
+                                      ),
+                                    )
+                                  },
                               child: const Text('Sí')),
                         ],
                       ),
@@ -223,12 +229,12 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                 },
 
                 child: sampleTile(
-                  context,
-                  sample,
-                  classification[sample.typeSample]?['color'] ?? colors.primary,
-                  creacionDateFormat,
-                  formattedTime
-                ),
+                    context,
+                    sample,
+                    classification[sample.typeSample]?['color'] ??
+                        colors.primary,
+                    creacionDateFormat,
+                    formattedTime),
               );
               // return sampleTile(
               //   context,
@@ -247,82 +253,92 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final isDarkmode = ref.watch(isDarkModeProvider);
+    final colors = Theme.of(context).colorScheme;
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Historial'),
-          actions: [
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.filter_alt_outlined),
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      backgroundColor: isDarkmode
-                          ? Colors.black
-                          : Colors.white, // Cambia el color de fondo
-                      shape: const RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(20)),
-                      ),
-                      isScrollControlled: true, // permite ajustar el tamaño
-                      builder: (context) {
-                        return Padding(
-                          padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
-                          // Ocupa solo el tamaño necesario
-                          child: Wrap(
-                            children: [
-                              ...classification.entries.map((entry) {
-                                final category = entry.key;
-                                final color = entry.value['color'];
-                                final icon = entry.value['icon'];
-                                return Center(
-                                  child: ListTile(
-                                    selectedTileColor:
-                                        color, // si deseas que al tocar se quede así
-                                    leading: CircleAvatar(
-                                      backgroundColor: color,
-                                      child: Icon(icon, color: Colors.white),
-                                    ),
-                                    title: Text(category),
-                                    onTap: () {
-                                      setState(() {
-                                        _selectedFilter = category;
-                                      });
-                                      Navigator.pop(context);
-                                    },
+      appBar: AppBar(
+        title: const Text('Historial'),
+        actions: [
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.filter_alt_outlined),
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    backgroundColor: isDarkmode
+                        ? Colors.black
+                        : Colors.white, // Cambia el color de fondo
+                    shape: const RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    isScrollControlled: true, // permite ajustar el tamaño
+                    builder: (context) {
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
+                        // Ocupa solo el tamaño necesario
+                        child: Wrap(
+                          children: [
+                            ...classification.entries.map((entry) {
+                              final category = entry.key;
+                              final color = entry.value['color'];
+                              final icon = entry.value['icon'];
+                              return Center(
+                                child: ListTile(
+                                  selectedTileColor:
+                                      color, // si deseas que al tocar se quede así
+                                  leading: CircleAvatar(
+                                    backgroundColor: color,
+                                    child: Icon(icon, color: Colors.white),
                                   ),
-                                );
-                              }),
-                              ListTile(
-                                leading: const Icon(Icons.clear),
-                                title: const Text('Quitar filtro'),
-                                onTap: () {
-                                  setState(() {
-                                    _selectedFilter = null;
-                                  });
-                                  Navigator.pop(context);
-                                },
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(Icons.refresh),
-                  onPressed: () {
-                    setState(
-                        () {}); // Refresca la pantalla al presionar el botón
-                  },
-                ),
-              ],
-            )
-          ],
+                                  title: Text(category),
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedFilter = category;
+                                    });
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              );
+                            }),
+                            ListTile(
+                              leading: const Icon(Icons.clear),
+                              title: const Text('Quitar filtro'),
+                              onTap: () {
+                                setState(() {
+                                  _selectedFilter = null;
+                                });
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.refresh),
+                onPressed: () {
+                  setState(() {}); // Refresca la pantalla al presionar el botón
+                },
+              ),
+            ],
+          )
+        ],
+      ),
+      body: buildSampleList(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        child: Icon(
+          Icons.arrow_back_ios_new_rounded,
+          color: colors.primary,
         ),
-        body: buildSampleList());
+      ),
+    );
   }
 }
 

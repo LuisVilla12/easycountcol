@@ -231,6 +231,7 @@ class _FollowsScreenState extends ConsumerState<FollowsScreen> {
 
   @override
   Widget build(BuildContext context) {
+        final colors = Theme.of(context).colorScheme;
     return Scaffold(
         appBar: AppBar(
           title: const Text('Seguimientos'),
@@ -259,7 +260,18 @@ class _FollowsScreenState extends ConsumerState<FollowsScreen> {
             )
           ],
         ),
-        body: buildSampleList());
+        body: buildSampleList(),
+        floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        child: Icon(
+          Icons.arrow_back_ios_new_rounded,
+          color: colors.primary,
+        ),
+      ),
+        );
+        
   }
 }
 
@@ -338,3 +350,4 @@ Widget followTile(BuildContext context, Follows follow, Color tagColor,
     ),
   );
 }
+

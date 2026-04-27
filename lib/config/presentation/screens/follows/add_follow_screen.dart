@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:easycoutcol/config/presentation/wigets/input_custom.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -86,6 +84,7 @@ class _AddFollowScreenState extends State<AddFollowScreen> {
                     ),
                     InputCustom(
                       labelInput: 'Descripción del seguimiento',
+                      maxLines: 4,
                       iconInput:
                           Icon(Icons.label_important, color: colors.primary),
                       controller: descripcionFollowController,

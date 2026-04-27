@@ -9,6 +9,7 @@ class ThemeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context,ref) {
     final bool isDarkmode=ref.watch(isDarkModeProvider);
+    final colors = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Personalizar tema'),
@@ -20,6 +21,15 @@ class ThemeScreen extends ConsumerWidget {
         ],
         ),
         body: const _ThemeChangerScreen(),
+                floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        child: Icon(
+          Icons.arrow_back_ios_new_rounded,
+          color: colors.primary,
+        ),
+      ),
     );
   }
 }

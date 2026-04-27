@@ -12,7 +12,9 @@ class InputCustom extends StatelessWidget {
   final String? Function(String?)? validator;
   final TextEditingController? controller; 
   final bool readOnly;
-  const InputCustom({super.key, required this.labelInput, this.hintInput, this.errorMessageInput, this.onChanged, this.validator, this.obscureTextInput=false, this.iconInput,this.keyboardType=TextInputType.text, this.suffixIcon, this.controller,this.readOnly=false});
+  final EdgeInsetsGeometry contentPadding;
+  final int? maxLines;
+  const InputCustom({super.key, required this.labelInput, this.hintInput, this.errorMessageInput, this.onChanged, this.validator, this.obscureTextInput=false, this.iconInput,this.keyboardType=TextInputType.text, this.suffixIcon, this.controller,this.readOnly=false, this.contentPadding= const EdgeInsets.symmetric(vertical: 4, horizontal: 4), this.maxLines=1});
 
 
   @override
@@ -31,7 +33,9 @@ class InputCustom extends StatelessWidget {
       validator: validator,
       obscureText: obscureTextInput,
       keyboardType:keyboardType,
+      maxLines: maxLines,
       decoration: InputDecoration(
+        contentPadding: contentPadding,
         // EStilo por default
         enabledBorder: borderCustom,
         // Cuando el usuario este dentro de ese campo

@@ -9,11 +9,21 @@ class ConfigScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context,ref) {
       // Saber el usuario con riverpod
+      final colors = Theme.of(context).colorScheme;
   return Scaffold(
       appBar: AppBar(
         title: const Text('Datos del usuario'),
         ),
         body: const _ConfigCountScreen(),
+                floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        child: Icon(
+          Icons.arrow_back_ios_new_rounded,
+          color: colors.primary,
+        ),
+      ),
     );
   }
 }

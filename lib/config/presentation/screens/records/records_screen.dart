@@ -2,13 +2,13 @@ import 'package:easycoutcol/app/Records.dart';
 import 'package:easycoutcol/config/presentation/providers/theme_provider.dart';
 import 'package:easycoutcol/config/presentation/screens/records/add_record_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/records/show_record_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/records/graph_record_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
-
 
 // ignore: must_be_immutable
 class RecordsScreen extends ConsumerStatefulWidget {
@@ -22,7 +22,7 @@ class RecordsScreen extends ConsumerStatefulWidget {
 
 class _RecordsScreenState extends ConsumerState<RecordsScreen> {
   int? idUser;
-  
+
   @override
   void initState() {
     super.initState();
@@ -30,10 +30,10 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
 
   // Obtener las muestras de la API
   Future<List<Records>> fetchRecords() async {
-
     // Utilizar dotenv para manejar la URL de la API
     final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:8000';
-    final response = await http.get(Uri.parse('$apiUrl/records/${widget.followID}'));
+    final response =
+        await http.get(Uri.parse('$apiUrl/records/${widget.followID}'));
 
     // print(response.body);
     if (response.statusCode == 200) {
@@ -56,7 +56,8 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Error al actualizar el registro: ${response.statusCode}');
+      throw Exception(
+          'Error al actualizar el registro: ${response.statusCode}');
     }
   }
 
@@ -74,7 +75,7 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
           return const Center(child: Text('No hay siguimientos disponibles'));
         } else {
           // Obtener todas las muestras
-          final allRecords = snapshot.data!;       
+          final allRecords = snapshot.data!;
           return ListView.builder(
             itemCount: allRecords.length,
             itemBuilder: (context, index) {
@@ -84,11 +85,14 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
               // Convertir el dato que viene de la base de datos a datatime
               final DateTime now = DateTime.now();
               // Convertir de string a DateTime
-              final DateTime creationTime = DateTime(now.year, now.month, now.day).add(Duration(seconds: timeRecord.toInt()));
+              final DateTime creationTime =
+                  DateTime(now.year, now.month, now.day)
+                      .add(Duration(seconds: timeRecord.toInt()));
 
               final DateTime creationDate = DateTime.parse(record.creationDate);
               // Dar formato a la fecha de creación
-              String creacionDateFormat = DateFormat('dd-MM-yyyy').format(creationDate);
+              String creacionDateFormat =
+                  DateFormat('dd-MM-yyyy').format(creationDate);
 
               // Convertir el datatime a time formateado
               final String formattedTime =
@@ -129,15 +133,19 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
                               child: const Text('No')),
                           TextButton(
                             onPressed: () async {
-                            //  Cierra el diálogo primero
-                             try {
-                               await updateStateRecord(record); // Espera la actualización
-                               Navigator.pop(context, true); 
-                             } catch (e) {
-                               // Manejo de error, por ejemplo:
-                               ScaffoldMessenger.of(context).showSnackBar(
-                                 SnackBar(content: Text('Error al actualizar el seguimiento')),);
-                             }
+                              //  Cierra el diálogo primero
+                              try {
+                                await updateStateRecord(
+                                    record); // Espera la actualización
+                                Navigator.pop(context, true);
+                              } catch (e) {
+                                // Manejo de error, por ejemplo:
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(
+                                          'Error al actualizar el seguimiento')),
+                                );
+                              }
                             },
                             child: const Text('Sí'),
                           ),
@@ -158,16 +166,15 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
                               child: const Text('No')),
                           TextButton(
                               onPressed: () => {
-                                
-                            //     Navigator.pop(context, true),
-                            //     Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (context) =>
-                            //         EditFollowScreen(idFollow: record.id),
-                            //   ),
-                            // )
-                              },
+                                    //     Navigator.pop(context, true),
+                                    //     Navigator.push(
+                                    //   context,
+                                    //   MaterialPageRoute(
+                                    //     builder: (context) =>
+                                    //         EditFollowScreen(idFollow: record.id),
+                                    //   ),
+                                    // )
+                                  },
                               child: const Text('Sí')),
                         ],
                       ),
@@ -190,13 +197,8 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
                   }
                 },
 
-                child: recordTile(
-                  context,
-                  record,
-                  colors.primary,
-                  creacionDateFormat,
-                  formattedTime
-                ),
+                child: recordTile(context, record, colors.primary,
+                    creacionDateFormat, formattedTime),
               );
             },
           );
@@ -208,35 +210,71 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
   @override
   Widget build(BuildContext context) {
     final isDarkmode = ref.watch(isDarkModeProvider);
+    final colors = Theme.of(context).colorScheme;
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Listado de registros'),
-          actions: [
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AddRecordScreen(followID: widget.followID),
-                      ),
-                    );
-                  },
+      appBar: AppBar(
+        title: const Text('Listado de registros'),
+        actions: [
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          AddRecordScreen(followID: widget.followID),
+                    ),
+                  );
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.refresh),
+                onPressed: () {
+                  setState(() {}); // Refresca la pantalla al presionar el botón
+                },
+              ),
+            ],
+          )
+        ],
+      ),
+      body: buildRecordsList(),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          // 🔹 Botón ver gráfica
+          FloatingActionButton(
+            heroTag: "grafica",
+            onPressed: () {
+              // navegar a tu screen de gráfica
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      GraphRecordScreen(followID: widget.followID),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.refresh),
-                  onPressed: () {
-                    setState(
-                        () {}); // Refresca la pantalla al presionar el botón
-                  },
-                ),
-              ],
-            )
-          ],
-        ),
-        body: buildRecordsList());
+              );
+            },
+            child: const Icon(Icons.show_chart),
+          ),
+
+          const SizedBox(height: 12),
+
+          FloatingActionButton(
+            heroTag: "back",
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: colors.primary,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -281,7 +319,9 @@ Widget recordTile(BuildContext context, Records record, Color tagColor,
         children: [
           Expanded(
             child: Text(
-              record.dayNumber == 0 ? 'Día de la siembra' : 'Día ${record.dayNumber}',
+              record.dayNumber == 0
+                  ? 'Día de la siembra'
+                  : 'Día ${record.dayNumber}',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),

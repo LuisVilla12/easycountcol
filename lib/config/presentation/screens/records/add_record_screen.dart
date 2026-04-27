@@ -265,7 +265,7 @@ class _ViewCameraState extends State<_ViewCamera>
                             // Ocultar spinner si la respuesta no es exitosa
                              Navigator.of(context).pop();
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Error al registrar la muestra: ${result['message']}")),
+                              SnackBar(content: Text(" ${result['message']}")),
                             );
                           }
                           // cerrar la carga
@@ -276,7 +276,7 @@ class _ViewCameraState extends State<_ViewCamera>
                           // Ocultar spinner si ocurre un error
                         Navigator.of(context).pop();
                         ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Error al subir la muestra: $e")),
+                        SnackBar(content: Text("Error: $e")),
                         );
                         }
                       }

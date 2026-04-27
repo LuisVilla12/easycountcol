@@ -16,12 +16,14 @@ import 'package:easycoutcol/config/presentation/screens/follows/follows_screen.d
 import 'package:easycoutcol/config/presentation/screens/records/add_record_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/records/records_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/records/show_record_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/records/graph_record_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/records/edit_record_screen.dart';
 
 import 'package:go_router/go_router.dart';
 
 // Definir rutas
 final appRouter = GoRouter(
-  initialLocation: '/home',
+  initialLocation: '/login',
   routes: [
     GoRoute(
       path: '/splash',
@@ -63,7 +65,6 @@ final appRouter = GoRouter(
           final id = int.parse(state.pathParameters['id']!);
           return EditFollowScreen(idFollow: id);
         }),
-    
     //Ver los records que tiene un follow
     GoRoute(
         path: '/follows/records:id',
@@ -74,10 +75,10 @@ final appRouter = GoRouter(
         }),
     //Crear un nuevo seguimiento
     GoRoute(
-        path: '/add-Follow',
-        name: AddFollowScreen.name,
-        builder: (context, state) => const AddFollowScreen(),
-        ),
+      path: '/add-Follow',
+      name: AddFollowScreen.name,
+      builder: (context, state) => const AddFollowScreen(),
+    ),
     //Registrar records al follows
     GoRoute(
         path: '/add_record:id',
@@ -130,5 +131,19 @@ final appRouter = GoRouter(
       name: HelpScreen.name,
       builder: (context, state) => const HelpScreen(),
     ),
+    GoRoute(
+        path: '/graph/follows:id',
+        name: GraphRecordScreen.name,
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return GraphRecordScreen(followID: id);
+        }),
+    GoRoute(
+        path: '/editRecord:id',
+        name: EditRecordScreen.name,
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return EditRecordScreen(idMuestra: id);
+        }),
   ],
 );

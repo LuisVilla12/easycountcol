@@ -57,7 +57,7 @@ class _ShowRecordScreenState extends State<ShowRecordScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: true, // Desactiva el botón de retroceso
         foregroundColor: Colors.white,
-        title: const Text('Detalles de la muestra', style: TextStyle(color: Colors.white)),
+        title: const Text('Detalles', style: TextStyle(color: Colors.white)),
         backgroundColor: colors.primary,
       ),
       body: FutureBuilder<Map<String, dynamic>>(
