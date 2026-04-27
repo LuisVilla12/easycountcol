@@ -4,7 +4,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-
 class ResultsScreen extends StatefulWidget {
   static const String name = 'results_screen';
 
@@ -94,78 +93,33 @@ class _ResultsScreenState extends State<ResultsScreen> {
                         _infoItem(Icons.timer, 'Hora de realización',
                             resultado.formattedTime),
                         const SizedBox(height: 12),
-                        _infoItem(Icons.science, 'Tipo de muestra',
-                            resultado.typeSample),
-                        const SizedBox(height: 12),
-                        _infoItem(Icons.local_drink, 'Factor de dilución',
-                            resultado.factorSample),
-                        const SizedBox(height: 12),
-                        _infoItem(Icons.water, 'Volumen de la muestra',
-                            resultado.volumenSample),
-                        const SizedBox(height: 12),
-                        _infoItem(Icons.trending_up, 'Medio de crecimiento',
-                            resultado.medioSample),
-                        const SizedBox(height: 12),
                         _infoItem(
                             Icons.zoom_in_sharp,
                             'Unidades formadoras de colonias',
                             resultado.count.toString()),
+                        _infoItem(
+                            Icons.grading_outlined,
+                            'Cantidad de clusters óptimos',
+                            resultado.optimalClusters.toString()),
+                        const Text(
+                          'Distribución por clusters:',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        _buildClusters(resultado.clustersDetail),
                         const SizedBox(height: 12),
                         _processingTimeItem(resultado.processingTime),
                         const SizedBox(height: 12),
 
-                        // Imagen Original
-                        // Padding(
-                        //   padding: const EdgeInsets.symmetric(horizontal: 10),
-                        //   child: Column(
-                        //     crossAxisAlignment: CrossAxisAlignment.start,
-                        //     children: [
-                        //       const Text(
-                        //         'Imagen original:',
-                        //         style: TextStyle(
-                        //           fontSize: 20,
-                        //           fontWeight: FontWeight.bold,
-                        //           color: Colors.white,
-                        //         ),
-                        //       ),
-                        //       const SizedBox(height: 10),
-                        //       ClipRRect(
-                        //         borderRadius: BorderRadius.circular(12),
-                        //         child: Image.memory(
-                        //           resultado.originalImage,
-                        //           fit: BoxFit.cover,
-                        //         ),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
-                        // const SizedBox(height: 10),
-
-                        // Imagen procesada
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 5),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Imagen procesada:',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.memory(
-                                  resultado.processedImage,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                        
+                        const SizedBox(height: 10),
+                        
                       ],
                     ),
                   ),
@@ -272,5 +226,48 @@ Widget _processingTimeItem(double time) {
         ),
       ),
     ],
+  );
+}
+
+Widget _buildClusters(Map<String, dynamic> clusters) {
+  if (clusters.isEmpty) {
+    return const Text(
+      'No hay datos de clusters',
+      style: TextStyle(color: Colors.white),
+    );
+  }
+
+  final sortedKeys = clusters.keys.toList()
+    ..sort((a, b) => int.parse(a).compareTo(int.parse(b)));
+
+  return Column(
+    children: sortedKeys.map((key) {
+      final data = clusters[key];
+
+      return Container(
+        margin: const EdgeInsets.symmetric(vertical: 5),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Cluster $key',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text('Colonias: ${data['count']}'),
+                Text('Porcentaje: ${data['percentage']}%'),
+              ],
+            )
+          ],
+        ),
+      );
+    }).toList(),
   );
 }

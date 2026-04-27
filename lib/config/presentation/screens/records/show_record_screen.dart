@@ -1,4 +1,3 @@
-import 'package:easycoutcol/app/resultadoMuestra.dart';
 import 'package:easycoutcol/app/resultadoRecord.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';

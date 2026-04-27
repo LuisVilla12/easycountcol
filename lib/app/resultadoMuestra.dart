@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:intl/intl.dart';
-
+import 'dart:convert';
 class ResultadoMuestra {
   final int id;
   final Uint8List originalImage;
@@ -15,6 +15,10 @@ class ResultadoMuestra {
   final int count;
   final String medioSample;
   final String formattedTime;
+  final int optimalClusters;
+  // final String clustersDetail;
+    final Map<String, dynamic> clustersDetail; // ✅ cambiado
+
 
   ResultadoMuestra({
     required this.id,
@@ -29,6 +33,8 @@ class ResultadoMuestra {
     required this.count,
     required this.medioSample,
     required this.formattedTime,
+    required this.optimalClusters,
+    required this.clustersDetail,
   });
 
   factory ResultadoMuestra.fromMap(Map<String, dynamic> data) {
@@ -53,6 +59,11 @@ class ResultadoMuestra {
       count: sample[9],
       medioSample: sample[11],
       formattedTime: formattedTime,
+      optimalClusters: sample[13],
+      // clustersDetail: sample[14],
+      clustersDetail: sample[14] != null
+          ? jsonDecode(sample[14])
+          : {},
     );
   }
 }
