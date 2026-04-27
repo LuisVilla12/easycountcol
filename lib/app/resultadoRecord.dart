@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:intl/intl.dart';
+import 'dart:convert';
 
 class ResultadoRecord {
   final int id;
@@ -11,6 +12,9 @@ class ResultadoRecord {
   final int count;
   final int dayNumber;
   final String formattedTime;
+  final int optimalClusters;
+  final Map<String, dynamic> clustersDetail;
+
 
   ResultadoRecord({
     required this.id,
@@ -21,6 +25,8 @@ class ResultadoRecord {
     required this.count,
     required this.dayNumber,
     required this.formattedTime,
+    required this.optimalClusters,
+    required this.clustersDetail,
   });
 
   factory ResultadoRecord.fromMap(Map<String, dynamic> data) {
@@ -40,6 +46,10 @@ class ResultadoRecord {
       dateSample: record[6],
       processingTime: record[8],
       formattedTime: formattedTime,
+      optimalClusters: record[10],
+      clustersDetail: record[9] != null
+          ? jsonDecode(record[9])
+          : {},
     );
   }
 }

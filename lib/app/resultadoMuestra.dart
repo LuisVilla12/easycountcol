@@ -16,8 +16,7 @@ class ResultadoMuestra {
   final String medioSample;
   final String formattedTime;
   final int optimalClusters;
-  // final String clustersDetail;
-    final Map<String, dynamic> clustersDetail; // ✅ cambiado
+  final Map<String, dynamic> clustersDetail;
 
 
   ResultadoMuestra({
@@ -60,7 +59,6 @@ class ResultadoMuestra {
       medioSample: sample[11],
       formattedTime: formattedTime,
       optimalClusters: sample[13],
-      // clustersDetail: sample[14],
       clustersDetail: sample[14] != null
           ? jsonDecode(sample[14])
           : {},

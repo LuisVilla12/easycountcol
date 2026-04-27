@@ -120,41 +120,20 @@ class _ResultsScreenState extends State<ResultsScreen> {
                       _processingTimeItem(resultado.processingTime),
 
                       const SizedBox(height: 20),
-
-                      // 📸 IMAGEN
-                      // const Text(
-                      //   'Imagen procesada',
-                      //   style: TextStyle(
-                      //     fontSize: 16,
-                      //     fontWeight: FontWeight.bold,
-                      //     color: Colors.white,
-                      //   ),
-                      // ),
-                      // const SizedBox(height: 10),
-
-                      // ClipRRect(
-                      //   borderRadius: BorderRadius.circular(12),
-                      //   child: Image.memory(
-                      //     resultado.processedImage,
-                      //     fit: BoxFit.cover,
-                      //   ),
-                      // ),
                       SingleChildScrollView(
-  scrollDirection: Axis.horizontal,
-  child: Row(
-    children: [
-
-      _imageCard('Muestra Procesada', resultado.processedImage),
-
-      const SizedBox(width: 12),
-
-      _imageCard('Imagen Original', resultado.originalImage),
-    ],
-  ),
-),
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            _imageCard(
+                                'Muestra Procesada', resultado.processedImage),
+                            const SizedBox(width: 12),
+                            _imageCard(
+                                'Imagen Original', resultado.originalImage),
+                          ],
+                        ),
+                      ),
                       const SizedBox(height: 20),
 
-                      // 📊 CLUSTERS
                       const Text(
                         'Distribución de colonias',
                         style: TextStyle(
@@ -188,9 +167,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 }
 
-
 Widget _infoChip(IconData icon, String label, String value) {
-  
   return Container(
     padding: const EdgeInsets.all(10),
     decoration: BoxDecoration(
@@ -284,7 +261,8 @@ Widget _buildClustersPro(Map<String, dynamic> clusters) {
                 value: percentage / 100,
                 minHeight: 8,
                 backgroundColor: Colors.grey.shade300,
-                color: colors[int.parse(key) % colors.length], // Color dinámico por cluster
+                color: colors[int.parse(key) %
+                    colors.length], // Color dinámico por cluster
               ),
             ),
 
@@ -355,6 +333,7 @@ Widget _processingTimeItem(double time) {
     ],
   );
 }
+
 Widget _imageCard(String title, image) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
