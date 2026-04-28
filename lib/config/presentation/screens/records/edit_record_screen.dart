@@ -1,31 +1,30 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:easycoutcol/app/resultadoRecord.dart';
-import 'package:easycoutcol/app/updatesRecords.dart';
+
 import 'package:easycoutcol/config/presentation/wigets/input_custom.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:easycoutcol/config/functions/dialog_helper.dart';
+import 'package:easycoutcol/app/showRecord.dart';
+
 
 class EditRecordScreen extends StatefulWidget {
-  static const String name = 'edit_record';
-  final int idMuestra;
-  const EditRecordScreen({super.key, required this.idMuestra});
+  static const String name = 'edit_record_screen';
+  final int idRecord;
+  const EditRecordScreen({super.key, required this.idRecord});
 
   @override
   State<EditRecordScreen> createState() => _EditRecordScreenState();
 }
 
 class _EditRecordScreenState extends State<EditRecordScreen> {
-  final GlobalKey<FormState> formKeySample = GlobalKey<FormState>();
+  final GlobalKey<FormState> formKeyFollow = GlobalKey<FormState>();
   final TextEditingController idRecordController = TextEditingController();
   final TextEditingController dayNumberController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final TextEditingController timeController = TextEditingController();
-  
-  String imagePath = '';
 
   late Future<Map<String, dynamic>> data;
   @override
@@ -48,56 +47,23 @@ class _EditRecordScreenState extends State<EditRecordScreen> {
     dayNumberController.clear();
     dateController.clear();
     timeController.clear();
-    imagePath = '';
-    setState(() {
-    });
   }
 
   Future<Map<String, dynamic>> fetchData() async {
     final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:8000';
-    final originalUrl = '$apiUrl/record/imagen-original/${widget.idMuestra}';
-    final processedUrl = '$apiUrl/record/imagen-inferencia/${widget.idMuestra}';
-    final infoUrl = '$apiUrl/record-info/${widget.idMuestra}';
+    final infoUrl = '$apiUrl/record-show/${widget.idRecord}';
 
     final responses = await Future.wait([
-      http.get(Uri.parse(originalUrl)),
-      http.get(Uri.parse(processedUrl)),
       http.get(Uri.parse(infoUrl)),
     ]);
 
     if (responses.any((res) => res.statusCode != 200)) {
       throw Exception('Error al cargar datos');
     }
-
-    final originalImage = responses[0].bodyBytes;
-    final processedImage = responses[1].bodyBytes;
-    final sample = jsonDecode(responses[2].body);
+    final record = jsonDecode(responses[0].body);
     return {
-      'originalImage': originalImage,
-      'processedImage': processedImage,
-      'sample': sample['sample'],
+      'record': record['record'],
     };
-  }
-
-  Widget showImageView() {
-    if (imagePath == '') return const SizedBox.shrink();
-    final file = File(imagePath);
-    if (!file.existsSync()) {
-      return const Padding(
-        padding: EdgeInsets.only(top: 20),
-        child: Text("La imagen no existe o no se pudo cargar."),
-      );
-    }
-
-    return Padding(
-      padding: const EdgeInsets.only(top: 20),
-      child: Image.file(
-        file,
-        width: 200,
-        height: 200,
-        fit: BoxFit.cover,
-      ),
-    );
   }
 
   @override
@@ -107,8 +73,8 @@ class _EditRecordScreenState extends State<EditRecordScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: true, // Desactiva el botón de retroceso
         foregroundColor: Colors.white,
-        title:
-            const Text('Editar Muestra', style: TextStyle(color: Colors.white)),
+        title: const Text('Editar Seguimiento',
+            style: TextStyle(color: Colors.white)),
         backgroundColor: colors.primary,
       ),
       body: FutureBuilder<Map<String, dynamic>>(
@@ -120,17 +86,17 @@ class _EditRecordScreenState extends State<EditRecordScreen> {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (snapshot.hasData) {
             // Usamos el modelo para parsear los datos
-            final resultado = ResultadoRecord.fromMap(snapshot.data!);
+            final resultado = ShowRecord.fromMap(snapshot.data!);
             // Asignar el valor por defecto si aún no se ha seleccionado
             idRecordController.text = resultado.id.toString();
-            dayNumberController.text = 1.toString();           
-            timeController.text = resultado.formattedTime;
+            dayNumberController.text =  resultado.dayNumber.toString();
+            // timeController.text = resultado.formattedTime;
             dateController.text = resultado.dateSample;
 
             return SingleChildScrollView(
               padding: const EdgeInsets.all(4),
               child: Form(
-                key: formKeySample,
+                key: formKeyFollow,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -143,7 +109,7 @@ class _EditRecordScreenState extends State<EditRecordScreen> {
                         children: [
                           //Nombre de la muestra
                           InputCustom(
-                            labelInput: 'Número de día',
+                            labelInput: 'Día del seguimiento',
                             iconInput: Icon(Icons.label_important,
                                 color: colors.primary),
                             controller: dayNumberController,
@@ -195,22 +161,7 @@ class _EditRecordScreenState extends State<EditRecordScreen> {
                             height: 20,
                           ),
                           // Imagen Original
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(height: 10),
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Image.memory(
-                                    resultado.originalImage,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+
                           const SizedBox(height: 30),
                           SizedBox(
                               width: double.infinity,
@@ -219,13 +170,13 @@ class _EditRecordScreenState extends State<EditRecordScreen> {
                                   return FilledButton.icon(
                                     onPressed: () async {
                                       // Solicita al usuario la confirmación antes de registrar la muestra
-                                      final confirmSendSample =
+                                      final confirmSendFollow =
                                           await showDialog<bool>(
                                         context: context,
                                         builder: (context) => AlertDialog(
                                           title: const Text('Confirmar'),
                                           content: const Text(
-                                              '¿Deseas actualizar la muestra?'),
+                                              '¿Deseas actualizar el seguimiento?'),
                                           actions: [
                                             TextButton(
                                               onPressed: () =>
@@ -242,21 +193,23 @@ class _EditRecordScreenState extends State<EditRecordScreen> {
                                           ],
                                         ),
                                       );
-                                      if (confirmSendSample == true) {
-                                        final isValid = formKeySample
+                                      if (confirmSendFollow == true) {
+                                        final isValid = formKeyFollow
                                             .currentState!
                                             .validate();
                                         if (!isValid) return;
-                                        
-                                        if (!context.mounted) return;
                                         try {
-                                          final result = await updateRecord(
-                                            recordID: int.parse(
-                                                idRecordController.text),
-                                            dayNumber:
-                                                dayNumberController.text,
-                                          );
-                                          if (result['success']) {
+                                          final result = true;
+                                          // await updatesFollow(
+                                          //   followID: int.parse(
+                                          //       idFollowController.text),
+                                          //   followName:
+                                          //       nameFollowController.text,
+                                          //   followDescription:
+                                          //       descripcionFollowController
+                                          //           .text,
+                                          // );
+                                          if (result) {
                                             final res = await mostrarDialogo(
                                               context: context,
                                               titulo: "Éxito",
@@ -265,8 +218,8 @@ class _EditRecordScreenState extends State<EditRecordScreen> {
                                             );
 
                                             if (res == true) {
-                                              Navigator.of(context).pop(
-                                                  true); // ← regresa a pantalla anterior
+                                              Navigator.of(context).pop(true); 
+                                              
                                             }
                                           } else {
                                             await mostrarDialogo(
@@ -282,7 +235,7 @@ class _EditRecordScreenState extends State<EditRecordScreen> {
                                       }
                                     },
                                     icon: const Icon(Icons.save),
-                                    label: const Text('Actualizar muestra'),
+                                    label: const Text('Actualizar seguimiento'),
                                     style: FilledButton.styleFrom(
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 15, vertical: 15),
@@ -318,3 +271,4 @@ class _EditRecordScreenState extends State<EditRecordScreen> {
     );
   }
 }
+

@@ -143,7 +143,7 @@ final appRouter = GoRouter(
         name: EditRecordScreen.name,
         builder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
-          return EditRecordScreen(idMuestra: id);
+          return EditRecordScreen(idRecord: id);
         }),
   ],
 );

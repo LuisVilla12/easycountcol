@@ -1,6 +1,7 @@
 import 'package:easycoutcol/app/Records.dart';
 import 'package:easycoutcol/config/presentation/providers/theme_provider.dart';
 import 'package:easycoutcol/config/presentation/screens/records/add_record_screen.dart';
+import 'package:easycoutcol/config/presentation/screens/records/edit_record_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/records/show_record_screen.dart';
 import 'package:easycoutcol/config/presentation/screens/records/graph_record_screen.dart';
 import 'package:flutter/material.dart';
@@ -166,14 +167,12 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
                               child: const Text('No')),
                           TextButton(
                               onPressed: () => {
-                                    //     Navigator.pop(context, true),
-                                    //     Navigator.push(
-                                    //   context,
-                                    //   MaterialPageRoute(
-                                    //     builder: (context) =>
-                                    //         EditFollowScreen(idFollow: record.id),
-                                    //   ),
-                                    // )
+                                    Navigator.pop(context, true),
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => EditRecordScreen(idRecord: record.id)),
+                                    )
                                   },
                               child: const Text('Sí')),
                         ],
